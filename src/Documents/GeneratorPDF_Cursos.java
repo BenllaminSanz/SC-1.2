@@ -46,8 +46,8 @@ public class GeneratorPDF_Cursos extends Conexion {
         ResultSet rs;
         PreparedStatement ps1;
         ResultSet rs1;
-        
-                // Crear un JFileChooser para que el usuario elija la ubicación del archivo
+
+        // Crear un JFileChooser para que el usuario elija la ubicación del archivo
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Guardar Lista de Inducción");
 
@@ -151,15 +151,15 @@ public class GeneratorPDF_Cursos extends Conexion {
                 tabla1.setHorizontalAlignment(0);
                 doc.add(tabla1);
                 doc.close();
-                JOptionPane.showMessageDialog(null, "Archivo Creado en "+ rutaDoc);
-            
-            if (Desktop.isDesktopSupported()) {
-            Desktop desktop = Desktop.getDesktop();
-                if (desktop.isSupported(Desktop.Action.OPEN)) {
-                    // Abrir el documento
-                    desktop.open(new File(rutaDoc));
+                JOptionPane.showMessageDialog(null, "Archivo Creado en " + rutaDoc);
+
+                if (Desktop.isDesktopSupported()) {
+                    Desktop desktop = Desktop.getDesktop();
+                    if (desktop.isSupported(Desktop.Action.OPEN)) {
+                        // Abrir el documento
+                        desktop.open(new File(rutaDoc));
+                    }
                 }
-            }
                 return true;
             }
         } catch (DocumentException | FileNotFoundException ex) {
@@ -190,7 +190,7 @@ public class GeneratorPDF_Cursos extends Conexion {
         String Duracion = decimalFormat.format(HorasCursos);
 
         Document doc = new Document();
-        
+
         // Crear un JFileChooser para que el usuario elija la ubicación del archivo
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Guardar Lista de Asistencia");
@@ -321,17 +321,17 @@ public class GeneratorPDF_Cursos extends Conexion {
             pieTable.addCell(nameCell7);
             doc.add(pieTable);
             doc.close();
-            
-            JOptionPane.showMessageDialog(null, "Archivo Creado en "+ rutaDoc);
-            
+
+            JOptionPane.showMessageDialog(null, "Archivo Creado en " + rutaDoc);
+
             if (Desktop.isDesktopSupported()) {
-            Desktop desktop = Desktop.getDesktop();
+                Desktop desktop = Desktop.getDesktop();
                 if (desktop.isSupported(Desktop.Action.OPEN)) {
                     // Abrir el documento
                     desktop.open(new File(rutaDoc));
                 }
             }
-            
+
             return true;
         } catch (DocumentException | SQLException | IOException ex) {
             Logger.getLogger(GeneratorPDF_Cursos.class
@@ -371,7 +371,7 @@ public class GeneratorPDF_Cursos extends Conexion {
         }
 
         File fileToSave = fileChooser.getSelectedFile();
-        String rutaDoc = fileToSave.getAbsolutePath();        
+        String rutaDoc = fileToSave.getAbsolutePath();
 
         try {
             PdfWriter.getInstance(doc,
@@ -486,10 +486,10 @@ public class GeneratorPDF_Cursos extends Conexion {
             pieTable.addCell(nameCell7);
             doc.add(pieTable);
             doc.close();
-            JOptionPane.showMessageDialog(null, "Archivo Creado en "+ rutaDoc);
-            
+            JOptionPane.showMessageDialog(null, "Archivo Creado en " + rutaDoc);
+
             if (Desktop.isDesktopSupported()) {
-            Desktop desktop = Desktop.getDesktop();
+                Desktop desktop = Desktop.getDesktop();
                 if (desktop.isSupported(Desktop.Action.OPEN)) {
                     // Abrir el documento
                     desktop.open(new File(rutaDoc));
@@ -511,7 +511,7 @@ public class GeneratorPDF_Cursos extends Conexion {
         String FechaS = formatFecha.format(fecha);
 
         LocalDate fechaActual = LocalDate.now();
-        
+
         // Crear un JFileChooser para que el usuario elija la ubicación del archivo
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Guardar Reporte de Entrenamiento");
@@ -701,16 +701,16 @@ public class GeneratorPDF_Cursos extends Conexion {
                 doc.add(tablaPuesto);
             }
             doc.close();
-            JOptionPane.showMessageDialog(null, "Archivo Creado en "+ rutaDoc);
-            
+            JOptionPane.showMessageDialog(null, "Archivo Creado en " + rutaDoc);
+
             if (Desktop.isDesktopSupported()) {
-            Desktop desktop = Desktop.getDesktop();
+                Desktop desktop = Desktop.getDesktop();
                 if (desktop.isSupported(Desktop.Action.OPEN)) {
                     // Abrir el documento
                     desktop.open(new File(rutaDoc));
                 }
             }
-            
+
             return true;
         } catch (DocumentException | FileNotFoundException | SQLException e) {
             Logger.getLogger(GeneratorPDF_LBU.class.getName()).log(Level.SEVERE, null, e);
@@ -730,7 +730,7 @@ public class GeneratorPDF_Cursos extends Conexion {
         // Crear un JFileChooser para que el usuario elija la ubicación del archivo
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Guardar Reporte de Entrenamiento");
-        fileChooser.setSelectedFile(new File("Reporte de Entrenamiento "+ area + " " + FechaS + ".pdf")); // Nombre predeterminado del archivo
+        fileChooser.setSelectedFile(new File("Reporte de Entrenamiento " + area + " " + FechaS + ".pdf")); // Nombre predeterminado del archivo
 
         int userSelection = fileChooser.showSaveDialog(null);
 
@@ -913,10 +913,10 @@ public class GeneratorPDF_Cursos extends Conexion {
                 doc.add(tablaPuesto);
             }
             doc.close();
-            JOptionPane.showMessageDialog(null, "Archivo Creado en "+ rutaDoc);
-            
+            JOptionPane.showMessageDialog(null, "Archivo Creado en " + rutaDoc);
+
             if (Desktop.isDesktopSupported()) {
-            Desktop desktop = Desktop.getDesktop();
+                Desktop desktop = Desktop.getDesktop();
                 if (desktop.isSupported(Desktop.Action.OPEN)) {
                     // Abrir el documento
                     desktop.open(new File(rutaDoc));
@@ -941,7 +941,7 @@ public class GeneratorPDF_Cursos extends Conexion {
         // Crear un JFileChooser para que el usuario elija la ubicación del archivo
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Guardar Reporte de Entrenamiento");
-        fileChooser.setSelectedFile(new File("Reporte de Entrenamiento "+ area + " Turno " + turno + " " + FechaS + ".pdf")); // Nombre predeterminado del archivo
+        fileChooser.setSelectedFile(new File("Reporte de Entrenamiento " + area + " Turno " + turno + " " + FechaS + ".pdf")); // Nombre predeterminado del archivo
 
         int userSelection = fileChooser.showSaveDialog(null);
 
@@ -1051,10 +1051,10 @@ public class GeneratorPDF_Cursos extends Conexion {
             }
             doc.newPage();
             doc.close();
-            JOptionPane.showMessageDialog(null, "Archivo Creado en "+ rutaDoc);
-            
+            JOptionPane.showMessageDialog(null, "Archivo Creado en " + rutaDoc);
+
             if (Desktop.isDesktopSupported()) {
-            Desktop desktop = Desktop.getDesktop();
+                Desktop desktop = Desktop.getDesktop();
                 if (desktop.isSupported(Desktop.Action.OPEN)) {
                     // Abrir el documento
                     desktop.open(new File(rutaDoc));

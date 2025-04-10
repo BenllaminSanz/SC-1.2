@@ -5,6 +5,7 @@ import Functions.DateTools;
 import Model.Trabajador;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -258,7 +259,20 @@ public class ConsultasTrabajador extends Conexion {
     //Funcion de Registro para Trabajadores a travez de archivo Excel
     public boolean cargarExcel(String file, int option) {
         Properties propiedades = new Properties();
-        try (FileInputStream fis = new FileInputStream("configExcelT.properties")) {
+        File archivoConfig = new File("configIndiceT.properties");
+        if (!archivoConfig.exists()) {
+            try (FileOutputStream fos = new FileOutputStream(archivoConfig)) {
+                // Puedes escribir propiedades por defecto aquí si deseas:
+                Properties defaultProps = new Properties();
+                // Ejemplo: defaultProps.setProperty("nivel1", "Básico");
+                defaultProps.store(fos, "Archivo de configuración creado automáticamente");
+            } catch (IOException ex) {
+                Logger.getLogger(ConsultasTrabajador.class.getName()).log(Level.SEVERE, "No se pudo crear el archivo de configuración", ex);
+                return false;
+            }
+        }
+
+        try (FileInputStream fis = new FileInputStream(archivoConfig)) {
             propiedades.load(fis);
         } catch (IOException ex) {
             Logger.getLogger(ConsultasTrabajador.class.getName()).log(Level.SEVERE, "No se pudo cargar el archivo de configuración", ex);
@@ -275,7 +289,7 @@ public class ConsultasTrabajador extends Conexion {
         int indiceImss = Integer.parseInt(propiedades.getProperty("indice.imss"));
         int indiceEmail = Integer.parseInt(propiedades.getProperty("indice.email"));
         int indiceTelefono = Integer.parseInt(propiedades.getProperty("indice.telefono"));
-        try (FileInputStream fis = new FileInputStream("configExcelT.properties")) {
+        try (FileInputStream fis = new FileInputStream("configIndiceT.properties")) {
             propiedades.load(fis);
         } catch (IOException ex) {
             Logger.getLogger(ConsultasTrabajador.class.getName()).log(Level.SEVERE, "No se pudo cargar el archivo de configuración", ex);
@@ -305,7 +319,7 @@ public class ConsultasTrabajador extends Conexion {
 
         try {
             Sheet hoja = getWorkbook(file);
-            int numFilas = hoja.getLastRowNum()-1;
+            int numFilas = hoja.getLastRowNum() - 1;
 
             for (int a = 3; a <= numFilas; a++) {
                 Row fila = hoja.getRow(a);
@@ -400,7 +414,7 @@ public class ConsultasTrabajador extends Conexion {
 
     public boolean modificarExcel(int folio, Row fila) {
         Properties propiedades = new Properties();
-        try (FileInputStream fis = new FileInputStream("configExcelT.properties")) {
+        try (FileInputStream fis = new FileInputStream("configIndiceT.properties")) {
             propiedades.load(fis);
         } catch (IOException ex) {
             Logger.getLogger(ConsultasTrabajador.class.getName()).log(Level.SEVERE, "No se pudo cargar el archivo de configuración", ex);
@@ -417,7 +431,7 @@ public class ConsultasTrabajador extends Conexion {
         int indiceImss = Integer.parseInt(propiedades.getProperty("indice.imss"));
         int indiceEmail = Integer.parseInt(propiedades.getProperty("indice.email"));
         int indiceTelefono = Integer.parseInt(propiedades.getProperty("indice.telefono"));
-        try (FileInputStream fis = new FileInputStream("configExcelT.properties")) {
+        try (FileInputStream fis = new FileInputStream("configIndiceT.properties")) {
             propiedades.load(fis);
         } catch (IOException ex) {
             Logger.getLogger(ConsultasTrabajador.class.getName()).log(Level.SEVERE, "No se pudo cargar el archivo de configuración", ex);
@@ -561,7 +575,7 @@ public class ConsultasTrabajador extends Conexion {
 
             if (rs.next()) {
                 status = rs.getString("Status_Trabajador");
-                System.out.println("x"+status);
+                System.out.println("x" + status);
                 return status;
             }
         } catch (SQLException ex) {

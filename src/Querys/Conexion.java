@@ -13,7 +13,7 @@ public class Conexion {
     //Variables para iniciar la conexion 
     //Variables locales
     Connection conn = null;
-    static String bd = "sistema_capacitacion_dump";
+    static String bd = "sistema_capacitacion";
     static String host = "localhost"; /* "10.102.128.80" */
 
     static int port = 3306;

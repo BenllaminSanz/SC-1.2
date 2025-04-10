@@ -4,15 +4,17 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
 public class ConfiguracionColumnasExcelTrabajadores extends JFrame {
+
     private JTextField txtFolio, txtNombre, txtSalario, txtFechaAntiguedad, txtFechaCumpleanos, txtCurp, txtRfc, txtImss, txtEmail, txtTelefono;
     private JButton btnGuardar, btnCancelar;
-    private Properties propiedades;
+    private final Properties propiedades;
 
     public ConfiguracionColumnasExcelTrabajadores() {
         // Configuración de la ventana
@@ -99,10 +101,27 @@ public class ConfiguracionColumnasExcelTrabajadores extends JFrame {
     }
 
     private void cargarPropiedades() {
-        try (FileInputStream fis = new FileInputStream("configIndiceT.properties")) {
+        File archivoConfig = new File("configIndiceT.properties");
+
+        if (!archivoConfig.exists()) {
+            try (FileOutputStream fos = new FileOutputStream(archivoConfig)) {
+                Properties propiedadesPorDefecto = new Properties();
+                // Puedes definir propiedades predeterminadas si lo deseas:
+                // propiedadesPorDefecto.setProperty("indiceInicial", "1000");
+
+                propiedadesPorDefecto.store(fos, "Archivo de configuración creado automáticamente");
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(this, "No se pudo crear el archivo de configuración.", "Error", JOptionPane.ERROR_MESSAGE);
+                ex.printStackTrace();
+                return;
+            }
+        }
+
+        try (FileInputStream fis = new FileInputStream(archivoConfig)) {
             propiedades.load(fis);
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(this, "No se pudo cargar el archivo de configuración.", "Error", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
         }
     }
 

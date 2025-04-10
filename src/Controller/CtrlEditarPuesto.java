@@ -52,6 +52,22 @@ public class CtrlEditarPuesto implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         //Función del botón Guardar
         if (e.getSource() == frm.btn_guardar && frm.btn_guardar.getText().equals("Guardar")) {
+
+            // Validación de campos vacíos
+            if (frm.txt_Puesto.getText().trim().isEmpty()
+                    || frm.txt_PuestoIngles.getText().trim().isEmpty()
+                    || frm.txt_nivel.getText().trim().isEmpty()
+                    || frm.txt_centrocosto.getText().trim().isEmpty()
+                    || frm.txt_totaltbr.getText().trim().isEmpty()
+                    || frm.txt_totalturno_tbr.getText().trim().isEmpty()
+                    || frm.cb_AreaPuesto.getSelectedItem() == null
+                    || frm.cb_AreaPuesto.getSelectedItem().toString().trim().isEmpty()) {
+
+                JOptionPane.showMessageDialog(null, "Por favor, llena todos los campos antes de guardar.", "Campos vacíos", JOptionPane.WARNING_MESSAGE);
+                return; // Evita continuar si hay campos vacíos
+            }
+
+            // Si pasa la validación, se guardan los datos
             mod.setNombre_Puesto(frm.txt_Puesto.getText());
             mod.setNombre_Puesto_Ingles(frm.txt_PuestoIngles.getText());
             mod.setDescripcion(frm.txt_descPuesto.getText());
@@ -63,7 +79,6 @@ public class CtrlEditarPuesto implements ActionListener {
             mod.setArea_idArea(Integer.parseInt(QueryFunctions.CapturaCondicionalSimple(
                     "area", "idArea", "Nombre_Area", area)));
 
-            //Llamada a la funcion de modificar enviando los datos guardados en la instacia
             if (modC.registrar(mod)) {
                 JOptionPane.showMessageDialog(null, "Puesto agregado");
                 DesignTabla.designPuestosArea(frmA, mod.getArea_idArea());

@@ -321,7 +321,11 @@ public class CtrlTrabajador implements ActionListener, KeyListener, MouseListene
             // Obtener la fecha seleccionada si se presionó el botón "OK"
             if (option == JOptionPane.OK_OPTION) {
                 String fechaInicio = DateTools.StringtoMySQL(((JTextField) dateChooserIn.getDateEditor().getUiComponent()).getText());
-                GeneratorPDF_LBU.Nuevos_Trabajadores(fechaInicio);
+                try {
+                    GeneratorPDF_LBU.Nuevos_Trabajadores(fechaInicio);
+                } catch (SQLException ex) {
+                    Logger.getLogger(CtrlTrabajador.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
 
@@ -457,7 +461,6 @@ public class CtrlTrabajador implements ActionListener, KeyListener, MouseListene
                     frmTrabajador.jTable_Trabajadores.getSelectedRow(), 0).toString();
             String status = frmTrabajador.grupoStatus.getSelection().getActionCommand();
             modTrabajador.setFolio_Trabajador(folio);
-            System.out.println(status);
             conTrabajador.modificarStatus(modTrabajador, status);
             DesignTabla.designTrabajador(frmTrabajador);
             actualizarVistaTrabajador();

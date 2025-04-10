@@ -34,6 +34,7 @@ public class ConsultasPuesto extends Conexion {
             ps.setInt(6, tbr.getPropuesto_Trabajadores());
             ps.setInt(7, tbr.getPropuesto_Turno());
             ps.setInt(8, tbr.getArea_idArea());
+            System.out.println(ps);
             ps.execute();
             return true;
 

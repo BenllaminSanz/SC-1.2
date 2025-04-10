@@ -41,7 +41,7 @@ public class GeneratorPDF_Certificados extends Conexion {
         Date fecha = new Date();
         SimpleDateFormat formatFecha = new SimpleDateFormat("dd-MM-yyyy");
         String FechaS = formatFecha.format(fecha);
-        
+
         // Crear un JFileChooser para que el usuario elija la ubicación del archivo
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Guardar Matriz de Certificados Operativos");
@@ -73,6 +73,22 @@ public class GeneratorPDF_Certificados extends Conexion {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
+                String idArea = rs.getString("idArea");
+
+                // NUEVO BLOQUE DE VALIDACIÓN
+                PreparedStatement validarAreaCursos = con.prepareStatement(
+                        "SELECT 1 FROM sistema_capacitacion.view_asistentes_cursos vac "
+                        + "JOIN view_trabajador vt ON vac.idAsistentes_Curso = vt.Folio_Trabajador "
+                        + "JOIN certificado_puesto cp ON vac.id_Certificado = cp.certificado_idCertificado "
+                        + "JOIN puesto p ON cp.puesto_idPuesto = p.idPuesto "
+                        + "WHERE p.area_idArea = ? AND vac.id_tipocurso = 2 AND vac.status_entrenamiento != 'Concluido' LIMIT 1"
+                );
+                validarAreaCursos.setString(1, idArea);
+                ResultSet rsValidaArea = validarAreaCursos.executeQuery();
+                if (!rsValidaArea.next()) {
+                    continue; // Saltar esta área si no tiene cursos activos
+                }
+                
                 Image logo = Image.getInstance(ClassLoader.getSystemResource("Images/LogoParkdale.png"));
                 logo.scalePercent(40F);
                 logo.setAlignment(0);
@@ -81,8 +97,7 @@ public class GeneratorPDF_Certificados extends Conexion {
                 doc.add(new Paragraph("Reporte de Certificados", font1));
                 doc.add(new Paragraph("Área: " + rs.getString("nombre_Area")));
                 doc.add(new Paragraph("\n"));
-
-                String idArea = rs.getString("idArea");
+                
                 String columns = QueryFunctions.CapturaDirecta("SELECT count(*) FROM turno;");
                 PreparedStatement ps1 = con.prepareStatement("SELECT * FROM turno");
                 ResultSet rs1 = ps1.executeQuery();
@@ -118,6 +133,21 @@ public class GeneratorPDF_Certificados extends Conexion {
                 ResultSet rs2 = ps2.executeQuery();
                 while (rs2.next()) {
                     String idPuesto = rs2.getString("idPuesto");
+
+                    PreparedStatement validarEntrenamiento = con.prepareStatement(
+                            "SELECT 1 FROM sistema_capacitacion.view_asistentes_cursos vac "
+                            + "JOIN view_trabajador vt ON vac.idAsistentes_Curso = vt.Folio_Trabajador "
+                            + "WHERE vac.id_Certificado IN (SELECT certificado_idCertificado FROM certificado_puesto cp WHERE cp.puesto_idPuesto = ?) "
+                            + "AND vt.idArea = ? AND vac.id_tipocurso = 2 AND vac.status_entrenamiento != 'Concluido' LIMIT 1");
+                    validarEntrenamiento.setString(1, idPuesto);
+                    validarEntrenamiento.setString(2, idArea);
+                    ResultSet validarRs = validarEntrenamiento.executeQuery();
+
+                    if (!validarRs.next()) {
+                        System.out.println(idPuesto + " Esta vacio");
+                        continue; // No hay asistentes en entrenamiento, saltar este puesto
+                    }
+
                     String puesto = QueryFunctions.CapturaCondicional("puesto", "nombre_puesto", "idPuesto", idPuesto);
                     BaseColor color = new BaseColor(175, 196, 174);
                     table.addCell(createHeaderCell(puesto, font, color, 4));
@@ -213,7 +243,7 @@ public class GeneratorPDF_Certificados extends Conexion {
         Date fecha = new Date();
         SimpleDateFormat formatFecha = new SimpleDateFormat("dd-MM-yyyy");
         String FechaS = formatFecha.format(fecha);
-        
+
         // Crear un JFileChooser para que el usuario elija la ubicación del archivo
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Guardar Matriz de Certificados Operativos Supervisores");
@@ -376,7 +406,7 @@ public class GeneratorPDF_Certificados extends Conexion {
                 doc.newPage();
             }
             doc.close();
-            
+
             JOptionPane.showMessageDialog(null, "Archivo Creado en " + rutaDoc);
             if (Desktop.isDesktopSupported()) {
                 Desktop desktop = Desktop.getDesktop();

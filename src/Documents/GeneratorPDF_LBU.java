@@ -40,7 +40,7 @@ public class GeneratorPDF_LBU extends Conexion {
     private static int cont = 0;
     private static final Conexion conn = new Conexion();
 
-    public static boolean Nuevos_Trabajadores(String fecha) {
+    public static boolean Nuevos_Trabajadores(String fecha) throws SQLException {
         Document doc = new Document();
         LocalDate fechaActual = LocalDate.now();
 
@@ -101,56 +101,53 @@ public class GeneratorPDF_LBU extends Conexion {
             tabla.addCell(new Phrase("SABADO \n" + DateTools.calcularFechas(6, fecha), font));
             tabla.addCell(new Phrase("DOMINGO \n" + DateTools.calcularFechas(7, fecha), font));
 
-            try {
-                Connection con = conn.getConnection();
-                PreparedStatement ps
-                        = con.prepareStatement("Select Folio_Trabajador, Nombre_Trabajador, turno.Nombre_Turno "
-                                + "from trabajador inner join turno "
-                                + "on trabajador.turno_idTurno=turno.idTurno where Fecha_Antiguedad = ?");
-                ps.setDate(1, java.sql.Date.valueOf(fecha));
-                ResultSet rs = ps.executeQuery();
+            Connection con = conn.getConnection();
+            PreparedStatement ps
+                    = con.prepareStatement("Select Folio_Trabajador, Nombre_Trabajador, turno.Nombre_Turno, "
+                            + "Teléfono_Trabajador  from trabajador inner join turno "
+                            + "on trabajador.turno_idTurno=turno.idTurno where Fecha_Antiguedad = ?");
+            ps.setDate(1, java.sql.Date.valueOf(fecha));
+            ResultSet rs = ps.executeQuery();
 
+            if (rs.next()) {
+                do {
+                    tabla.addCell(new Phrase(rs.getString(1), font));
+                    tabla.addCell(new Phrase(rs.getString(2), font));
+                    tabla.addCell("");
+                    tabla.addCell(new Phrase(rs.getString(3), font));
+                    tabla.addCell(new Phrase(rs.getString(4), font));
+                    tabla.addCell("");
+                    tabla.addCell("");
+                    tabla.addCell("");
+                    tabla.addCell("");
+                    tabla.addCell("");
+                    tabla.addCell("");
+                    tabla.addCell("");
+                    cont++;
+                } while (rs.next());
+                doc.add(tabla);
+                doc.add(new Phrase("\n"));
+                doc.add(new Phrase("Firma de enterado de asignación de turno."));
+
+                ps = con.prepareStatement("Select Nombre_Trabajador from trabajador "
+                        + "inner join turno on trabajador.turno_idTurno=turno.idTurno where Fecha_Antiguedad = ?");
+                ps.setDate(1, java.sql.Date.valueOf(fecha));
+                rs = ps.executeQuery();
+
+                float[] relativeWidths1 = {1F, 1F};
+                PdfPTable tabla1 = new PdfPTable(relativeWidths1);
+                tabla1.setWidthPercentage(50);
+                tabla1.getDefaultCell().setFixedHeight(20);
                 if (rs.next()) {
                     do {
-                        tabla.addCell(new Phrase(rs.getString(1), font));
-                        tabla.addCell(new Phrase(rs.getString(2), font));
-                        tabla.addCell("");
-                        tabla.addCell(new Phrase(rs.getString(3), font));
-                        tabla.addCell("");
-                        tabla.addCell("");
-                        tabla.addCell("");
-                        tabla.addCell("");
-                        tabla.addCell("");
-                        tabla.addCell("");
-                        tabla.addCell("");
-                        tabla.addCell("");
-                        cont++;
+                        tabla1.addCell(new Phrase(rs.getString(1), font));
+                        tabla1.addCell("");
                     } while (rs.next());
-                    doc.add(tabla);
-                    doc.add(new Phrase("\n"));
-                    doc.add(new Phrase("Firma de enterado de asignación de turno."));
-
-                    ps = con.prepareStatement("Select Nombre_Trabajador from trabajador "
-                            + "inner join turno on trabajador.turno_idTurno=turno.idTurno where Fecha_Antiguedad = ?");
-                    ps.setDate(1, java.sql.Date.valueOf(fecha));
-                    rs = ps.executeQuery();
-
-                    float[] relativeWidths1 = {1F, 1F};
-                    PdfPTable tabla1 = new PdfPTable(relativeWidths1);
-                    tabla1.setWidthPercentage(50);
-                    tabla1.getDefaultCell().setFixedHeight(20);
-                    if (rs.next()) {
-                        do {
-                            tabla1.addCell(new Phrase(rs.getString(1), font));
-                            tabla1.addCell("");
-                        } while (rs.next());
-                        tabla1.setHorizontalAlignment(0);
-                        doc.add(tabla1);
-                    }
+                    tabla1.setHorizontalAlignment(0);
+                    doc.add(tabla1);
                 }
-            } catch (SQLException e) {
-                System.err.println(e);
             }
+            ps.close();
             doc.close();
             JOptionPane.showMessageDialog(null, "Archivo Creado en Capacitacion/NUEVO INGRESO/LISTAS DE NUEVO INGRESO " + fechaActual.getYear()
                     + " con " + cont + " trabajadores nuevos.");
@@ -174,11 +171,11 @@ public class GeneratorPDF_LBU extends Conexion {
     public static boolean Bajas_Trabajadores(String fechaInicio, String fechaFin) {
         Document doc = new Document();
         LocalDate fechaActual = LocalDate.now();
-        
-                // Crear un JFileChooser para que el usuario elija la ubicación del archivo
+
+        // Crear un JFileChooser para que el usuario elija la ubicación del archivo
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Listado de Bajas");
-        fileChooser.setSelectedFile(new File("Listado de Bajas del " + fechaInicio + " al " + fechaFin + ".pdf")); 
+        fileChooser.setSelectedFile(new File("Listado de Bajas del " + fechaInicio + " al " + fechaFin + ".pdf"));
         // Nombre predeterminado del archivo
 
         int userSelection = fileChooser.showSaveDialog(null);
@@ -263,8 +260,8 @@ public class GeneratorPDF_LBU extends Conexion {
         Date fecha = new Date();
         SimpleDateFormat formatFecha = new SimpleDateFormat("dd-MM-yyyy");
         String FechaS = formatFecha.format(fecha);
-        
-                // Crear un JFileChooser para que el usuario elija la ubicación del archivo
+
+        // Crear un JFileChooser para que el usuario elija la ubicación del archivo
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Guardar LBU Operativo");
         fileChooser.setSelectedFile(new File("LBU Operativo " + FechaS + ".pdf")); // Nombre predeterminado del archivo
@@ -370,11 +367,11 @@ public class GeneratorPDF_LBU extends Conexion {
         Date fecha = new Date();
         SimpleDateFormat formatFecha = new SimpleDateFormat("dd-MM-yyyy");
         String FechaS = formatFecha.format(fecha);
-        
+
         // Crear un JFileChooser para que el usuario elija la ubicación del archivo
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Guardar LBU Operativo");
-        fileChooser.setSelectedFile(new File("LBU Operativo "+ mod.getNombre_Area() + " " + FechaS + ".pdf")); // Nombre predeterminado del archivo
+        fileChooser.setSelectedFile(new File("LBU Operativo " + mod.getNombre_Area() + " " + FechaS + ".pdf")); // Nombre predeterminado del archivo
 
         int userSelection = fileChooser.showSaveDialog(null);
 
@@ -462,11 +459,11 @@ public class GeneratorPDF_LBU extends Conexion {
         Date fecha = new Date();
         SimpleDateFormat formatFecha = new SimpleDateFormat("dd-MM-yyyy");
         String FechaS = formatFecha.format(fecha);
-        
-                // Crear un JFileChooser para que el usuario elija la ubicación del archivo
+
+        // Crear un JFileChooser para que el usuario elija la ubicación del archivo
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Guardar LBU Operativo");
-        fileChooser.setSelectedFile(new File("LBU Operativo "+ mod.getNombre_Area() + " " 
+        fileChooser.setSelectedFile(new File("LBU Operativo " + mod.getNombre_Area() + " "
                 + mod.getNombre_Puesto() + " " + FechaS + ".pdf")); // Nombre predeterminado del archivo
 
         int userSelection = fileChooser.showSaveDialog(null);
@@ -565,11 +562,11 @@ public class GeneratorPDF_LBU extends Conexion {
         Date fecha = new Date();
         SimpleDateFormat formatFecha = new SimpleDateFormat("dd-MM-yyyy");
         String FechaS = formatFecha.format(fecha);
-        
+
         // Crear un JFileChooser para que el usuario elija la ubicación del archivo
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("LBU Operativo");
-        fileChooser.setSelectedFile(new File("LBU Operativo "+ mod.getNombre_Area() 
+        fileChooser.setSelectedFile(new File("LBU Operativo " + mod.getNombre_Area()
                 + " " + mod.getNombre_Turno() + " " + FechaS + ".pdf")); // Nombre predeterminado del archivo
 
         int userSelection = fileChooser.showSaveDialog(null);
@@ -665,11 +662,11 @@ public class GeneratorPDF_LBU extends Conexion {
         Date fecha = new Date();
         SimpleDateFormat formatFecha = new SimpleDateFormat("dd-MM-yyyy");
         String FechaS = formatFecha.format(fecha);
-        
+
         // Crear un JFileChooser para que el usuario elija la ubicación del archivo
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Guardar LBU Operativo");
-        fileChooser.setSelectedFile(new File("LBU Operativo "+ mod.getNombre_Area() 
+        fileChooser.setSelectedFile(new File("LBU Operativo " + mod.getNombre_Area()
                 + " " + mod.getNombre_Puesto() + " Turno " + mod.getNombre_Turno() + " " + FechaS + ".pdf")); // Nombre predeterminado del archivo
 
         int userSelection = fileChooser.showSaveDialog(null);
@@ -825,11 +822,11 @@ public class GeneratorPDF_LBU extends Conexion {
         Date fecha = new Date();
         SimpleDateFormat formatFecha = new SimpleDateFormat("dd-MM-yyyy");
         String FechaS = formatFecha.format(fecha);
-        
-                // Crear un JFileChooser para que el usuario elija la ubicación del archivo
+
+        // Crear un JFileChooser para que el usuario elija la ubicación del archivo
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Guardar LBU Operativo por Supervisor");
-        fileChooser.setSelectedFile(new File("LBU Operativo "+ mod.getNombre_Supervisor() + " " + FechaS + ".pdf")); // Nombre predeterminado del archivo
+        fileChooser.setSelectedFile(new File("LBU Operativo " + mod.getNombre_Supervisor() + " " + FechaS + ".pdf")); // Nombre predeterminado del archivo
 
         int userSelection = fileChooser.showSaveDialog(null);
 
@@ -937,7 +934,7 @@ public class GeneratorPDF_LBU extends Conexion {
         Date fecha = new Date();
         SimpleDateFormat formatFecha = new SimpleDateFormat("dd-MM-yyyy");
         String FechaS = formatFecha.format(fecha);
-        
+
         // Crear un JFileChooser para que el usuario elija la ubicación del archivo
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Guardar LBU Resumen de Supervisores");
@@ -953,7 +950,7 @@ public class GeneratorPDF_LBU extends Conexion {
 
         File fileToSave = fileChooser.getSelectedFile();
         String rutaDoc = fileToSave.getAbsolutePath();
-        
+
         try {
             PdfWriter.getInstance(doc, new FileOutputStream(rutaDoc));
             doc.setPageSize(PageSize.LETTER.rotate());
