@@ -61,8 +61,6 @@ public class CtrlAdministrador implements ActionListener {
         setLookAndFeel();
         setLogo();
         setWindowProperties();
-        //Funciones que se ejecutan al inicar la ventana
-        //cambioTurnoFecha();
     }
 
     @Override
@@ -138,31 +136,17 @@ public class CtrlAdministrador implements ActionListener {
 
         //Botón para inicar funcion del cambio de turno
         if (e.getSource() == frame.itm_CmbTurnos) {
-            //Metodo para ejecutar el cambio de Turno en la BD
-            cambioTurnoManual();
-        }
-    }
-
-    //Metodo para el cambio de turno de los trabajadores por fecha
-    private void cambioTurnoFecha() {
-        LocalDateTime fechaActual = LocalDateTime.now();
-        int mesActual = fechaActual.getMonthValue();
-        int diaActual = fechaActual.getDayOfMonth();
-
-        if (diaActual == 6 && (mesActual % 3) == 0) {
-            String message = "Hoy es día " + diaActual + " de " + DateTools.obtenerNombreMes(mesActual)
-                    + ". ¿Desea autorizar el cambio de turno?";
-            int opcion = JOptionPane.showConfirmDialog(frame, message,
-                    "Cambio de turno", JOptionPane.YES_NO_OPTION);
-
-            if (opcion == JOptionPane.YES_OPTION) {
-                cambiarTurnos();
+            try {
+                //Metodo para ejecutar el cambio de Turno en la BD
+                cambioTurnoManual();
+            } catch (SQLException ex) {
+                Logger.getLogger(CtrlAdministrador.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
 
     //Metodo par el cambio de turno de forma manual
-    private void cambioTurnoManual() {
+    private void cambioTurnoManual() throws SQLException {
         LocalDateTime fechaActual = LocalDateTime.now();
         int mesActual = fechaActual.getMonthValue();
         int diaActual = fechaActual.getDayOfMonth();
@@ -179,20 +163,23 @@ public class CtrlAdministrador implements ActionListener {
 
     //Metodo para cambiar los turnos de los trabajadores en la base de datos
     //Este llama a la funcion cambiar_turnos creada en la base de datos
-    private void cambiarTurnos() {
+    private void cambiarTurnos() throws SQLException {
+        Connection conn = new Conexion().getConnection();
+        String metodoCambioarTurnos = "{CALL sistema_capacitacion.cambiar_turnos()}";
+        PreparedStatement ps = conn.prepareStatement(metodoCambioarTurnos);
         try {
-            Connection conn = new Conexion().getConnection();
-            String metodoCambioarTurnos = "{CALL sistema_capacitacion.cambiar_turnos()}";
-            PreparedStatement ps = conn.prepareStatement(metodoCambioarTurnos);
+
             ps.execute();
 
             JOptionPane.showMessageDialog(frame, "Cambio exitoso de turno", "Información",
                     JOptionPane.INFORMATION_MESSAGE);
             Logger.getLogger(getClass().getName()).log(Level.INFO, "Cambio Exitoso de Turno");
+            ps.close();
         } catch (SQLException ex) {
             Logger.getLogger(CtrlAdministrador.class.getName()).log(Level.SEVERE, null, ex);
             JOptionPane.showMessageDialog(frame, "Cambio fallido de turno. Contacte con el programador.",
                     "Error", JOptionPane.ERROR_MESSAGE);
+            ps.close();
         }
     }
 
