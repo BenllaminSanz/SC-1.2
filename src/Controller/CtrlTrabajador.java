@@ -10,6 +10,7 @@ import ContextController.ContextoEditarAdministrativo;
 import ContextController.ContextoEditarBaja;
 import ContextController.ContextoEditarTrabajador;
 import ContextController.ContextoTrabajador;
+import Documents.GeneratorExcel_BDs;
 import Documents.GeneratorPDF_LBU;
 import Functions.DateTools;
 import Functions.QueryFunctions;
@@ -49,10 +50,14 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -140,6 +145,7 @@ public class CtrlTrabajador implements ActionListener, KeyListener, MouseListene
         this.frmTrabajador.btn_RefreshTabla3.addActionListener(this);
         this.frmTrabajador.item_EliminarBrigadista.addActionListener(this);
         this.frmTrabajador.item_nivelesSalarios.addActionListener(this);
+        this.frmTrabajador.btn_ListT.addActionListener(this);
     }
 
     //Funcion de inicio
@@ -198,13 +204,13 @@ public class CtrlTrabajador implements ActionListener, KeyListener, MouseListene
                 }
             }
         }
-        
+
         //Accion para Cargar Trabajadores desde archivo Excel
         if (e.getSource() == frmTrabajador.Item_EditarLecturaExcel) {
             ConfiguracionColumnasExcelTrabajadores configuracion = new ConfiguracionColumnasExcelTrabajadores();
             configuracion.setVisible(true);
         }
-        
+
         //Accion para Cargar Trabajadores desde archivo Excel
         if (e.getSource() == frmTrabajador.item_nivelesSalarios) {
             ConfiguracionNivelesSalarios configuracion = new ConfiguracionNivelesSalarios();
@@ -660,6 +666,57 @@ public class CtrlTrabajador implements ActionListener, KeyListener, MouseListene
             JOptionPane.showMessageDialog(null, "Para agregar o modificar un Brigadista,\n"
                     + "busque su número de Nomina en su respectiva tabla. \n"
                     + "Dele click a la opción de modificar y busque el apartodo de Brigadas.");
+        }
+
+        if (e.getSource() == frmTrabajador.btn_ListT) {
+            // Lista de campos disponibles
+            Map<String, String> camposDisponibles = new LinkedHashMap<>();
+            camposDisponibles.put("Folio_Trabajador", "Nomina");
+            camposDisponibles.put("nombre_trabajador", "Nombre");
+            camposDisponibles.put("CURP_Trabajador", "CURP");
+            camposDisponibles.put("RFC_Trabajador", "RFC");
+            camposDisponibles.put("IMSS_Trabajador", "IMSS");
+            camposDisponibles.put("Fecha_Antiguedad", "Ingreso");
+            camposDisponibles.put("Nombre_Area", "Area");
+            camposDisponibles.put("Nombre_Puesto", "Puesto");
+            camposDisponibles.put("nombre_turno", "Turno");
+            camposDisponibles.put("Supervisor", "Supervisor");
+            camposDisponibles.put("SalarioDiario_Trabajador", "Salario");
+            camposDisponibles.put("Nivel", "Nivel");
+            camposDisponibles.put("Fecha_Cumpleaños", "Cumpleaños");
+            camposDisponibles.put("Email_Trabajador", "Email");
+            camposDisponibles.put("Teléfono_Trabajador", "Teléfono");
+            camposDisponibles.put("Sexo", "Sexo");
+
+            JPanel panel = new JPanel(new GridLayout(0, 1));
+            Map<String, JCheckBox> checkBoxes = new HashMap<>();
+
+            for (Map.Entry<String, String> entry : camposDisponibles.entrySet()) {
+                JCheckBox checkBox = new JCheckBox(entry.getValue(), true); // true para seleccionado por defecto
+                checkBoxes.put(entry.getKey(), checkBox);
+                panel.add(checkBox);
+            }
+
+            int result = JOptionPane.showConfirmDialog(null, panel, "Selecciona los campos a exportar",
+                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+            List<String> camposSeleccionados = new ArrayList<>();
+            for (Map.Entry<String, JCheckBox> entry : checkBoxes.entrySet()) {
+                if (entry.getValue().isSelected()) {
+                    camposSeleccionados.add(entry.getKey());
+                }
+            }
+
+            if (result != JOptionPane.OK_OPTION) {
+                JOptionPane.showMessageDialog(null, "Operación cancelada por el usuario.");
+            } else {
+                frmTrabajador.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                if (GeneratorExcel_BDs.BD_TRABAJADORES(camposDisponibles, camposSeleccionados)) {
+                    frmTrabajador.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                } else {
+                    frmTrabajador.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                }
+            }
         }
     }
 

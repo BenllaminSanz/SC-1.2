@@ -106,7 +106,8 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
     private final ConsultasPersonalCertificado modTCt = new ConsultasPersonalCertificado();
     private final IFrmCapacitacion frm;
     private final FrmAdministrador frmA;
-    int year = Calendar.getInstance().get(Calendar.YEAR);
+//    int year = Calendar.getInstance().get(Calendar.YEAR);
+    int year = 2023;
 
     //Relacionamos el controlador con la vista
     public CtrlCapacitacion(ContextoCapacitacion contexto) {

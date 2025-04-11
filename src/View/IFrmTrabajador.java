@@ -86,6 +86,7 @@ public class IFrmTrabajador extends javax.swing.JInternalFrame {
         btn7 = new javax.swing.JButton();
         ScrollPane = new javax.swing.JScrollPane();
         jTable_Trabajadores = new javax.swing.JTable();
+        btn_ListT = new javax.swing.JButton();
         Panel_Bajas = new javax.swing.JPanel();
         txt_buscar_bajas = new javax.swing.JTextField();
         btn_RefreshTabla2 = new javax.swing.JButton();
@@ -383,7 +384,7 @@ public class IFrmTrabajador extends javax.swing.JInternalFrame {
                 .addComponent(txt_total, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(35, Short.MAX_VALUE))
         );
         Panel_AtajosLayout.setVerticalGroup(
             Panel_AtajosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -408,6 +409,10 @@ public class IFrmTrabajador extends javax.swing.JInternalFrame {
         ));
         ScrollPane.setViewportView(jTable_Trabajadores);
 
+        btn_ListT.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/IconPrint.png"))); // NOI18N
+        btn_ListT.setToolTipText("Enlistar Trabajadores");
+        btn_ListT.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+
         javax.swing.GroupLayout Panel_TrabajadorLayout = new javax.swing.GroupLayout(Panel_Trabajador);
         Panel_Trabajador.setLayout(Panel_TrabajadorLayout);
         Panel_TrabajadorLayout.setHorizontalGroup(
@@ -424,6 +429,8 @@ public class IFrmTrabajador extends javax.swing.JInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btn_AgregarTrabajador, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btn_ListT, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btn_RefreshTabla, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
@@ -438,9 +445,10 @@ public class IFrmTrabajador extends javax.swing.JInternalFrame {
                             .addGroup(Panel_TrabajadorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                 .addComponent(label_buscar)
                                 .addComponent(txt_buscar_Tbr, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(btn_AgregarTrabajador, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(btn_AgregarTrabajador, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(btn_ListT, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(ScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE)
+                .addComponent(ScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 419, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(Panel_Atajos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -969,6 +977,7 @@ public class IFrmTrabajador extends javax.swing.JInternalFrame {
     public javax.swing.JRadioButton btn_D;
     public javax.swing.JRadioButton btn_LS;
     public javax.swing.JRadioButton btn_LV;
+    public javax.swing.JButton btn_ListT;
     public javax.swing.JButton btn_RefreshTabla;
     public javax.swing.JButton btn_RefreshTabla2;
     public javax.swing.JButton btn_RefreshTabla3;

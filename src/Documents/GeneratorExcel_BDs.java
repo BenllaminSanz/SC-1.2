@@ -14,6 +14,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -29,7 +31,7 @@ public class GeneratorExcel_BDs extends Conexion {
         Date fecha = new Date();
         SimpleDateFormat formatFecha = new SimpleDateFormat("dd-MM-yyyy");
         String FechaS = formatFecha.format(fecha);
-        
+
         // Crear un JFileChooser para que el usuario elija la ubicación del archivo
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Guardar Respaldo de Cursos");
@@ -45,7 +47,7 @@ public class GeneratorExcel_BDs extends Conexion {
 
         File fileToSave = fileChooser.getSelectedFile();
         String rutaDoc = fileToSave.getAbsolutePath();
-        
+
         try {
             Workbook workbook = new XSSFWorkbook();
             Connection con = conn.getConnection(); // Crear un archivo de Excel
@@ -203,6 +205,95 @@ public class GeneratorExcel_BDs extends Conexion {
                         row.createCell(8).setCellValue(DateTools.MySQLtoString(rs2.getDate("fecha_termino")));
                         row.createCell(9).setCellValue(DateTools.MySQLtoString(rs2.getDate("fecha_certificacion")));
                     }
+                }
+            }
+            FileOutputStream outputStream = new FileOutputStream(rutaDoc);
+            workbook.write(outputStream);
+            JOptionPane.showMessageDialog(null, "Respaldo Creado en " + rutaDoc);
+            if (Desktop.isDesktopSupported()) {
+                Desktop desktop = Desktop.getDesktop();
+                if (desktop.isSupported(Desktop.Action.OPEN)) {
+                    // Abrir el documento
+                    desktop.open(new File(rutaDoc));
+                }
+            }
+            ps.close();
+            return true;
+        } catch (SQLException | FileNotFoundException ex) {
+            Logger.getLogger(GeneratorExcel_LBU.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showConfirmDialog(null, "Error al generar archivo: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (IOException ex) {
+            Logger.getLogger(GeneratorExcel_LBU.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+
+    public static boolean BD_TRABAJADORES(Map<String, String> camposDisponibles, List<String> camposSeleccionados) {
+        Date fecha = new Date();
+        SimpleDateFormat formatFecha = new SimpleDateFormat("dd-MM-yyyy");
+        String FechaS = formatFecha.format(fecha);
+
+        // Crear un JFileChooser para que el usuario elija la ubicación del archivo
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Guardar Respaldo de Certificados");
+        fileChooser.setSelectedFile(new File("Respaldo Lista de Trabajadores " + FechaS + ".xlsx")); // Nombre predeterminado del archivo
+
+        int userSelection = fileChooser.showSaveDialog(null);
+
+        if (userSelection != JFileChooser.APPROVE_OPTION) {
+            // El usuario canceló la operación
+            JOptionPane.showMessageDialog(null, "Operación cancelada por el usuario.");
+            return false;
+        }
+
+        File fileToSave = fileChooser.getSelectedFile();
+        String rutaDoc = fileToSave.getAbsolutePath();
+        try {
+            Workbook workbook = new XSSFWorkbook();
+            Connection con = conn.getConnection();
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM area");
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Sheet sheet = workbook.createSheet(rs.getString("nombre_Area"));
+                int rowIndex = 0;
+
+                Row row = sheet.createRow(rowIndex++);
+                row.createCell(0).setCellValue(rs.getString("Nombre_Area"));
+
+                PreparedStatement ps1 = con.prepareStatement("SELECT * FROM turno");
+                ResultSet rs1 = ps1.executeQuery();
+
+                while (rs1.next()) {
+                    row = sheet.createRow(rowIndex++);
+                    row.createCell(0).setCellValue("Turno " + rs1.getString("nombre_Turno"));
+
+                    PreparedStatement ps2 = con.prepareStatement("SELECT * FROM view_trabajador \n"
+                            + "WHERE nombre_area = ? AND nombre_turno = ?");
+                    ps2.setString(1, rs.getString("nombre_Area"));
+                    ps2.setString(2, rs1.getString("nombre_Turno"));
+                    ResultSet rs2 = ps2.executeQuery();
+
+                    row = sheet.createRow(rowIndex++);
+                    int colIndex = 0;
+                    for (String campo : camposSeleccionados) {
+                        row.createCell(colIndex++).setCellValue(camposDisponibles.get(campo));
+                    }
+
+                    while (rs2.next()) {
+                        row = sheet.createRow(rowIndex++);
+                        colIndex = 0;
+                        for (String campo : camposSeleccionados) {
+                            if (campo.startsWith("fecha")) {
+                                row.createCell(colIndex++).setCellValue(DateTools.MySQLtoString(rs2.getDate(campo)));
+                            } else if (campo.equals("Folio_Trabajador")) {
+                                row.createCell(colIndex++).setCellValue(rs2.getInt(campo));
+                            } else {
+                                row.createCell(colIndex++).setCellValue(rs2.getString(campo));
+                            }
+                        }
+                    }
+
                 }
             }
             FileOutputStream outputStream = new FileOutputStream(rutaDoc);
