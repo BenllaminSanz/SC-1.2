@@ -5,6 +5,7 @@ import Querys.Conexion;
 import static Tables.CargarTabla.conn;
 import java.awt.Desktop;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -16,6 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -284,14 +286,30 @@ public class GeneratorExcel_BDs extends Conexion {
                         row = sheet.createRow(rowIndex++);
                         colIndex = 0;
                         for (String campo : camposSeleccionados) {
-                            if (campo.startsWith("fecha")) {
-                                row.createCell(colIndex++).setCellValue(DateTools.MySQLtoString(rs2.getDate(campo)));
-                            } else if (campo.equals("Folio_Trabajador")) {
-                                row.createCell(colIndex++).setCellValue(rs2.getInt(campo));
-                            } else {
-                                row.createCell(colIndex++).setCellValue(rs2.getString(campo));
+                            switch (campo) {
+                                case "Nivel":
+                                    String nivel = calcularNivel(rs2.getDouble("SalarioDiario_Trabajador")); // ejemplo
+                                    row.createCell(colIndex++).setCellValue(nivel);
+                                    break;
+                                case "Sexo":
+                                    String curp = rs2.getString("CURP_Trabajador");
+                                    String sexo = obtenerSexoDesdeCURP(curp);
+                                    row.createCell(colIndex++).setCellValue(sexo);
+                                    break;
+                                default:
+                                    if (campo.startsWith("fecha")) {
+                                        row.createCell(colIndex++).setCellValue(DateTools.MySQLtoString(rs2.getDate(campo)));
+                                    } else if (campo.equals("Folio_Trabajador")) {
+                                        row.createCell(colIndex++).setCellValue(rs2.getInt(campo));
+                                    } else {
+                                        row.createCell(colIndex++).setCellValue(rs2.getString(campo));
+                                    }
                             }
                         }
+                    }
+
+                    for (int i = 0; i < camposSeleccionados.size(); i++) {
+                        sheet.autoSizeColumn(i);
                     }
 
                 }
@@ -315,5 +333,49 @@ public class GeneratorExcel_BDs extends Conexion {
             Logger.getLogger(GeneratorExcel_LBU.class.getName()).log(Level.SEVERE, null, ex);
         }
         return false;
+    }
+
+    private static String calcularNivel(double aDouble) throws FileNotFoundException, IOException {
+        Properties properties = new Properties();
+        FileInputStream fis = new FileInputStream("niveles.properties");
+        properties.load(fis);
+
+        // Obtener el salario del trabajador
+        double salario = aDouble;
+        // Determinar el nivel del trabajador
+        String nivel = determinarNivel(salario, properties);
+        // Asignar el nivel al objeto tbr
+        return nivel;
+    }
+
+    public static String determinarNivel(double salario, Properties properties) {
+        // Recorre las claves de los niveles y compara los salarios
+        for (String key : properties.stringPropertyNames()) {
+            String salarioStr = properties.getProperty(key);
+            if (salarioStr != null && !salarioStr.isEmpty()) {
+                double nivelSalario = Double.parseDouble(salarioStr);
+
+                // Si el salario del trabajador es mayor o igual al salario del nivel, asigna el nivel
+                if (salario >= nivelSalario) {
+                    return key.replace("nivel.", "");  // Retorna el nivel
+                }
+            }
+        }
+
+        // Si no se encuentra un nivel adecuado, retornar un valor predeterminado
+        return " ";
+    }
+
+    private static String obtenerSexoDesdeCURP(String curp) {
+        // Verificar si el CURP es válido y tiene la longitud correcta (18 caracteres)
+        if (curp != null && curp.length() == 18) {
+            // Obtener el séptimo carácter (índice 6) que representa el sexo
+            char sexoChar = curp.charAt(10);
+            // Verificar el sexo y asignar el valor correspondiente
+            String sexo = (sexoChar == 'H') ? "Hombre" : (sexoChar == 'M') ? "Mujer" : "Desconocido";
+            // Asignar el sexo al objeto tbr (o a la variable correspondiente)
+            return sexo;
+        }
+        return null;
     }
 }
