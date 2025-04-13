@@ -73,6 +73,7 @@ public class IFrmLBU extends javax.swing.JInternalFrame {
         jMenu2 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
+        jMenuItem3 = new javax.swing.JMenuItem();
 
         setClosable(true);
         setIconifiable(true);
@@ -528,8 +529,17 @@ public class IFrmLBU extends javax.swing.JInternalFrame {
         jMenu2.add(jMenuItem1);
 
         jMenuItem2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/IconList.png"))); // NOI18N
-        jMenuItem2.setText("Especifica");
+        jMenuItem2.setText("Especifica Áreas");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
         jMenu2.add(jMenuItem2);
+
+        jMenuItem3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/IconList.png"))); // NOI18N
+        jMenuItem3.setText("Especifica Turnos");
+        jMenu2.add(jMenuItem3);
 
         Bar_LBU.add(jMenu2);
 
@@ -574,6 +584,10 @@ public class IFrmLBU extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuBar Bar_LBU;
     private javax.swing.JPanel Panel_Resumen_LBU;
@@ -607,9 +621,10 @@ public class IFrmLBU extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
+    public javax.swing.JMenu jMenu2;
     public javax.swing.JMenuItem jMenuItem1;
     public javax.swing.JMenuItem jMenuItem2;
+    public javax.swing.JMenuItem jMenuItem3;
     public javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;

@@ -38,7 +38,7 @@ public class GeneratorPDF_Brigadas extends Conexion {
         Date fecha = new Date();
         SimpleDateFormat formatFecha = new SimpleDateFormat("dd-MM-yyyy");
         String FechaS = formatFecha.format(fecha);
-        
+
         // Crear un JFileChooser para que el usuario elija la ubicación del archivo
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Guardar Lista de Emergencias");
@@ -65,6 +65,10 @@ public class GeneratorPDF_Brigadas extends Conexion {
             Font font = new Font();
             font.setSize(9);
 
+            Image logo = Image.getInstance(ClassLoader.getSystemResource("Images/LogoParkdale.png"));
+            logo.scalePercent(40F);
+            logo.setAlignment(0);
+
             PreparedStatement ps = con.prepareStatement("SELECT * FROM area");
             ResultSet rs = ps.executeQuery();
 
@@ -73,10 +77,6 @@ public class GeneratorPDF_Brigadas extends Conexion {
                 ResultSet rs1 = ps1.executeQuery();
 
                 while (rs1.next()) {
-                    Image logo = Image.getInstance(ClassLoader.getSystemResource("Images/LogoParkdale.png"));
-                    logo.scalePercent(40F);
-                    logo.setAlignment(0);
-
                     float[] relativeWidths = {0.5F, 2F, 2, 0.7F};
                     PdfPTable tabla = new PdfPTable(relativeWidths);
                     tabla.setWidthPercentage(100);
@@ -125,8 +125,9 @@ public class GeneratorPDF_Brigadas extends Conexion {
                     }
                     doc.newPage();
                 }
-
             }
+
+            doc.add(logo);
 
             PreparedStatement ps2 = con.prepareStatement("SELECT area_administrativo FROM sistema_capacitacion.administrativos group by area_administrativo;");
             ResultSet rs2 = ps2.executeQuery();
@@ -136,10 +137,6 @@ public class GeneratorPDF_Brigadas extends Conexion {
                 ResultSet rs3 = ps3.executeQuery();
 
                 while (rs3.next()) {
-                    Image logo = Image.getInstance(ClassLoader.getSystemResource("Images/LogoParkdale.png"));
-                    logo.scalePercent(40F);
-                    logo.setAlignment(0);
-
                     float[] relativeWidths = {0.5F, 2F, 2, 0.7F};
                     PdfPTable tabla = new PdfPTable(relativeWidths);
                     tabla.setWidthPercentage(100);
@@ -168,7 +165,6 @@ public class GeneratorPDF_Brigadas extends Conexion {
                     }
 
                     if (cont > 0) {
-                        doc.add(logo);
                         doc.add(new Paragraph("Lista de Emergencia, Área: " + rs2.getString("area_administrativo")
                                 + ", Turno: " + rs3.getString("turno")));
                         doc.add(new Paragraph("Fecha: " + FechaS));
@@ -187,7 +183,6 @@ public class GeneratorPDF_Brigadas extends Conexion {
                         total.setHorizontalAlignment(0);
                         doc.add(total);
                     }
-                    doc.newPage();
                 }
 
             }
@@ -217,7 +212,7 @@ public class GeneratorPDF_Brigadas extends Conexion {
         Date fecha = new Date();
         SimpleDateFormat formatFecha = new SimpleDateFormat("dd-MM-yyyy");
         String FechaS = formatFecha.format(fecha);
-        
+
         // Crear un JFileChooser para que el usuario elija la ubicación del archivo
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Guardar Lista General de Emergencia");
@@ -391,7 +386,7 @@ public class GeneratorPDF_Brigadas extends Conexion {
         Date fecha = new Date();
         SimpleDateFormat formatFecha = new SimpleDateFormat("dd-MM-yyyy");
         String FechaS = formatFecha.format(fecha);
-        
+
         // Crear un JFileChooser para que el usuario elija la ubicación del archivo
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Lista General de Emergencia");
@@ -549,6 +544,106 @@ public class GeneratorPDF_Brigadas extends Conexion {
         } catch (DocumentException ex) {
             Logger.getLogger(GeneratorPDF_Brigadas.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return false;
+    }
+
+    public static boolean Lista_EmergenciaPorTurno(String turno) {
+        Document doc = new Document();
+        Date fecha = new Date();
+        SimpleDateFormat formatFecha = new SimpleDateFormat("dd-MM-yyyy");
+        String FechaS = formatFecha.format(fecha);
+
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Lista General de Emergencia por Turno");
+        fileChooser.setSelectedFile(new File("Lista Emergencia Turno " + turno + " " + FechaS + ".pdf"));
+
+        int userSelection = fileChooser.showSaveDialog(null);
+        if (userSelection != JFileChooser.APPROVE_OPTION) {
+            JOptionPane.showMessageDialog(null, "Operación cancelada por el usuario.");
+            return false;
+        }
+
+        File fileToSave = fileChooser.getSelectedFile();
+        String rutaDoc = fileToSave.getAbsolutePath();
+
+        try {
+            Connection con = conn.getConnection();
+            PdfWriter writer = PdfWriter.getInstance(doc, new FileOutputStream(rutaDoc));
+            doc.setPageSize(PageSize.LETTER);
+            doc.setMargins(20, 20, 20, 20);
+            doc.open();
+
+            Font font = new Font();
+            font.setSize(9);
+
+            Image logo = Image.getInstance(ClassLoader.getSystemResource("Images/LogoParkdale.png"));
+            logo.scalePercent(40F);
+            logo.setAlignment(0);
+
+            float[] relativeWidths = {0.5F, 2F, 2, 0.7F};
+            PdfPTable tabla = new PdfPTable(relativeWidths);
+            tabla.setWidthPercentage(100);
+
+            BaseColor color = new BaseColor(175, 196, 174);
+            Font font1 = new Font();
+            font1.setStyle(Font.BOLD);
+            font1.setSize(10);
+
+            tabla.addCell(createHeaderCell("NÚM. NOM", font1, color, 1));
+            tabla.addCell(createHeaderCell("NOMBRE COMPLETO", font1, color, 1));
+            tabla.addCell(createHeaderCell("BRIGADISTA", font1, color, 1));
+            tabla.addCell(createHeaderCell("ASISTENCIA", font1, color, 1));
+
+            // Consulta general por turno
+            PreparedStatement ps = con.prepareStatement(
+                    "SELECT * FROM sistema_capacitacion.view_trabajador vt "
+                    + "LEFT JOIN brigadas b ON vt.brigada_idBrigada = b.idbrigadas "
+                    + "WHERE nombre_turno = ?");
+            ps.setString(1, turno);
+            ResultSet rs = ps.executeQuery();
+
+            int cont = 0;
+            while (rs.next()) {
+                tabla.addCell(new Phrase(rs.getString("Folio_Trabajador"), font));
+                tabla.addCell(new Phrase(rs.getString("Nombre_Trabajador"), font));
+                tabla.addCell(new Phrase(rs.getString("nombre_brigada"), font));
+                tabla.addCell(""); // Asistencia vacía
+                cont++;
+            }
+
+            if (cont > 0) {
+                doc.add(logo);
+                doc.add(new Paragraph("Lista de Emergencia por Turno: " + turno));
+                doc.add(new Paragraph("Fecha: " + FechaS));
+                doc.add(new Paragraph("\n"));
+                doc.add(tabla);
+                doc.add(new Paragraph("\n"));
+
+                PdfPTable total = new PdfPTable(1);
+                total.setWidthPercentage(30);
+                PdfPCell cell = new PdfPCell();
+                Paragraph paragraph = new Paragraph("Total de Asistentes: ____/" + cont);
+                paragraph.setAlignment(Paragraph.ALIGN_RIGHT);
+                cell.addElement(paragraph);
+                total.addCell(cell);
+                total.setHorizontalAlignment(0);
+                doc.add(total);
+            }
+
+            doc.close();
+            JOptionPane.showMessageDialog(null, "Archivo Creado en " + rutaDoc);
+
+            if (Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().open(new File(rutaDoc));
+            }
+
+            return true;
+
+        } catch (Exception ex) {
+            Logger.getLogger(GeneratorPDF_Brigadas.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showConfirmDialog(null, "Error al generar archivo: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
         return false;
     }
 

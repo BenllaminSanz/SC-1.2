@@ -240,12 +240,10 @@ public class CtrlTrabajador implements ActionListener, KeyListener, MouseListene
             modTrabajador.setFolio_Trabajador(folio);
 
             int option = JOptionPane.showConfirmDialog(null, "¿Seguro de dar de baja este Trabajador?");
-            if (option == JOptionPane.OK_OPTION) {
-                if (conTrabajador.eliminar(modTrabajador)) {
-                    JOptionPane.showMessageDialog(null, "Baja de trabajador realizada");
-                    actualizarVistaTrabajador();
-                    DesignTabla.designBajas(frmTrabajador);
-                }
+            if (option == JOptionPane.OK_OPTION && conTrabajador.eliminar(modTrabajador)) {
+                JOptionPane.showMessageDialog(null, "Baja de trabajador realizada");
+                actualizarVistaTrabajador();
+                DesignTabla.designBajas(frmTrabajador);
             }
         }
 
@@ -254,30 +252,29 @@ public class CtrlTrabajador implements ActionListener, KeyListener, MouseListene
             String folio = frmTrabajador.jTable_Bajas.getValueAt(
                     frmTrabajador.jTable_Bajas.getSelectedRow(), 0).toString();
             modBajas.setFolio_Trabajador(folio);
-            if (JOptionPane.showConfirmDialog(null, "¿Seguro de restaurar este Trabajador?") == JOptionPane.OK_OPTION) {
-                if (conBajas.buscar(modBajas)) {
-                    modTrabajador.setFolio_Trabajador(modBajas.getFolio_Trabajador());
-                    modTrabajador.setNombre_Trabajador(modBajas.getNombre_Trabajador());
-                    modTrabajador.setCURP_Trabajador(modBajas.getCURP_Trabajador());
-                    modTrabajador.setRFC_Trabajador(modBajas.getRFC_Trabajador());
-                    modTrabajador.setIMSS_Trabajador(modBajas.getIMSS_Trabajador());
-                    modTrabajador.setFecha_Antiguedad(modBajas.getFecha_Antiguedad());
-                    modTrabajador.setÁrea_Trabajador(modBajas.getÁrea_Trabajador());
-                    modTrabajador.setPuesto_Trabajador(modBajas.getPuesto_Trabajador());
-                    modTrabajador.setTurno_Trabajador(modBajas.getTurno_Trabajador());
-                    modTrabajador.setSalarioDiario_Trabajador(modBajas.getSalarioDiario_Trabajador());
-                    modTrabajador.setFecha_Cumpleaños(modBajas.getFecha_Cumpleaños());
-                    modTrabajador.setEmail_Trabajador(modBajas.getEmail_Trabajador());
-                    modTrabajador.setTel_Trabajador(modBajas.getTeléfono_Trabajador());
-                    modTrabajador.setComentario(modBajas.getComentario());
+            if (JOptionPane.showConfirmDialog(null, "¿Seguro de restaurar este Trabajador?") == JOptionPane.OK_OPTION 
+                    && conBajas.buscar(modBajas)) {
+                modTrabajador.setFolio_Trabajador(modBajas.getFolio_Trabajador());
+                modTrabajador.setNombre_Trabajador(modBajas.getNombre_Trabajador());
+                modTrabajador.setCURP_Trabajador(modBajas.getCURP_Trabajador());
+                modTrabajador.setRFC_Trabajador(modBajas.getRFC_Trabajador());
+                modTrabajador.setIMSS_Trabajador(modBajas.getIMSS_Trabajador());
+                modTrabajador.setFecha_Antiguedad(modBajas.getFecha_Antiguedad());
+                modTrabajador.setÁrea_Trabajador(modBajas.getÁrea_Trabajador());
+                modTrabajador.setPuesto_Trabajador(modBajas.getPuesto_Trabajador());
+                modTrabajador.setTurno_Trabajador(modBajas.getTurno_Trabajador());
+                modTrabajador.setSalarioDiario_Trabajador(modBajas.getSalarioDiario_Trabajador());
+                modTrabajador.setFecha_Cumpleaños(modBajas.getFecha_Cumpleaños());
+                modTrabajador.setEmail_Trabajador(modBajas.getEmail_Trabajador());
+                modTrabajador.setTel_Trabajador(modBajas.getTeléfono_Trabajador());
+                modTrabajador.setComentario(modBajas.getComentario());
 
-                    if (conTrabajador.registrar(modTrabajador) && conBajas.eliminar(modBajas)) {
-                        JOptionPane.showMessageDialog(null, "Trabajador: "
-                                + modBajas.getFolio_Trabajador() + " restaurado");
-                        actualizarVistaTrabajador();
-                        DesignTabla.designTrabajador(frmTrabajador);
-                        DesignTabla.designBajas(frmTrabajador);
-                    }
+                if (conTrabajador.registrar(modTrabajador) && conBajas.eliminar(modBajas)) {
+                    JOptionPane.showMessageDialog(null, "Trabajador: "
+                            + modBajas.getFolio_Trabajador() + " restaurado");
+                    actualizarVistaTrabajador();
+                    DesignTabla.designTrabajador(frmTrabajador);
+                    DesignTabla.designBajas(frmTrabajador);
                 }
             }
         }
@@ -290,12 +287,10 @@ public class CtrlTrabajador implements ActionListener, KeyListener, MouseListene
 
             int option = JOptionPane.showConfirmDialog(null,
                     "¿Seguro de eliminar este trabajador permanentemente?");
-            if (option == JOptionPane.OK_OPTION) {
-                if (conBajas.eliminar(modBajas)) {
+            if (option == JOptionPane.OK_OPTION && conBajas.eliminar(modBajas)) {
                     JOptionPane.showMessageDialog(null, "Trabajador eliminado permanentemente");
                     actualizarVistaTrabajador();
                     DesignTabla.designBajas(frmTrabajador);
-                }
             }
         }
 
@@ -895,26 +890,32 @@ public class CtrlTrabajador implements ActionListener, KeyListener, MouseListene
 
     @Override
     public void keyTyped(KeyEvent e) {
+        //
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
+        //
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        //
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
+        //
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
+        //
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
+        //
     }
 
     @Override

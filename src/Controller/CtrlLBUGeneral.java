@@ -49,6 +49,7 @@ public class CtrlLBUGeneral implements ActionListener {
         this.frm.itemRptArea_Excel.addActionListener(this);
         this.frm.jMenuItem1.addActionListener(this);
         this.frm.jMenuItem2.addActionListener(this);
+        this.frm.jMenuItem3.addActionListener(this);
     }
 
     //Funcion de inicio
@@ -237,6 +238,27 @@ public class CtrlLBUGeneral implements ActionListener {
                     GeneratorPDF_Brigadas.Lista_EmergenciaEspecifico(areaSeleccionada, turnoSeleccionado);
                     frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 }
+
+            }
+        }
+
+        if (e.getSource() == frm.jMenuItem3) {
+            JComboBox<String> comboBox1 = new JComboBox<>();
+
+            JLabel label1 = new JLabel("Turno:");
+
+            QueryFunctions.LlenarComboBox("turno", "nombre_Turno", comboBox1);
+
+            Object[] components = {label1, comboBox1};
+
+            int option = JOptionPane.showConfirmDialog(null, components, "Lista de Emergencia por Turnos", JOptionPane.PLAIN_MESSAGE);
+
+            if (option == JOptionPane.OK_OPTION) {
+                // Acción a realizar al hacer clic en "Aceptar"
+                frm.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                String turnoSeleccionado = (String) comboBox1.getSelectedItem();
+                GeneratorPDF_Brigadas.Lista_EmergenciaPorTurno(turnoSeleccionado);
+                frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
             }
         }
