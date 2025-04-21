@@ -1,150 +1,171 @@
 package Subviews;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 
 public class ConfiguracionNivelesSalarios extends JFrame {
-    private JTextField A1, B1, A2, B2, A3, B3, A4, B4, 
-            A5, B5, A6, B6, A7, B7, A8, B8;
-    private JButton btnGuardar, btnCancelar;
+
     private Properties propiedades;
+    private Map<String, JTextField> campos = new LinkedHashMap<>();
+    private JPanel panel;
+    private JButton btnGuardar, btnCancelar, btnAgregar, btnEliminar;
 
     public ConfiguracionNivelesSalarios() {
-        // Configuración de la ventana
         setTitle("Configurar Niveles de Salarios");
-        setSize(300, 500);
+        setSize(350, 600);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Cargar propiedades desde el archivo
         propiedades = new Properties();
         cargarPropiedades();
 
-        // Crear componentes
-        JPanel panel = new JPanel(new GridLayout(18, 2, 10, 10));
+        panel = new JPanel(new GridLayout(0, 2, 10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        actualizarPanel();
 
-        panel.add(new JLabel("Nivel 1A:"));
-        A1 = new JTextField(propiedades.getProperty("nivel.1A"));
-        panel.add(A1);
-        panel.add(new JLabel("Nivel 1B:"));
-        B1 = new JTextField(propiedades.getProperty("nivel.1B"));
-        panel.add(B1);
-        
-        panel.add(new JLabel("Nivel 2A:"));
-        A2 = new JTextField(propiedades.getProperty("nivel.2A"));
-        panel.add(A2);
-        panel.add(new JLabel("Nivel 2B:"));
-        B2 = new JTextField(propiedades.getProperty("nivel.2B"));
-        panel.add(B2);
-        
-        panel.add(new JLabel("Nivel 3A:"));
-        A3 = new JTextField(propiedades.getProperty("nivel.3A"));
-        panel.add(A3);
-        panel.add(new JLabel("Nivel 3B:"));
-        B3 = new JTextField(propiedades.getProperty("nivel.3B"));
-        panel.add(B3);
-        
-        panel.add(new JLabel("Nivel 4A:"));
-        A4 = new JTextField(propiedades.getProperty("nivel.4A"));
-        panel.add(A4);
-        panel.add(new JLabel("Nivel 4B:"));
-        B4 = new JTextField(propiedades.getProperty("nivel.4B"));
-        panel.add(B4);
-        
-        panel.add(new JLabel("Nivel 5A:"));
-        A5 = new JTextField(propiedades.getProperty("nivel.5A"));
-        panel.add(A5);
-        panel.add(new JLabel("Nivel 5B:"));
-        B5 = new JTextField(propiedades.getProperty("nivel.5B"));
-        panel.add(B5);
-        
-        panel.add(new JLabel("Nivel 6A:"));
-        A6 = new JTextField(propiedades.getProperty("nivel.6A"));
-        panel.add(A6);
-        panel.add(new JLabel("Nivel 6B:"));
-        B6 = new JTextField(propiedades.getProperty("nivel.6B"));
-        panel.add(B6);
-        
-        panel.add(new JLabel("Nivel 7A:"));
-        A7 = new JTextField(propiedades.getProperty("nivel.7A"));
-        panel.add(A7);
-        panel.add(new JLabel("Nivel 7B:"));
-        B7 = new JTextField(propiedades.getProperty("nivel.7B"));
-        panel.add(B7);
-        
-        panel.add(new JLabel("Nivel 8A:"));
-        A8 = new JTextField(propiedades.getProperty("nivel.8A"));
-        panel.add(A8);
-        panel.add(new JLabel("Nivel 8B:"));
-        B8 = new JTextField(propiedades.getProperty("nivel.8B"));
-        panel.add(B8);
-
+        // Botones
         btnGuardar = new JButton("Guardar");
         btnCancelar = new JButton("Cancelar");
+        btnAgregar = new JButton("Agregar Nivel");
+        btnEliminar = new JButton("Eliminar Nivel");
 
-        // Agregar acción al botón Guardar
-        btnGuardar.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                guardarPropiedades();
-                JOptionPane.showMessageDialog(ConfiguracionNivelesSalarios.this, "Niveles guardados correctamente.");
-                dispose(); // Cerrar la ventana después de guardar
-            }
+        btnGuardar.addActionListener(e -> {
+            guardarPropiedades();
+            JOptionPane.showMessageDialog(this, "Niveles guardados correctamente.");
+            dispose();
         });
 
-        // Agregar acción al botón Cancelar
-        btnCancelar.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose(); // Cerrar la ventana sin guardar
-            }
-        });
+        btnCancelar.addActionListener(e -> dispose());
 
-        // Agregar botones al panel
-        panel.add(btnGuardar);
-        panel.add(btnCancelar);
+        btnAgregar.addActionListener(e -> agregarNivel());
 
-        // Agregar panel a la ventana
-        add(panel);
+        btnEliminar.addActionListener(e -> eliminarNivel());
+
+        JPanel botonesPanel = new JPanel(new GridLayout(2, 2, 10, 10));
+        botonesPanel.add(btnGuardar);
+        botonesPanel.add(btnCancelar);
+        botonesPanel.add(btnAgregar);
+        botonesPanel.add(btnEliminar);
+
+        // Contenedor principal
+        JScrollPane scrollPane = new JScrollPane(panel);
+        scrollPane.setPreferredSize(new Dimension(300, 450));
+
+        add(scrollPane, BorderLayout.CENTER);
+        add(botonesPanel, BorderLayout.SOUTH);
     }
 
     private void cargarPropiedades() {
-        try (FileInputStream fis = new FileInputStream("niveles.properties")) {
-            propiedades.load(fis);
+        try (InputStream input = new FileInputStream("niveles.properties")) {
+            propiedades.load(input);
         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(this, "No se pudo cargar el archivo de configuración.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "No se pudo cargar el archivo de propiedades.", "Error", JOptionPane.ERROR_MESSAGE);
+            dispose();
         }
     }
 
     private void guardarPropiedades() {
-        propiedades.setProperty("nivel.A1", A1.getText());
-        propiedades.setProperty("nivel.B1", B1.getText());
-        propiedades.setProperty("nivel.A2", A2.getText());
-        propiedades.setProperty("nivel.B2", B2.getText());
-        propiedades.setProperty("nivel.A3", A3.getText());
-        propiedades.setProperty("nivel.B3", B3.getText());
-        propiedades.setProperty("nivel.A4", A4.getText());
-        propiedades.setProperty("nivel.B4", B4.getText());
-        propiedades.setProperty("nivel.A5", A5.getText());
-        propiedades.setProperty("nivel.B5", B5.getText());
-        propiedades.setProperty("nivel.A6", A6.getText());
-        propiedades.setProperty("nivel.B6", B6.getText());
-        propiedades.setProperty("nivel.A7", A7.getText());
-        propiedades.setProperty("nivel.B7", B7.getText());
-        propiedades.setProperty("nivel.A8", A8.getText());
-        propiedades.setProperty("nivel.B8", B8.getText());
+        for (Map.Entry<String, JTextField> entry : campos.entrySet()) {
+            propiedades.setProperty(entry.getKey(), entry.getValue().getText());
+        }
 
-        try (FileOutputStream fos = new FileOutputStream("niveles.properties")) {
-            propiedades.store(fos, "Configurar Niveles de Salarios");
+        try (OutputStream output = new FileOutputStream("niveles.properties")) {
+            propiedades.store(output, null);
         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(this, "No se pudo guardar el archivo de configuración.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "No se pudo guardar el archivo de propiedades.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void actualizarPanel() {
+        panel.removeAll();
+        campos.clear();
+
+        List<String> clavesOrdenadas = propiedades.stringPropertyNames().stream()
+                .filter(k -> k.startsWith("nivel."))
+                .sorted(Comparator.comparingInt((String k) -> {
+                    String nivel = k.substring("nivel.".length());
+                    return Integer.parseInt(nivel.replaceAll("[^0-9]", ""));
+                }).thenComparing(k -> {
+                    String nivel = k.substring("nivel.".length());
+                    return nivel.replaceAll("[0-9]", "");
+                }))
+                .collect(Collectors.toList());
+
+        for (String key : clavesOrdenadas) {
+            String nivel = key.substring("nivel.".length());
+            JLabel label = new JLabel("Nivel " + nivel + ":");
+            JTextField campo = new JTextField(propiedades.getProperty(key));
+            campos.put(key, campo);
+            panel.add(label);
+            panel.add(campo);
+        }
+
+        panel.revalidate();
+        panel.repaint();
+    }
+
+    private void agregarNivel() {
+        String nuevoNivel = JOptionPane.showInputDialog(this, "Ingresa el nuevo nivel (ej: 9A):");
+        if (nuevoNivel == null || nuevoNivel.trim().isEmpty()) {
+            return;
+        }
+
+        String clave = "nivel." + nuevoNivel.toUpperCase();
+
+        if (propiedades.containsKey(clave)) {
+            JOptionPane.showMessageDialog(this, "Ese nivel ya existe.");
+            return;
+        }
+
+        propiedades.setProperty(clave, ""); // valor vacío por default
+        actualizarPanel();
+    }
+
+    private void eliminarNivel() {
+        Object[] opciones = propiedades.stringPropertyNames().stream()
+                .filter(k -> k.startsWith("nivel."))
+                .sorted()
+                .map(k -> k.substring("nivel.".length()))
+                .toArray();
+
+        if (opciones.length == 0) {
+            JOptionPane.showMessageDialog(this, "No hay niveles para eliminar.");
+            return;
+        }
+
+        String seleccion = (String) JOptionPane.showInputDialog(
+                this,
+                "Selecciona el nivel a eliminar:",
+                "Eliminar Nivel",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                opciones,
+                opciones[0]
+        );
+
+        if (seleccion != null) {
+            propiedades.remove("nivel." + seleccion);
+            actualizarPanel();
         }
     }
 }

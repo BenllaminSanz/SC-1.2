@@ -2,6 +2,7 @@
 package Tables;
 
 import Functions.DateTools;
+import Functions.Niveles_Salarios;
 import Functions.QueryFunctions;
 import Model.Administrativos;
 import Model.Area;
@@ -78,10 +79,9 @@ public class CargarTabla {
                 tbr.setNombre_Area(rs.getString("Nombre_Area"));
                 tbr.setNombre_Turno(rs.getString("Nombre_Turno"));
                 tbr.setNombre_Puesto(rs.getString("Nombre_Puesto"));
-                tbr.setSalarioDiario_Trabajador(Double.valueOf(
-                        rs.getString("SalarioDiario_Trabajador")));
+                tbr.setSalarioDiario_Trabajador(rs.getDouble("SalarioDiario_Trabajador"));
                 tbr.setStatus_Trabajador(rs.getString("Status_Trabajador"));
-                
+
                 Properties properties = new Properties();
                 FileInputStream fis = new FileInputStream("niveles.properties");
                 properties.load(fis);
@@ -89,7 +89,7 @@ public class CargarTabla {
                 // Obtener el salario del trabajador
                 double salario = rs.getDouble("SalarioDiario_Trabajador");
                 // Determinar el nivel del trabajador
-                String nivel = determinarNivel(salario, properties);
+                String nivel = Niveles_Salarios.determinarNivel(salario, properties);
                 // Asignar el nivel al objeto tbr
                 tbr.setNivel_Salario(nivel);
 
@@ -118,24 +118,6 @@ public class CargarTabla {
             }
         }
         return trabajador;
-    }
-
-    public static String determinarNivel(double salario, Properties properties) {
-        // Recorre las claves de los niveles y compara los salarios
-        for (String key : properties.stringPropertyNames()) {
-            String salarioStr = properties.getProperty(key);
-            if (salarioStr != null && !salarioStr.isEmpty()) {
-                double nivelSalario = Double.parseDouble(salarioStr);
-
-                // Si el salario del trabajador es mayor o igual al salario del nivel, asigna el nivel
-                if (salario >= nivelSalario) {
-                    return key.replace("nivel.", "");  // Retorna el nivel
-                }
-            }
-        }
-
-        // Si no se encuentra un nivel adecuado, retornar un valor predeterminado
-        return " ";
     }
 
     public static List<Bajas> cargarTablaBajas() {
@@ -1286,7 +1268,7 @@ public class CargarTabla {
                 // Obtener el salario del trabajador
                 double salario = rs.getDouble("SalarioDiario_Trabajador");
                 // Determinar el nivel del trabajador
-                String nivel = determinarNivel(salario, properties);
+                String nivel = Niveles_Salarios.determinarNivel(salario, properties);
                 // Asignar el nivel al objeto tbr
                 tbr.setNivel_Salario(nivel);
 

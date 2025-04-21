@@ -576,59 +576,89 @@ public class GeneratorPDF_Brigadas extends Conexion {
             Font font = new Font();
             font.setSize(9);
 
-            Image logo = Image.getInstance(ClassLoader.getSystemResource("Images/LogoParkdale.png"));
-            logo.scalePercent(40F);
-            logo.setAlignment(0);
-
-            float[] relativeWidths = {0.5F, 2F, 2, 0.7F};
-            PdfPTable tabla = new PdfPTable(relativeWidths);
-            tabla.setWidthPercentage(100);
-
-            BaseColor color = new BaseColor(175, 196, 174);
+            Font fontTitle = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
             Font font1 = new Font();
             font1.setStyle(Font.BOLD);
             font1.setSize(10);
 
-            tabla.addCell(createHeaderCell("NÚM. NOM", font1, color, 1));
-            tabla.addCell(createHeaderCell("NOMBRE COMPLETO", font1, color, 1));
-            tabla.addCell(createHeaderCell("BRIGADISTA", font1, color, 1));
-            tabla.addCell(createHeaderCell("ASISTENCIA", font1, color, 1));
+            BaseColor color = new BaseColor(175, 196, 174);
 
-            // Consulta general por turno
+            Image logo = Image.getInstance(ClassLoader.getSystemResource("Images/LogoParkdale.png"));
+            logo.scalePercent(40F);
+            logo.setAlignment(0);
+
+            doc.add(logo);
+            doc.add(new Paragraph("Lista de Emergencia por Turno: " + turno, fontTitle));
+            doc.add(new Paragraph("Fecha: " + FechaS));
+            doc.add(new Paragraph("\n"));
+
             PreparedStatement ps = con.prepareStatement(
-                    "SELECT * FROM sistema_capacitacion.view_trabajador vt "
+                    "SELECT vt.*, b.nombre_brigada FROM sistema_capacitacion.view_trabajador vt "
                     + "LEFT JOIN brigadas b ON vt.brigada_idBrigada = b.idbrigadas "
-                    + "WHERE nombre_turno = ?");
+                    + "WHERE nombre_turno = ? ORDER BY nombre_area, Nombre_Trabajador"
+            );
             ps.setString(1, turno);
             ResultSet rs = ps.executeQuery();
 
-            int cont = 0;
+            String areaActual = "";
+            int totalArea = 0;
+            int totalGeneral = 0;
+
+            PdfPTable tabla = null;
+
             while (rs.next()) {
+                String area = rs.getString("nombre_area");
+
+                // Si cambia el área, creamos un nuevo título y tabla
+                if (!area.equals(areaActual)) {
+                    if (tabla != null) {
+                        doc.add(tabla);
+                        doc.add(new Paragraph("Total del Área: ____/" + totalArea));
+                        doc.newPage();
+                    }
+
+                    totalArea = 0;
+                    areaActual = area;
+
+                    doc.add(new Paragraph("Área: " + areaActual, font1));
+                    doc.add(new Paragraph("\n"));
+
+                    float[] relativeWidths = {0.5F, 2F, 2, 0.7F};
+                    tabla = new PdfPTable(relativeWidths);
+                    tabla.setWidthPercentage(100);
+
+                    tabla.addCell(createHeaderCell("NÚM. NOM", font1, color, 1));
+                    tabla.addCell(createHeaderCell("NOMBRE COMPLETO", font1, color, 1));
+                    tabla.addCell(createHeaderCell("BRIGADISTA", font1, color, 1));
+                    tabla.addCell(createHeaderCell("ASISTENCIA", font1, color, 1));
+                }
+
                 tabla.addCell(new Phrase(rs.getString("Folio_Trabajador"), font));
                 tabla.addCell(new Phrase(rs.getString("Nombre_Trabajador"), font));
                 tabla.addCell(new Phrase(rs.getString("nombre_brigada"), font));
-                tabla.addCell(""); // Asistencia vacía
-                cont++;
+                tabla.addCell(""); // asistencia vacía
+
+                totalArea++;
+                totalGeneral++;
             }
 
-            if (cont > 0) {
-                doc.add(logo);
-                doc.add(new Paragraph("Lista de Emergencia por Turno: " + turno));
-                doc.add(new Paragraph("Fecha: " + FechaS));
-                doc.add(new Paragraph("\n"));
+            // Añadir última tabla
+            if (tabla != null && totalArea > 0) {
                 doc.add(tabla);
-                doc.add(new Paragraph("\n"));
-
-                PdfPTable total = new PdfPTable(1);
-                total.setWidthPercentage(30);
-                PdfPCell cell = new PdfPCell();
-                Paragraph paragraph = new Paragraph("Total de Asistentes: ____/" + cont);
-                paragraph.setAlignment(Paragraph.ALIGN_RIGHT);
-                cell.addElement(paragraph);
-                total.addCell(cell);
-                total.setHorizontalAlignment(0);
-                doc.add(total);
+                doc.add(new Paragraph("Total del Área: ____/" + totalArea));
             }
+
+            // Total general
+            doc.add(new Paragraph("\n"));
+            PdfPTable total = new PdfPTable(1);
+            total.setWidthPercentage(30);
+            PdfPCell cell = new PdfPCell();
+            Paragraph paragraph = new Paragraph("Total de Asistentes: ____/" + totalGeneral);
+            paragraph.setAlignment(Paragraph.ALIGN_RIGHT);
+            cell.addElement(paragraph);
+            total.addCell(cell);
+            total.setHorizontalAlignment(0);
+            doc.add(total);
 
             doc.close();
             JOptionPane.showMessageDialog(null, "Archivo Creado en " + rutaDoc);
