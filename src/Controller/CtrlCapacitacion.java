@@ -46,6 +46,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -802,12 +803,16 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
         }
         
         if (e.getSource() == frm.jMenuItem9) {
-            // Acción a realizar al hacer clic en "Aceptar"
-            frm.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-            if (GeneratorExcel_BDs.BD_CERTIFICADOS()) {
-                frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-            } else {
-                frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            try {
+                // Acción a realizar al hacer clic en "Aceptar"
+                frm.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                if (GeneratorExcel_BDs.BD_CERTIFICADOS()) {
+                    frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                } else {
+                    frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(CtrlCapacitacion.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         

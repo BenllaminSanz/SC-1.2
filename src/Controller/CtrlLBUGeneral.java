@@ -53,7 +53,8 @@ public class CtrlLBUGeneral implements ActionListener {
     }
 
     //Funcion de inicio
-    public void iniciar() {
+    public void iniciar() throws SQLException {
+
         //Llamado a los metodos de diseño de los paneles
         DesingTablas();
         //Funciones de Arranque
