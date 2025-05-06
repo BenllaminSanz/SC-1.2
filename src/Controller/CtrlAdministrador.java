@@ -110,7 +110,11 @@ public class CtrlAdministrador implements ActionListener {
             if (x == null) {
                 ContextoLBU contextoLBU = new ContextoLBU(frame);
                 CtrlLBUGeneral ctrl = new CtrlLBUGeneral(contextoLBU);
-                ctrl.iniciar();
+                try {
+                    ctrl.iniciar();
+                } catch (SQLException ex) {
+                    Logger.getLogger(CtrlAdministrador.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 ViewTools.Centrar(frame, contextoLBU.ventanaLBU);
                 frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
             } else {
