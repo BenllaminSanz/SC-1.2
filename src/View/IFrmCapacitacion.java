@@ -172,9 +172,11 @@ public class IFrmCapacitacion extends javax.swing.JInternalFrame {
         jMenuItem5 = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItem11 = new javax.swing.JMenuItem();
+        jMenuItem10 = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
         jMenuItem6 = new javax.swing.JMenuItem();
         jMenuItem7 = new javax.swing.JMenuItem();
+        jMenuItem12 = new javax.swing.JMenuItem();
         jMenu5 = new javax.swing.JMenu();
         jMenuItem8 = new javax.swing.JMenuItem();
         jMenuItem9 = new javax.swing.JMenuItem();
@@ -1310,6 +1312,10 @@ public class IFrmCapacitacion extends javax.swing.JInternalFrame {
         jMenuItem11.setText("Via PDF");
         jMenu6.add(jMenuItem11);
 
+        jMenuItem10.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/IconPDF.png"))); // NOI18N
+        jMenuItem10.setText("Via PDF Especifico");
+        jMenu6.add(jMenuItem10);
+
         jMenu1.add(jMenu6);
 
         jMenuBar1.add(jMenu1);
@@ -1324,6 +1330,10 @@ public class IFrmCapacitacion extends javax.swing.JInternalFrame {
         jMenuItem7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/IconExcel.png"))); // NOI18N
         jMenuItem7.setText("Generar Formato Anual");
         jMenu4.add(jMenuItem7);
+
+        jMenuItem12.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/IconPDF.png"))); // NOI18N
+        jMenuItem12.setText("Generar Diplomas PDF");
+        jMenu4.add(jMenuItem12);
 
         jMenuBar1.add(jMenu4);
 
@@ -1470,7 +1480,9 @@ public class IFrmCapacitacion extends javax.swing.JInternalFrame {
     private javax.swing.JMenu jMenu6;
     private javax.swing.JMenuBar jMenuBar1;
     public javax.swing.JMenuItem jMenuItem1;
+    public javax.swing.JMenuItem jMenuItem10;
     public javax.swing.JMenuItem jMenuItem11;
+    public javax.swing.JMenuItem jMenuItem12;
     public javax.swing.JMenuItem jMenuItem2;
     public javax.swing.JMenuItem jMenuItem3;
     public javax.swing.JMenuItem jMenuItem4;

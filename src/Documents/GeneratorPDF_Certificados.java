@@ -88,7 +88,7 @@ public class GeneratorPDF_Certificados extends Conexion {
                 if (!rsValidaArea.next()) {
                     continue; // Saltar esta área si no tiene cursos activos
                 }
-                
+
                 Image logo = Image.getInstance(ClassLoader.getSystemResource("Images/LogoParkdale.png"));
                 logo.scalePercent(40F);
                 logo.setAlignment(0);
@@ -97,7 +97,7 @@ public class GeneratorPDF_Certificados extends Conexion {
                 doc.add(new Paragraph("Reporte de Certificados", font1));
                 doc.add(new Paragraph("Área: " + rs.getString("nombre_Area")));
                 doc.add(new Paragraph("\n"));
-                
+
                 String columns = QueryFunctions.CapturaDirecta("SELECT count(*) FROM turno;");
                 PreparedStatement ps1 = con.prepareStatement("SELECT * FROM turno");
                 ResultSet rs1 = ps1.executeQuery();
@@ -996,4 +996,136 @@ public class GeneratorPDF_Certificados extends Conexion {
         }
         return false;
     }
+
+    public static boolean CertificadosResumenEspecifico(String areaSeleccionada, String turnoSeleccionado) {
+        Document doc = new Document();
+        Date fecha = new Date();
+        SimpleDateFormat formatFecha = new SimpleDateFormat("dd-MM-yyyy");
+        String FechaS = formatFecha.format(fecha);
+
+        // Crear un JFileChooser para que el usuario elija la ubicación del archivo
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Guardar Matriz de Certificados Operativos Supervisores");
+        fileChooser.setSelectedFile(new File("Resumen de Flexibilidad de Supervisores Especifico " + FechaS + ".pdf")); // Nombre predeterminado del archivo
+
+        int userSelection = fileChooser.showSaveDialog(null);
+
+        if (userSelection != JFileChooser.APPROVE_OPTION) {
+            // El usuario canceló la operación
+            JOptionPane.showMessageDialog(null, "Operación cancelada por el usuario.");
+            return false;
+        }
+
+        File fileToSave = fileChooser.getSelectedFile();
+        String rutaDoc = fileToSave.getAbsolutePath();
+
+        try {
+            PdfWriter.getInstance(doc, new FileOutputStream(rutaDoc));
+            doc.setPageSize(PageSize.LETTER.rotate());
+            doc.setMargins(20, 20, 20, 20);
+            doc.open();
+
+            Font font = new Font();
+            font.setSize(9);
+            Font font1 = new Font();
+            font1.setSize(8);
+
+            Connection con = conn.getConnection();
+            PreparedStatement psql = con.prepareStatement("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));");
+            psql.execute();
+
+            PreparedStatement ps = null;
+            PreparedStatement ps2 = null;
+
+            if (turnoSeleccionado == "Todos...") {
+                ps = con.prepareStatement("SELECT * FROM sistema_capacitacion.view_certificados_area\n"
+                        + "WHERE nombre_Area = ? GROUP BY `Puesto`");
+                ps.setString(1, areaSeleccionada);
+                
+                PreparedStatement psV = con.prepareStatement("SET @nombre_Area:=?");
+                psV.setString(1, areaSeleccionada);
+                psV.executeUpdate();
+                ps2 = con.prepareStatement("SELECT * FROM sistema_capacitacion.view_certificados_area_total");
+            } else {
+                ps = con.prepareStatement("SELECT * FROM sistema_capacitacion.view_certificados_area_turno\n"
+                        + "WHERE nombre_Area = ? AND nombre_turno = ? GROUP BY `Puesto`");
+                ps.setString(1, areaSeleccionada);
+                ps.setString(2, turnoSeleccionado);
+                
+                PreparedStatement psA = con.prepareStatement("SET @nombre_Area:=?");
+                psA.setString(1, areaSeleccionada);
+                psA.executeUpdate();
+                
+                PreparedStatement psT = con.prepareStatement("SET @nombre_Turno:=?");
+                psT.setString(1, turnoSeleccionado);
+                psT.executeUpdate();
+                
+                ps2 = con.prepareStatement("SELECT * FROM sistema_capacitacion.view_certificados_area_turno_total");
+                System.out.println("1");
+            }
+
+            ResultSet rs = ps.executeQuery();
+
+            Image logo = Image.getInstance(ClassLoader.getSystemResource("Images/LogoParkdale.png"));
+            logo.scalePercent(40F);
+            logo.setAlignment(0);
+            doc.add(logo);
+
+            doc.add(new Paragraph("Resúmen de Flexibilidad Especifico"));
+            doc.add(new Paragraph("Area: " + areaSeleccionada));
+            doc.add(new Paragraph("Turno: " + turnoSeleccionado));
+            doc.add(new Paragraph("Fecha: " + FechaS));
+            doc.add(new Paragraph("\n"));
+
+            PdfPTable tablaE = DesingPDF_LBU.encabezadoSupervisorFlexi();
+            doc.add(tablaE);
+            while (rs.next()) {
+                float[] relativeWidths = new float[]{2F, 0.5F, 0.5F, 0.5F, 0.5F, 0.5F};
+                PdfPTable tabla = new PdfPTable(relativeWidths);
+                tabla.setWidthPercentage(100);
+                tabla.addCell(rs.getString("Puesto"));
+                tabla.addCell(rs.getString("plantilla"));
+                tabla.addCell(rs.getString("certificados"));
+                tabla.addCell(rs.getString("flexibilidad") + "%");
+                tabla.addCell(rs.getString("En Primer Puesto"));
+                tabla.addCell(rs.getString("En Segundo Puesto"));
+                doc.add(tabla);
+            }
+            doc.add(new Phrase("Resúmen: "));
+
+            PdfPTable tablaSt = DesingPDF_LBU.encabezadoSupervisorTotalFlexi();
+            doc.add(tablaSt);
+
+            ResultSet rs2 = ps2.executeQuery();
+            if (rs2.next()) {
+                PdfPTable tablaTotal = new PdfPTable(new float[]{0.5F, 0.5F, 0.5F, 0.5F, 0.5F});
+                tablaTotal.setWidthPercentage(67);
+                tablaTotal.setHorizontalAlignment(Element.ALIGN_RIGHT);
+
+                tablaTotal.addCell(rs2.getString("plantilla"));
+                tablaTotal.addCell(rs2.getString("certificados"));
+                tablaTotal.addCell(rs2.getString("flexibilidad") + "%");
+                tablaTotal.addCell(rs2.getString("En Primer Puesto"));
+                tablaTotal.addCell(rs2.getString("En Segundo Puesto"));
+                doc.add(tablaTotal);
+            }
+            doc.close();
+            JOptionPane.showMessageDialog(null, "Archivo Creado en " + rutaDoc);
+            if (Desktop.isDesktopSupported()) {
+                Desktop desktop = Desktop.getDesktop();
+                if (desktop.isSupported(Desktop.Action.OPEN)) {
+                    // Abrir el documento
+                    desktop.open(new File(rutaDoc));
+                }
+            }
+            return true;
+        } catch (DocumentException | FileNotFoundException | SQLException ex) {
+            Logger.getLogger(GeneratorPDF_LBU.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showConfirmDialog(null, "Error al generar archivo: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (IOException ex) {
+            Logger.getLogger(GeneratorPDF_LBU.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+
 }

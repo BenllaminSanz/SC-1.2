@@ -8,6 +8,7 @@ import ContextController.ContextoEditarCurso;
 import ContextController.ContextoEditarCursoPersonal;
 import ContextController.ContextoEditarHistorialCurso;
 import ContextController.ContextoEditarRequerimientos;
+import Documents.DesingPDF_Diplomas;
 import Documents.GeneratorExcel_BDs;
 import Documents.GeneratorExcel_Certificados;
 import Documents.GeneratorPDF_Certificados;
@@ -36,6 +37,7 @@ import Tables.TableAsistentesCertificados;
 import Tables.TableCertificadosTrabajador;
 import View.FrmAdministrador;
 import View.IFrmCapacitacion;
+import com.itextpdf.text.DocumentException;
 import com.toedter.calendar.JDateChooser;
 import com.toedter.calendar.JMonthChooser;
 import com.toedter.calendar.JYearChooser;
@@ -163,7 +165,9 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
         this.frm.jMenuItem7.addActionListener(this);
         this.frm.jMenuItem8.addActionListener(this);
         this.frm.jMenuItem9.addActionListener(this);
+        this.frm.jMenuItem10.addActionListener(this);
         this.frm.jMenuItem11.addActionListener(this);
+        this.frm.jMenuItem12.addActionListener(this);
         this.frm.jButton1.addActionListener(this);
         this.frm.jButton2.addActionListener(this);
         this.frm.jButton3.addActionListener(this);
@@ -801,7 +805,7 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
                 frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
             }
         }
-        
+
         if (e.getSource() == frm.jMenuItem9) {
             try {
                 // Acción a realizar al hacer clic en "Aceptar"
@@ -815,13 +819,69 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
                 Logger.getLogger(CtrlCapacitacion.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        
+
         if (e.getSource() == frm.jMenuItem11) {
             // Acción a realizar al hacer clic en "Aceptar"
             frm.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             if (GeneratorPDF_Certificados.CertificadosResumenSupervisor()) {
                 frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
             } else {
+                frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            }
+        }
+
+        if (e.getSource() == frm.jMenuItem10) {
+            JComboBox<String> comboBox1 = new JComboBox<>();
+            JComboBox<String> comboBox2 = new JComboBox<>();
+
+            JLabel label1 = new JLabel("Area:");
+            JLabel label2 = new JLabel("Turno:");
+
+            QueryFunctions.LlenarComboBox("area", "nombre_Area", comboBox1);
+            comboBox2.addItem("Todos...");
+            QueryFunctions.LlenarComboBox("turno", "nombre_Turno", comboBox2);
+
+            Object[] components = {label1, comboBox1, label2, comboBox2};
+
+            int option = JOptionPane.showConfirmDialog(null, components, "Reporte Flexibilidad", JOptionPane.PLAIN_MESSAGE);
+
+            if (option == JOptionPane.OK_OPTION) {
+                // Acción a realizar al hacer clic en "Aceptar"
+                frm.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                String areaSeleccionada = (String) comboBox1.getSelectedItem();
+                String turnoSeleccionado = (String) comboBox2.getSelectedItem();
+                if (turnoSeleccionado.equals("Todos...")) {
+                    GeneratorPDF_Certificados.CertificadosResumenEspecifico(areaSeleccionada, turnoSeleccionado);
+                    frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                } else {
+                    GeneratorPDF_Certificados.CertificadosResumenEspecifico(areaSeleccionada, turnoSeleccionado);
+                    frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                }
+            }
+        }
+
+        if (e.getSource() == frm.jMenuItem12) {
+            JYearChooser chooser1 = new JYearChooser();
+            JMonthChooser choorser2 = new JMonthChooser();
+
+            JLabel label1 = new JLabel("Año:");
+            JLabel label2 = new JLabel("Mes:");
+
+            Object[] components = {label1, chooser1, label2, choorser2};
+
+            int option = JOptionPane.showConfirmDialog(null, components, "Diplomas del Mes", JOptionPane.PLAIN_MESSAGE);
+
+            if (option == JOptionPane.OK_OPTION) {
+                // Acción a realizar al hacer clic en "Aceptar"
+                frm.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                int añoSeleccionado = chooser1.getYear();
+                int mesSeleccionado = choorser2.getMonth();
+                try {
+                    DesingPDF_Diplomas.FormatoDiplomas(añoSeleccionado, mesSeleccionado);
+                    frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                } catch (DocumentException ex) {
+                    Logger.getLogger(CtrlCapacitacion.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
             }
         }

@@ -578,7 +578,8 @@ public class GeneratorPDF_Cursos extends Conexion {
                                     + "(FLOOR(DATEDIFF(curdate(),fecha_inicio ) / 7))-(FLOOR(DATEDIFF(fecha_estimada,fecha_inicio ) / 7)) AS diferencia\n"
                                     + "FROM sistema_capacitacion.view_asistentes_cursos\n"
                                     + "LEFT JOIN view_lbu ON view_asistentes_cursos.idAsistentes_Curso = view_lbu.Folio_Trabajador\n"
-                                    + "WHERE nombre_area = ? and nombre_turno = ? AND status_entrenamiento = 'En Entrenamiento'\n"
+                                    + "JOIN view_reporte_entrenamiento ON view_lbu.Folio_Trabajador = view_reporte_entrenamiento.Folio_Trabajador\n"
+                                    + "WHERE view_lbu.nombre_area = ? and view_lbu.nombre_turno = ? AND status_entrenamiento = 'En Entrenamiento'\n"
                                     + "AND id_tipocurso = 2");
 
                             ps3.setString(1, Area);

@@ -1,5 +1,6 @@
 package Documents;
 
+import static Functions.optenerNivel.recibirNivel;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
@@ -12,7 +13,8 @@ import java.sql.SQLException;
 public class DesingPDF_Cursos {
 
     public static PdfPTable encabezadotablaEntrenamientoGeneral(Font font) throws SQLException {
-        PdfPTable tablaPuesto = new PdfPTable(new float[]{0.5F, 1F, 0.7F, 0.4F, 1F, 0.8F, 0.5F, 0.5F, 0.5F, 0.5F, 0.5F, 1F});
+        PdfPTable tablaPuesto = new PdfPTable(
+                new float[]{0.6F, 1.0F, 0.9F, 0.4F, 0.4F, 0.4F, 0.9F, 1.0F, 0.8F, 0.7F, 0.7F, 0.6F, 0.6F, 0.6F, 0.8F});
         tablaPuesto.setWidthPercentage(100);
         BaseColor color = new BaseColor(175, 196, 174);
         Font font1 = new Font();
@@ -24,6 +26,9 @@ public class DesingPDF_Cursos {
         tablaPuesto.addCell(createHeaderCell("Nombre", font1, color, 1));
         tablaPuesto.addCell(createHeaderCell("Área", font1, color, 1));
         tablaPuesto.addCell(createHeaderCell("Turno", font1, color, 1));
+        tablaPuesto.addCell(createHeaderCell("Nivel", font1, color, 1));
+        tablaPuesto.addCell(createHeaderCell("Salario", font1, color, 1));
+        tablaPuesto.addCell(createHeaderCell("Estado", font1, color, 1));
         tablaPuesto.addCell(createHeaderCell("Curso", font1, color, 1));
         tablaPuesto.addCell(createHeaderCell("Entrenamiento", font1, color, 1));
         tablaPuesto.addCell(createHeaderCell("Fecha Inicio", font1, color, 1));
@@ -37,7 +42,8 @@ public class DesingPDF_Cursos {
     }
 
     public static PdfPTable tablaEntrenamientoGeneral(Font font, ResultSet rs1) throws SQLException {
-        PdfPTable tablaPuesto = new PdfPTable(new float[]{0.5F, 1F, 0.7F, 0.4F, 1F, 0.8F, 0.5F, 0.5F, 0.5F, 0.5F, 0.5F, 1F});
+        PdfPTable tablaPuesto = new PdfPTable(
+                new float[]{0.6F, 1.0F, 0.9F, 0.4F, 0.4F, 0.4F, 0.9F, 1.0F, 0.8F, 0.7F, 0.7F, 0.6F, 0.6F, 0.6F, 0.8F});
         tablaPuesto.setWidthPercentage(100);
 
         Font font1 = new Font();
@@ -46,8 +52,8 @@ public class DesingPDF_Cursos {
         font1.setColor(BaseColor.RED);
 
         // Agregar celdas de datos
-        String[] columnas = {"idAsistentes_Curso", "Nombre_Asistente", "nombre_Area", "nombre_Turno", "nombre_curso", "tipo_entrenamiento",
-            "fecha_inicio", "fecha_estimada", "programadas", "actual", "diferencia", "nombre_instructor"};
+        String[] columnas = {"idAsistentes_Curso", "Nombre_Asistente", "nombre_Area", "nombre_Turno", "Nivel", "Salario", "Estado",
+            "nombre_curso", "tipo_entrenamiento", "fecha_inicio", "fecha_estimada", "programadas", "actual", "diferencia", "nombre_instructor"};
         for (String columna : columnas) {
             PdfPCell celda = new PdfPCell();
             switch (columna) {
@@ -76,6 +82,12 @@ public class DesingPDF_Cursos {
                         celda.setVerticalAlignment(Element.ALIGN_MIDDLE);
                         tablaPuesto.addCell(celda);
                     }
+                    break;
+                case "Nivel":
+                    celda.setPhrase(new Phrase(recibirNivel(rs1), font));
+                    celda.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    celda.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    tablaPuesto.addCell(celda);
                     break;
                 default:
                     celda.setPhrase(new Phrase(rs1.getString(columna), font));
