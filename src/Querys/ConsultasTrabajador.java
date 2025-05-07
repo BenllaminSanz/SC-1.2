@@ -143,6 +143,7 @@ public class ConsultasTrabajador extends Conexion {
                 ps.setNull(16, tbr.getBrigada());
             }
             ps.setString(17, folio);
+            System.out.println(ps);
             ps.execute();
             return true;
         } catch (SQLException ex) {
@@ -457,57 +458,57 @@ public class ConsultasTrabajador extends Conexion {
         try {
             ps = con.prepareStatement(sql);
 
-            Cell celdaFolio = fila.getCell(indiceFolio);
-            if (celdaFolio != null && celdaFolio.getCellTypeEnum() == CellType.NUMERIC) {
-                ps.setInt(1, (int) celdaFolio.getNumericCellValue());
-            } else {
-                // Maneja el caso donde la celda está vacía o el tipo no es el esperado
-                ps.setNull(1, java.sql.Types.INTEGER);
-            }
+            ps.setString(1, fila.getCell(indiceNombre) != null ? fila.getCell(indiceNombre).getStringCellValue() : "");
 
-            ps.setString(2, fila.getCell(indiceNombre) != null ? fila.getCell(indiceNombre).getStringCellValue() : "");
-
-            ps.setString(3, cmbDec(fila.getCell(indiceSalario)));
+            ps.setString(2, cmbDec(fila.getCell(indiceSalario)));
 
             Cell celda1 = fila.getCell(indiceFechaAntiguedad);
             if (celda1 != null) {
-                ps.setString(4, DateTools.ExceltoMySQLfromCell(celda1));
+                ps.setString(3, DateTools.ExceltoMySQLfromCell(celda1));
             } else {
-                ps.setNull(4, java.sql.Types.VARCHAR); // Si la celda es null, establece el valor como NULL
+                ps.setNull(3, java.sql.Types.VARCHAR); // Si la celda es null, establece el valor como NULL
             }
 
             Cell celda2 = fila.getCell(indiceFechaCumpleanos);
             if (celda2 != null) {
-                ps.setString(5, DateTools.ExceltoMySQLfromCell(celda2));
+                ps.setString(4, DateTools.ExceltoMySQLfromCell(celda2));
             } else {
-                ps.setNull(5, java.sql.Types.VARCHAR); // Si la celda es null, establece el valor como NULL
+                ps.setNull(4, java.sql.Types.VARCHAR); // Si la celda es null, establece el valor como NULL
             }
 
-            ps.setString(6, fila.getCell(indiceCurp) != null ? fila.getCell(indiceCurp).getStringCellValue() : "");
-            ps.setString(7, fila.getCell(indiceRfc) != null ? fila.getCell(indiceRfc).getStringCellValue() : "");
+            ps.setString(5, fila.getCell(indiceCurp) != null ? fila.getCell(indiceCurp).getStringCellValue() : "");
+            ps.setString(6, fila.getCell(indiceRfc) != null ? fila.getCell(indiceRfc).getStringCellValue() : "");
 
             int celdaIMSS = 0;
             Cell celdaIMSSValue = fila.getCell(indiceImss);
             if (celdaIMSSValue != null && celdaIMSSValue.getCellTypeEnum() == CellType.NUMERIC) {
                 celdaIMSS = (int) celdaIMSSValue.getNumericCellValue();
             }
-            ps.setString(8, String.valueOf(celdaIMSS));
+            ps.setString(7, String.valueOf(celdaIMSS));
 
-            ps.setString(9, fila.getCell(indiceEmail) != null ? fila.getCell(indiceEmail).getStringCellValue() : "");
+            ps.setString(8, fila.getCell(indiceEmail) != null ? fila.getCell(indiceEmail).getStringCellValue() : "");
 
             Cell celdaTel = fila.getCell(indiceTelefono);
             if (celdaTel != null) {
                 if (celdaTel.getCellTypeEnum() == CellType.NUMERIC) {
                     long longTel = (long) celdaTel.getNumericCellValue();
                     String tel = String.valueOf(longTel);
-                    ps.setString(10, tel);
+                    ps.setString(9, tel);
                 } else if (celdaTel.getCellTypeEnum() == CellType.STRING) {
                     String tel = celdaTel.getStringCellValue();
                     tel = tel.replaceAll("\\s+", "");
-                    ps.setString(10, tel);
+                    ps.setString(9, tel);
                 }
             } else {
-                ps.setNull(10, java.sql.Types.VARCHAR); // Si la celda de teléfono es null, establece el valor como NULL
+                ps.setNull(9, java.sql.Types.VARCHAR); // Si la celda de teléfono es null, establece el valor como NULL
+            }
+            
+            Cell celdaFolio = fila.getCell(indiceFolio);
+            if (celdaFolio != null && celdaFolio.getCellTypeEnum() == CellType.NUMERIC) {
+                ps.setInt(10, (int) celdaFolio.getNumericCellValue());
+            } else {
+                // Maneja el caso donde la celda está vacía o el tipo no es el esperado
+                ps.setNull(10, java.sql.Types.INTEGER);
             }
 
             ps.execute();

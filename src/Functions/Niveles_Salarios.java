@@ -12,7 +12,7 @@ public class Niveles_Salarios {
             if (salarioStr != null && !salarioStr.isEmpty()) {
                 try {
                     double nivelSalario = Double.parseDouble(salarioStr);
-                    if (salario >= nivelSalario && nivelSalario > mejorSalario) {
+                    if (salario == nivelSalario && nivelSalario > mejorSalario) {
                         mejorSalario = nivelSalario;
                         mejorNivel = key.replace("nivel.", "");
                     }
@@ -21,7 +21,6 @@ public class Niveles_Salarios {
                 }
             }
         }
-
         return mejorNivel.isEmpty() ? "" : mejorNivel;
     }
 }

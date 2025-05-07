@@ -148,7 +148,8 @@ public class CtrlEditarTrabajador implements ActionListener {
                 } else{
                     mod.setBrigadista(false);
                 }
-            
+                    System.out.println(folio);
+
             //Llamada a la funcion de modificar enviando los datos guardados en la instacia
             if (modC.modificar(mod, folio)) {
                 JOptionPane.showMessageDialog(null, "Registro Modificado");
