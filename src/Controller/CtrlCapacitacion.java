@@ -109,8 +109,7 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
     private final ConsultasPersonalCertificado modTCt = new ConsultasPersonalCertificado();
     private final IFrmCapacitacion frm;
     private final FrmAdministrador frmA;
-//    int year = Calendar.getInstance().get(Calendar.YEAR);
-    int year = 2023;
+    int year = Calendar.getInstance().get(Calendar.YEAR);
 
     //Relacionamos el controlador con la vista
     public CtrlCapacitacion(ContextoCapacitacion contexto) {
@@ -168,6 +167,7 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
         this.frm.jMenuItem10.addActionListener(this);
         this.frm.jMenuItem11.addActionListener(this);
         this.frm.jMenuItem12.addActionListener(this);
+        this.frm.jMenuItem13.addActionListener(this);
         this.frm.jButton1.addActionListener(this);
         this.frm.jButton2.addActionListener(this);
         this.frm.jButton3.addActionListener(this);
@@ -660,6 +660,17 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
             frm.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             try {
                 GeneratorPDF_Cursos.Entrenamiento_General();
+                frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            } catch (Exception ex) {
+                Logger.getLogger(CtrlEditarTrabajador.class.getName()).log(Level.SEVERE, null, ex);
+                frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            }
+        }
+        
+        if (e.getSource() == frm.jMenuItem13) {
+            frm.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            try {
+                GeneratorPDF_Cursos.Entrenamiento_GeneralSalarios();
                 frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
             } catch (Exception ex) {
                 Logger.getLogger(CtrlEditarTrabajador.class.getName()).log(Level.SEVERE, null, ex);

@@ -57,8 +57,11 @@ public class CtrlEditarCertificado implements ActionListener {
         if (e.getSource() == frm.btn_guardar && frm.btn_guardar.getText().equals("Guardar")) {
             mod.setNombre_Certificado(frm.txt_certificado.getText());
             mod.setGerente1(frm.txt_gerente1.getText());
+            mod.setGerente1(frm.txt_gerente1.getText());
             mod.setGerente2(frm.txt_gerente2.getText());
+            mod.setGerente1(frm.txt_gerente1.getText());
             mod.setGerente3(frm.txt_gerente3.getText());
+            mod.setGerente1(frm.txt_gerente1.getText());
             if (!frm.cb_nocurso.isSelected()) {
                 if (modC.agregarCertificado(mod)) {
                     JOptionPane.showMessageDialog(frm,
@@ -88,6 +91,10 @@ public class CtrlEditarCertificado implements ActionListener {
             mod.setGerente1(frm.txt_gerente1.getText());
             mod.setGerente2(frm.txt_gerente2.getText());
             mod.setGerente3(frm.txt_gerente3.getText());
+            mod.setPuesto1(frm.txt_gerente1.getText());
+            mod.setPuesto2(frm.txt_gerente2.getText());
+            mod.setPuesto3(frm.txt_gerente3.getText());
+            
             if (!frm.cb_nocurso.isSelected()) {
                 if (modC.actualizarCurso(mod)) {
                     JOptionPane.showMessageDialog(frm,

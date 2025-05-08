@@ -24,11 +24,11 @@ public class IFrmEditarCertificado extends javax.swing.JInternalFrame {
         txt_gerente2 = new javax.swing.JTextField();
         txt_gerente3 = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        txt_puesto1 = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
+        txt_puesto2 = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
-        jTextField3 = new javax.swing.JTextField();
+        txt_puesto3 = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable_Puestos = new javax.swing.JTable();
         btn_AgregarPuesto = new javax.swing.JButton();
@@ -52,17 +52,15 @@ public class IFrmEditarCertificado extends javax.swing.JInternalFrame {
 
         jLabel5.setText("Gerente 3:");
 
-        txt_gerente1.setText("Simón Aguilar Delova");
-
-        txt_gerente2.setText("Leonel Toledo Lili");
+        txt_gerente2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txt_gerente2ActionPerformed(evt);
+            }
+        });
 
         jLabel6.setText("Puesto:");
 
-        jTextField1.setText("Gerente de Planta");
-
         jLabel7.setText("Puesto:");
-
-        jTextField2.setText("Gerente de Recursos Humanos");
 
         jLabel8.setText("Puesto:");
 
@@ -102,7 +100,7 @@ public class IFrmEditarCertificado extends javax.swing.JInternalFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel7)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField2))
+                        .addComponent(txt_puesto2))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel4)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -110,7 +108,7 @@ public class IFrmEditarCertificado extends javax.swing.JInternalFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel6)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField1))
+                        .addComponent(txt_puesto1))
                     .addComponent(jLabel1)
                     .addComponent(jLabel2)
                     .addGroup(layout.createSequentialGroup()
@@ -121,7 +119,7 @@ public class IFrmEditarCertificado extends javax.swing.JInternalFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel8)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField3))
+                        .addComponent(txt_puesto3))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btn_cancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -153,7 +151,7 @@ public class IFrmEditarCertificado extends javax.swing.JInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel6)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(txt_puesto1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel4)
@@ -161,7 +159,7 @@ public class IFrmEditarCertificado extends javax.swing.JInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel7)
-                            .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(txt_puesto2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(txt_gerente3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -169,7 +167,7 @@ public class IFrmEditarCertificado extends javax.swing.JInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel8)
-                            .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(txt_puesto3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(40, 40, 40)
                         .addComponent(btn_cancelar)))
                 .addContainerGap())
@@ -177,6 +175,10 @@ public class IFrmEditarCertificado extends javax.swing.JInternalFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void txt_gerente2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_gerente2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txt_gerente2ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -196,12 +198,12 @@ public class IFrmEditarCertificado extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JScrollPane jScrollPane1;
     public javax.swing.JTable jTable_Puestos;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
     public javax.swing.JTextField txt_certificado;
     public javax.swing.JTextField txt_gerente1;
     public javax.swing.JTextField txt_gerente2;
     public javax.swing.JTextField txt_gerente3;
+    public javax.swing.JTextField txt_puesto1;
+    public javax.swing.JTextField txt_puesto2;
+    public javax.swing.JTextField txt_puesto3;
     // End of variables declaration//GEN-END:variables
 }

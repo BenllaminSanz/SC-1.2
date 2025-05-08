@@ -61,16 +61,17 @@ public class ConsultasSupervisor extends Conexion {
         String sql = "INSERT INTO `sistema_capacitacion`.`supervisor`\n"
                 + "(`idSupervisor`,"
                 + "`Nombre_Supervisor`,\n"
+                + "`Propuesto_Trabajadores`,\n"
                 + "`area_idArea`)\n"
                 + "VALUES\n"
-                + "(?,?,?);";
+                + "(?,?,?,?);";
 
         try {
             ps = con.prepareStatement(sql);
             ps.setInt(1, tbr.getId_supervisor());
             ps.setString(2, tbr.getNombre_supervisor());
-            ps.setInt(3, tbr.getArea_idarea());
-            System.out.println(ps);
+            ps.setInt(3, tbr.getPropuesto_trabajadores());
+            ps.setInt(4, tbr.getArea_idarea());
             ps.execute();
 
             if (buscar(tbr)) {

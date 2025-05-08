@@ -51,6 +51,7 @@ public class Graphics_Cursos {
                 + "    SUM(num_asistentes)/SUM(asistentes_esperados) AS porcentaje\n"
                 + "FROM sistema_capacitacion.view_historialcursos\n"
                 + "WHERE estado_curso = 'Concluido'\n"
+                + "AND YEAR(fecha_inicio) = YEAR(CURDATE())"
                 + "GROUP BY id_tipocurso\n"
                 + "ORDER BY id_tipocurso;";
 
@@ -145,6 +146,7 @@ public class Graphics_Cursos {
                 + "SUM(horas_asistentes)/60 AS horas_capacitacion\n"
                 + "FROM sistema_capacitacion.view_historialcursos\n"
                 + "WHERE estado_curso = 'Concluido'\n"
+                + "AND YEAR(fecha_inicio) = YEAR(CURDATE())"
                 + "GROUP BY id_tipocurso\n"
                 + "ORDER BY id_tipocurso;";
 
@@ -211,7 +213,8 @@ public class Graphics_Cursos {
                 + "SUM(duracion_curso)/60 AS horas_curso,\n"
                 + "SUM(horas_asistentes)/60 AS horas_capacitacion\n"
                 + "FROM sistema_capacitacion.view_historialcursos\n"
-                + "WHERE estado_curso = 'Concluido';";
+                + "WHERE estado_curso = 'Concluido'\n"
+                + "AND YEAR(fecha_inicio) = YEAR(CURDATE());";
 
         try {
             PreparedStatement ps = con.prepareStatement(mode);

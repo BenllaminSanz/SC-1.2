@@ -127,35 +127,40 @@ public class GeneratorPDF_Brigadas extends Conexion {
                 }
             }
 
-            doc.add(logo);
-
             PreparedStatement ps2 = con.prepareStatement("SELECT area_administrativo FROM sistema_capacitacion.administrativos group by area_administrativo;");
             ResultSet rs2 = ps2.executeQuery();
 
+            int cont = 0;
+            float[] relativeWidths = {0.5F, 2F, 2, 0.7F};
+            PdfPTable tabla = new PdfPTable(relativeWidths);
+            tabla.setWidthPercentage(100);
+
+            BaseColor color = new BaseColor(175, 196, 174);
+            Font font1 = new Font();
+            font1.setStyle(Font.BOLD);
+            font1.setSize(10);
+
+            tabla.addCell(createHeaderCell("NÚM. NOM", font1, color, 1));
+            tabla.addCell(createHeaderCell("NOMBRE COMPLETO", font1, color, 1));
+            tabla.addCell(createHeaderCell("BRIGADISTA", font1, color, 1));
+            tabla.addCell(createHeaderCell("ASISTENCIA", font1, color, 1));
+
             while (rs2.next()) {
+                
+                doc.add(logo);
+                doc.add(new Paragraph("Lista de Emergencia, Área Admnistrativa "));
+                doc.add(new Paragraph("Fecha: " + FechaS));
+                doc.add(new Paragraph("\n"));
+                
                 PreparedStatement ps3 = con.prepareStatement("SELECT turno FROM sistema_capacitacion.administrativos group by turno;");
                 ResultSet rs3 = ps3.executeQuery();
 
                 while (rs3.next()) {
-                    float[] relativeWidths = {0.5F, 2F, 2, 0.7F};
-                    PdfPTable tabla = new PdfPTable(relativeWidths);
-                    tabla.setWidthPercentage(100);
-
-                    BaseColor color = new BaseColor(175, 196, 174);
-                    Font font1 = new Font();
-                    font1.setStyle(Font.BOLD);
-                    font1.setSize(10);
-
-                    tabla.addCell(createHeaderCell("NÚM. NOM", font1, color, 1));
-                    tabla.addCell(createHeaderCell("NOMBRE COMPLETO", font1, color, 1));
-                    tabla.addCell(createHeaderCell("BRIGADISTA", font1, color, 1));
-                    tabla.addCell(createHeaderCell("ASISTENCIA", font1, color, 1));
-
                     PreparedStatement ps4 = con.prepareStatement("SELECT * FROM sistema_capacitacion.administrativos vt \n"
                             + "LEFT JOIN brigadas b ON vt.brigada_idBrigada = b.idbrigadas WHERE area_administrativo = '" + rs2.getString("area_administrativo") + "'\n"
                             + "AND turno = '" + rs3.getString("turno") + "'");
                     ResultSet rs4 = ps4.executeQuery();
-                    int cont = 0;
+
                     while (rs4.next()) {
                         tabla.addCell(new Phrase(rs4.getString(1), font));
                         tabla.addCell(new Phrase(rs4.getString(2), font));
@@ -163,26 +168,22 @@ public class GeneratorPDF_Brigadas extends Conexion {
                         tabla.addCell("");
                         cont++;
                     }
+                }
 
-                    if (cont > 0) {
-                        doc.add(new Paragraph("Lista de Emergencia, Área: " + rs2.getString("area_administrativo")
-                                + ", Turno: " + rs3.getString("turno")));
-                        doc.add(new Paragraph("Fecha: " + FechaS));
-                        doc.add(new Paragraph("\n"));
+                if (cont > 0) {
+                    doc.add(tabla);
+                    doc.add(new Paragraph("\n"));
 
-                        doc.add(tabla);
-                        doc.add(new Paragraph("\n"));
-
-                        PdfPTable total = new PdfPTable(1);
-                        total.setWidthPercentage(30);
-                        PdfPCell cell = new PdfPCell();
-                        Paragraph paragraph = new Paragraph("Total de Asistentes: ____/" + cont);
-                        paragraph.setAlignment(Paragraph.ALIGN_RIGHT);
-                        cell.addElement(paragraph);
-                        total.addCell(cell);
-                        total.setHorizontalAlignment(0);
-                        doc.add(total);
-                    }
+                    PdfPTable total = new PdfPTable(1);
+                    total.setWidthPercentage(30);
+                    PdfPCell cell = new PdfPCell();
+                    Paragraph paragraph = new Paragraph("Total de Asistentes: ____/" + cont);
+                    paragraph.setAlignment(Paragraph.ALIGN_RIGHT);
+                    cell.addElement(paragraph);
+                    total.addCell(cell);
+                    total.setHorizontalAlignment(0);
+                    doc.add(total);
+                    doc.newPage();
                 }
 
             }

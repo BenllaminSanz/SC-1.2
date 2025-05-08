@@ -165,6 +165,7 @@ public class IFrmCapacitacion extends javax.swing.JInternalFrame {
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem13 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
         jMenuItem3 = new javax.swing.JMenuItem();
@@ -1282,6 +1283,15 @@ public class IFrmCapacitacion extends javax.swing.JInternalFrame {
         jMenuItem1.setText("Reporte General PDF");
         jMenu2.add(jMenuItem1);
 
+        jMenuItem13.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/IconPDF.png"))); // NOI18N
+        jMenuItem13.setText("Reporte General con Salarios PDF");
+        jMenuItem13.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem13ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItem13);
+
         jMenuItem2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/IconPDF.png"))); // NOI18N
         jMenuItem2.setText("Reporte Especifico PDF");
         jMenu2.add(jMenuItem2);
@@ -1396,6 +1406,10 @@ public class IFrmCapacitacion extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_cb_areaItemStateChanged
 
+    private void jMenuItem13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem13ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jMenuItem13ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JMenuItem AgregarCurso;
@@ -1483,6 +1497,7 @@ public class IFrmCapacitacion extends javax.swing.JInternalFrame {
     public javax.swing.JMenuItem jMenuItem10;
     public javax.swing.JMenuItem jMenuItem11;
     public javax.swing.JMenuItem jMenuItem12;
+    public javax.swing.JMenuItem jMenuItem13;
     public javax.swing.JMenuItem jMenuItem2;
     public javax.swing.JMenuItem jMenuItem3;
     public javax.swing.JMenuItem jMenuItem4;

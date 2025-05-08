@@ -27,7 +27,10 @@ public class ConsultasCertificado extends Conexion {
                 mod.setGerente1(rs.getString("gerente1"));
                 mod.setGerente2(rs.getString("gerente2"));
                 mod.setGerente3(rs.getString("gerente3"));
-                
+                mod.setPuesto1(rs.getString("puesto1"));
+                mod.setPuesto2(rs.getString("puesto2"));
+                mod.setPuesto3(rs.getString("puesto3"));
+
                 return true;
             }
             return false;
@@ -47,10 +50,10 @@ public class ConsultasCertificado extends Conexion {
         PreparedStatement ps = null;
         Connection con = getConnection();
         String sql = "INSERT INTO `sistema_capacitacion`.`certificado`\n"
-                + "(`nombre_certificado`,`gerente1`,`gerente2`,`gerente3`)\n"
+                + "(`nombre_certificado`,`gerente1`,`gerente2`,`gerente3`,`puesto1`,`puesto2`,`puesto3`)\n"
                 + "VALUES\n"
-                + "(?,?,?,?);";
-        
+                + "(?,?,?,?,?,?,?);";
+
         String sql1 = "SELECT * FROM `sistema_capacitacion`.`certificado`\n"
                 + "WHERE nombre_certificado = ?";
 
@@ -60,11 +63,13 @@ public class ConsultasCertificado extends Conexion {
             ps.setString(2, mod.getGerente1());
             ps.setString(3, mod.getGerente2());
             ps.setString(4, mod.getGerente3());
+            ps.setString(5, mod.getPuesto1());
+            ps.setString(6, mod.getPuesto2());
+            ps.setString(7, mod.getPuesto3());
             ps.execute();
-            
+
             ps = con.prepareStatement(sql1);
-            
-            
+
             return true;
 
         } catch (SQLException e) {
@@ -83,9 +88,9 @@ public class ConsultasCertificado extends Conexion {
         PreparedStatement ps = null;
         Connection con = getConnection();
         String sql = "INSERT INTO `sistema_capacitacion`.`certificado`\n"
-                + "(`nombre_certificado`,`gerente1`,`gerente2`,`gerente3`) "
+                + "(`nombre_certificado`,`gerente1`,`gerente2`,`gerente3`, `puesto1`,`puesto2`,`puesto3`) "
                 + "VALUES\n"
-                + "(?,?,?,?);";
+                + "(?,?,?,?,?,?,?);";
 
         try {
             ps = con.prepareStatement(sql);
@@ -93,6 +98,9 @@ public class ConsultasCertificado extends Conexion {
             ps.setString(2, mod.getGerente1());
             ps.setString(3, mod.getGerente2());
             ps.setString(4, mod.getGerente3());
+            ps.setString(5, mod.getPuesto1());
+            ps.setString(6, mod.getPuesto2());
+            ps.setString(7, mod.getPuesto3());
             ps.execute();
             return true;
 
@@ -117,7 +125,10 @@ public class ConsultasCertificado extends Conexion {
                 + "`nombre_certificado` = ?,\n"
                 + "`gerente1` = ?,"
                 + "`gerente2` = ?,"
-                + "`gerente3` = ?\n"
+                + "`gerente3` = ?,"
+                + "`puesto1` = ?,"
+                + "`puesto2` = ?,"
+                + "`puesto3` = ?\n"
                 + "WHERE `idcertificado` = ?;";
 
         try {
@@ -126,7 +137,11 @@ public class ConsultasCertificado extends Conexion {
             ps.setString(2, mod.getGerente1());
             ps.setString(3, mod.getGerente2());
             ps.setString(4, mod.getGerente3());
-            ps.setInt(5, mod.getIdCertificado());
+            ps.setString(5, mod.getPuesto1());
+            ps.setString(6, mod.getPuesto2());
+            ps.setString(7, mod.getPuesto3());
+            ps.setInt(8, mod.getIdCertificado());
+            System.out.println("3: " + ps);
             ps.execute();
             return true;
 
@@ -151,7 +166,10 @@ public class ConsultasCertificado extends Conexion {
                 + "`nombre_certificado` = ?,\n"
                 + "`gerente1` = ?,"
                 + "`gerente2` = ?,"
-                + "`gerente3` = ?\n"
+                + "`gerente3` = ?,"
+                + "`puesto1` = ?,"
+                + "`puesto2` = ?,"
+                + "`puesto3` = ?\n"
                 + "WHERE `idcertificado` = ?;";
 
         try {
@@ -160,7 +178,11 @@ public class ConsultasCertificado extends Conexion {
             ps.setString(2, mod.getGerente1());
             ps.setString(3, mod.getGerente2());
             ps.setString(4, mod.getGerente3());
-            ps.setInt(5, mod.getIdCertificado());
+            ps.setString(5, mod.getPuesto1());
+            ps.setString(6, mod.getPuesto2());
+            ps.setString(7, mod.getPuesto3());
+            ps.setInt(8, mod.getIdCertificado());
+            System.out.println("2: " + ps);
             ps.execute();
             return true;
 

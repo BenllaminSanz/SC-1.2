@@ -22,7 +22,7 @@ public class optenerNivel {
             properties.load(fis);
             
             // Obtener el salario del trabajador
-            double salario = rs.getDouble("Salario");
+            double salario = rs.getDouble("SalarioDiario_Trabajador");
             // Determinar el nivel del trabajador
             String nivel = Niveles_Salarios.determinarNivel(salario, properties);
             // Asignar el nivel al objeto tbr

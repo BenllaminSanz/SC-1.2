@@ -14,6 +14,90 @@ public class DesingPDF_Cursos {
 
     public static PdfPTable encabezadotablaEntrenamientoGeneral(Font font) throws SQLException {
         PdfPTable tablaPuesto = new PdfPTable(
+                new float[]{0.6F, 1.0F, 0.9F, 0.4F, 0.4F, 1.0F, 0.8F, 0.7F, 0.7F, 0.6F, 0.6F, 0.6F, 0.8F});
+        tablaPuesto.setWidthPercentage(100);
+        BaseColor color = new BaseColor(175, 196, 174);
+        Font font1 = new Font();
+        font1.setStyle(Font.BOLD);
+        font1.setSize(9);
+
+        // Agregar celda de encabezado
+        tablaPuesto.addCell(createHeaderCell("Nomina", font1, color, 1));
+        tablaPuesto.addCell(createHeaderCell("Nombre", font1, color, 1));
+        tablaPuesto.addCell(createHeaderCell("Área", font1, color, 1));
+        tablaPuesto.addCell(createHeaderCell("Turno", font1, color, 1));
+        tablaPuesto.addCell(createHeaderCell("Nivel", font1, color, 1));
+        tablaPuesto.addCell(createHeaderCell("Curso", font1, color, 1));
+        tablaPuesto.addCell(createHeaderCell("Entrenamiento", font1, color, 1));
+        tablaPuesto.addCell(createHeaderCell("Fecha Inicio", font1, color, 1));
+        tablaPuesto.addCell(createHeaderCell("Fecha Cierre Programada", font1, color, 1));
+        tablaPuesto.addCell(createHeaderCell("Sem. Progamadas", font1, color, 1));
+        tablaPuesto.addCell(createHeaderCell("Sem. Entrenamiento Actual", font1, color, 1));
+        tablaPuesto.addCell(createHeaderCell("Diferencia", font1, color, 1));
+        tablaPuesto.addCell(createHeaderCell("Instructor", font1, color, 1));
+
+        return tablaPuesto;
+    }
+
+    public static PdfPTable tablaEntrenamientoGeneral(Font font, ResultSet rs1) throws SQLException {
+        PdfPTable tablaPuesto = new PdfPTable(
+                new float[]{0.6F, 1.0F, 0.9F, 0.4F, 0.4F, 1.0F, 0.8F, 0.7F, 0.7F, 0.6F, 0.6F, 0.6F, 0.8F});
+        tablaPuesto.setWidthPercentage(100);
+
+        Font font1 = new Font();
+        font1.setStyle(Font.BOLD);
+        font1.setSize(8);
+        font1.setColor(BaseColor.RED);
+
+        // Agregar celdas de datos
+        String[] columnas = {"idAsistentes_Curso", "Nombre_Asistente", "nombre_Area", "nombre_Turno", "Nivel",
+            "nombre_curso", "tipo_entrenamiento", "fecha_inicio", "fecha_estimada", "programadas", "actual", "diferencia", "nombre_instructor"};
+        for (String columna : columnas) {
+            PdfPCell celda = new PdfPCell();
+            switch (columna) {
+                case "nombre_Turno":
+                case "actual":
+                case "programadas":
+                    celda.setPhrase(new Phrase(rs1.getString(columna), font));
+                    celda.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    celda.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    tablaPuesto.addCell(celda);
+                    break;
+                case "diferencia":
+                    if (rs1.getInt(columna) > 0) {
+                        celda.setPhrase(new Phrase("+" + rs1.getString(columna), font1));
+                        celda.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        celda.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                        tablaPuesto.addCell(celda);
+                    } else if (rs1.getInt(columna) < 0) {
+                        celda.setPhrase(new Phrase(rs1.getString(columna), font));
+                        celda.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        celda.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                        tablaPuesto.addCell(celda);
+                    } else {
+                        celda.setPhrase(new Phrase(rs1.getString(columna), font));
+                        celda.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        celda.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                        tablaPuesto.addCell(celda);
+                    }
+                    break;
+                case "Nivel":
+                    celda.setPhrase(new Phrase(recibirNivel(rs1), font));
+                    celda.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    celda.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    tablaPuesto.addCell(celda);
+                    break;
+                default:
+                    celda.setPhrase(new Phrase(rs1.getString(columna), font));
+                    tablaPuesto.addCell(celda);
+                    break;
+            }
+        }
+        return tablaPuesto;
+    }
+
+    public static PdfPTable encabezadotablaEntrenamientoGeneralSalarios(Font font) throws SQLException {
+        PdfPTable tablaPuesto = new PdfPTable(
                 new float[]{0.6F, 1.0F, 0.9F, 0.4F, 0.4F, 0.4F, 0.9F, 1.0F, 0.8F, 0.7F, 0.7F, 0.6F, 0.6F, 0.6F, 0.8F});
         tablaPuesto.setWidthPercentage(100);
         BaseColor color = new BaseColor(175, 196, 174);
@@ -41,7 +125,7 @@ public class DesingPDF_Cursos {
         return tablaPuesto;
     }
 
-    public static PdfPTable tablaEntrenamientoGeneral(Font font, ResultSet rs1) throws SQLException {
+    public static PdfPTable tablaEntrenamientoGeneralSalarios(Font font, ResultSet rs1) throws SQLException {
         PdfPTable tablaPuesto = new PdfPTable(
                 new float[]{0.6F, 1.0F, 0.9F, 0.4F, 0.4F, 0.4F, 0.9F, 1.0F, 0.8F, 0.7F, 0.7F, 0.6F, 0.6F, 0.6F, 0.8F});
         tablaPuesto.setWidthPercentage(100);
@@ -52,7 +136,7 @@ public class DesingPDF_Cursos {
         font1.setColor(BaseColor.RED);
 
         // Agregar celdas de datos
-        String[] columnas = {"idAsistentes_Curso", "Nombre_Asistente", "nombre_Area", "nombre_Turno", "Nivel", "Salario", "Estado",
+        String[] columnas = {"idAsistentes_Curso", "Nombre_Asistente", "nombre_Area", "nombre_Turno", "Nivel", "SalarioDiario_Trabajador", "Estado",
             "nombre_curso", "tipo_entrenamiento", "fecha_inicio", "fecha_estimada", "programadas", "actual", "diferencia", "nombre_instructor"};
         for (String columna : columnas) {
             PdfPCell celda = new PdfPCell();

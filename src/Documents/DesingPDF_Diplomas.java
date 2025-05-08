@@ -2,6 +2,7 @@ package Documents;
 
 import Functions.DateTools;
 import Querys.Conexion;
+import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
@@ -65,44 +66,21 @@ public class DesingPDF_Diplomas extends Conexion {
                 String nombreCompleto = rs.getString("Nombres") + " " + rs.getString("Apellidos");
                 String tipoCertificado = rs.getString("tipo_certificacion");
                 String nombreCertificado = rs.getString("nombre_certificado");
-                SimpleDateFormat formatoFecha = new SimpleDateFormat("'Yecapixtla, Mor a' d 'de' MMMM 'del' yyyy", new Locale("es", "MX"));
+                SimpleDateFormat formatoFecha = new SimpleDateFormat("'Yecapixtla, Mor a' d 'de' MMMM 'del' yyyy.", new Locale("es", "MX"));
                 String fechaCertificacion = formatoFecha.format(rs.getDate("fecha_certificacion"));
 
-                Font tituloFont = new Font(Font.FontFamily.TIMES_ROMAN, 24, Font.BOLD);
-                Font textoFont = new Font(Font.FontFamily.TIMES_ROMAN, 16, Font.NORMAL);
-                Font subFont = new Font(Font.FontFamily.TIMES_ROMAN, 10, Font.NORMAL);
+                Font tituloFont = new Font(Font.FontFamily.TIMES_ROMAN, 30, Font.BOLD);
+                Font textoFont = new Font(Font.FontFamily.TIMES_ROMAN, 28, Font.ITALIC);
+                Font tipoFont = new Font(Font.FontFamily.TIMES_ROMAN, 28, Font.BOLD);
+                Font fechaFont = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.ITALIC);
+                Font subFont = new Font(Font.FontFamily.TIMES_ROMAN, 10, Font.BOLD);
 
-                // Cargar la imagen de fondo
-//                InputStream inputStreamL = ClassLoader.getSystemResourceAsStream("Images/fondoDiploma.png");
-//                Image fondo = Image.getInstance(ImageIO.read(inputStreamL), null);
-//                fondo.setAbsolutePosition(0, 0);
-//                fondo.setAlignment(Element.ALIGN_CENTER);
-//                fondo.scaleAbsolute(PageSize.A4.getHeight(), PageSize.A4.getWidth());
-//                document.add(fondo);
-//                InputStream inputStream = ClassLoader.getSystemResourceAsStream("Images/IconParkdale.png");
-//                Image logo = Image.getInstance(ImageIO.read(inputStream), null);
-//                logo.scaleToFit(200, 100);
-//                logo.setAlignment(Element.ALIGN_CENTER);
-//                document.add(logo);
-//                Paragraph otorga = new Paragraph("Otorga el presente", textoFont);
-//                otorga.setAlignment(Element.ALIGN_CENTER);
-//                document.add(otorga);
-//                Paragraph titulo = new Paragraph("DIPLOMA", tituloFont);
-//                titulo.setAlignment(Element.ALIGN_CENTER);
-//                document.add(titulo);
-                document.add(new Paragraph("\n"));
-                document.add(new Paragraph("\n"));
-                document.add(new Paragraph("\n"));
-                document.add(new Paragraph("\n"));
-                document.add(new Paragraph("\n"));
-                document.add(new Paragraph("\n"));
-                document.add(new Paragraph("\n"));
-                document.add(new Paragraph("\n"));
-                document.add(new Paragraph("\n"));
-                document.add(new Paragraph("\n"));
-                document.add(new Paragraph("\n"));
+                Paragraph espacio = new Paragraph(" ");
+                espacio.setLeading(225f); // 11.5 cm en puntos
+                document.add(espacio);
 
-                Paragraph nombre = new Paragraph("a: " + nombreCompleto, textoFont);
+                String nombreFormateado = capitalizarCadaPalabra(nombreCompleto);
+                Paragraph nombre = new Paragraph("a: " + nombreFormateado, tituloFont);
                 nombre.setAlignment(Element.ALIGN_CENTER);
                 document.add(nombre);
 
@@ -110,47 +88,71 @@ public class DesingPDF_Diplomas extends Conexion {
                 texto1.setAlignment(Element.ALIGN_CENTER);
                 document.add(texto1);
 
-                Paragraph curso = new Paragraph(tipoCertificado + " " + nombreCertificado, textoFont);
+//                Paragraph curso = new Paragraph(tipoCertificado + " " + nombreCertificado, tipoFont);
+                Paragraph curso = new Paragraph(nombreCertificado, tipoFont);
                 curso.setAlignment(Element.ALIGN_CENTER);
                 document.add(curso);
 
-                document.add(new Paragraph("\n"));
+                espacio.setLeading(30f); // 11.5 cm en puntos
+                document.add(espacio);
 
-                Paragraph fecha = new Paragraph(fechaCertificacion, textoFont);
+                Paragraph fecha = new Paragraph(fechaCertificacion, fechaFont);
                 fecha.setAlignment(Element.ALIGN_RIGHT);
                 document.add(fecha);
 
-                document.add(new Paragraph("\n"));
-                document.add(new Paragraph("\n"));
-                document.add(new Paragraph("\n"));
-                document.add(new Paragraph("\n"));
-                document.add(new Paragraph("\n"));
+                espacio.setLeading(50f); // 11.5 cm en puntos
+                document.add(espacio);
 
                 PdfPTable table = new PdfPTable(3); // Número de columnas
                 table.setWidthPercentage(100); // Ajusta el ancho de la tabla
 
-                PdfPCell cell = new PdfPCell(new Phrase(rs.getString("gerente1") + "\n" + rs.getString("puesto1"), subFont));
-                cell.setHorizontalAlignment(Element.ALIGN_CENTER); // Centrado horizontal
-                cell.setVerticalAlignment(Element.ALIGN_MIDDLE); // Centrado vertical
-                cell.setBorder(Rectangle.NO_BORDER); // Elimina los bordes
+                Chunk gerente1 = new Chunk(rs.getString("gerente1") + "\n", subFont);
+                gerente1.setUnderline(0.3f, -2f); // grosor, posición vertical
 
+                Chunk puesto1 = new Chunk(rs.getString("puesto1"), subFont); // Sin subrayado, o agrégalo si quieres
+
+                Phrase phrase = new Phrase();
+                phrase.add(gerente1);
+                phrase.add(puesto1);
+
+                PdfPCell cell = new PdfPCell(phrase);
+                cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                cell.setBorder(Rectangle.NO_BORDER);
                 table.addCell(cell);
 
-                PdfPCell cell1 = new PdfPCell(new Phrase(rs.getString("gerente2") + "\n" + rs.getString("puesto2"), subFont));
-                cell1.setHorizontalAlignment(Element.ALIGN_CENTER); // Centrado horizontal
-                cell1.setVerticalAlignment(Element.ALIGN_MIDDLE); // Centrado vertical
-                cell1.setBorder(Rectangle.NO_BORDER); // Elimina los bordes
-                table.addCell(cell1);
+                Chunk gerente2 = new Chunk(rs.getString("gerente2") + "\n", subFont);
+                gerente2.setUnderline(0.3f, -2f); // grosor, posición vertical
 
-                PdfPCell cell2 = new PdfPCell(new Phrase(rs.getString("gerente3") + "\n" + rs.getString("puesto3"), subFont));
-                cell2.setHorizontalAlignment(Element.ALIGN_CENTER); // Centrado horizontal
-                cell2.setVerticalAlignment(Element.ALIGN_MIDDLE); // Centrado vertical
-                cell2.setBorder(Rectangle.NO_BORDER); // Elimina los bordes
+                Chunk puesto2 = new Chunk(rs.getString("puesto2"), subFont); // Sin subrayado, o agrégalo si quieres
 
+                Phrase phrase2 = new Phrase();
+                phrase2.add(gerente2);
+                phrase2.add(puesto2);
+
+                PdfPCell cell2 = new PdfPCell(phrase2);
+                cell2.setHorizontalAlignment(Element.ALIGN_CENTER);
+                cell2.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                cell2.setBorder(Rectangle.NO_BORDER);
                 table.addCell(cell2);
 
-                document.add(table);
+                Chunk gerente3 = new Chunk(rs.getString("gerente3") + "\n", subFont);
+                gerente3.setUnderline(0.3f, -2f); // grosor, posición vertical
 
+                Chunk puesto3 = new Chunk(rs.getString("puesto3"), subFont); // Sin subrayado, o agrégalo si quieres
+
+                Phrase phrase3 = new Phrase();
+                phrase3.add(gerente3);
+                phrase3.add(puesto3);
+
+                PdfPCell cell3 = new PdfPCell(phrase3);
+                cell3.setHorizontalAlignment(Element.ALIGN_CENTER);
+                cell3.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                cell3.setBorder(Rectangle.NO_BORDER);
+                table.addCell(cell3);
+
+                table.setHorizontalAlignment(Element.ALIGN_CENTER);
+                document.add(table);
                 document.add(new Paragraph("\n\n"));
             }
             document.close();
@@ -167,5 +169,24 @@ public class DesingPDF_Diplomas extends Conexion {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public static String capitalizarCadaPalabra(String texto) {
+        if (texto == null || texto.isEmpty()) {
+            return texto;
+        }
+
+        String[] palabras = texto.toLowerCase().split("\\s+");
+        StringBuilder resultado = new StringBuilder();
+
+        for (String palabra : palabras) {
+            if (palabra.length() > 0) {
+                resultado.append(Character.toUpperCase(palabra.charAt(0)))
+                        .append(palabra.substring(1))
+                        .append(" ");
+            }
+        }
+
+        return resultado.toString().trim();
     }
 }

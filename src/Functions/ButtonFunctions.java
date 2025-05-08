@@ -290,6 +290,9 @@ public class ButtonFunctions {
                     frm.txt_gerente1.setText(mod.getGerente1());
                     frm.txt_gerente2.setText(mod.getGerente2());
                     frm.txt_gerente3.setText(mod.getGerente3());
+                    frm.txt_puesto1.setText(mod.getPuesto1());
+                    frm.txt_puesto2.setText(mod.getPuesto2());
+                    frm.txt_puesto3.setText(mod.getPuesto3());
                     if (modCP.consultar(folio)) {
                         frm.jTable_Puestos.setEnabled(true);
                         DesignTabla.designCertificadoPuesto(frm, folio);

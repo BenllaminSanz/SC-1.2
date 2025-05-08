@@ -410,10 +410,12 @@ public class CtrlTrabajador implements ActionListener, KeyListener, MouseListene
 
         if (e.getSource() == frmTrabajador.btn_guardar_sup) {
             if (frmTrabajador.btn_guardar_sup.getText().equals("Guardar")) {
+                modSupervisor.setId_supervisor(Integer.parseInt(frmTrabajador.txt_nomina_sup.getText()));
                 modSupervisor.setNombre_supervisor(frmTrabajador.txt_NombreSupervisor.getText());
                 String idArea = QueryFunctions.CapturaCondicionalSimple("area", "idArea", "nombre_Area",
                         frmTrabajador.cb_Area.getSelectedItem().toString());
                 modSupervisor.setArea_idarea(Integer.parseInt(idArea));
+                modSupervisor.setPropuesto_trabajadores(Integer.parseInt(frmTrabajador.txt_Propuesto.getText()));
                 obtenerTurnosSeleccionados();
                 if (conSupervisor.insertar(modSupervisor, obtenerTurnosSeleccionados())) {
                     JOptionPane.showMessageDialog(null, "Registro de Supervisor Existoso");
