@@ -64,7 +64,7 @@ public class DesingPDF_Diplomas extends Conexion {
                 document.newPage(); // Agregar una nueva página por cada diploma
 
                 String nombreCompleto = rs.getString("Nombres") + " " + rs.getString("Apellidos");
-                String tipoCertificado = rs.getString("tipo_certificacion");
+//                String tipoCertificado = rs.getString("tipo_certificacion");
                 String nombreCertificado = rs.getString("nombre_certificado");
                 SimpleDateFormat formatoFecha = new SimpleDateFormat("'Yecapixtla, Mor a' d 'de' MMMM 'del' yyyy.", new Locale("es", "MX"));
                 String fechaCertificacion = formatoFecha.format(rs.getDate("fecha_certificacion"));

@@ -19,9 +19,9 @@ import javax.swing.JOptionPane;
 
 public class CtrlEditarCertificado implements ActionListener {
 
-    private final Certificado mod =  new Certificado();
-    private final ConsultasCertificado modC =  new ConsultasCertificado();
-    private final ConsultasCertificadoPuesto modCC =  new ConsultasCertificadoPuesto();
+    private final Certificado mod = new Certificado();
+    private final ConsultasCertificado modC = new ConsultasCertificado();
+    private final ConsultasCertificadoPuesto modCC = new ConsultasCertificadoPuesto();
     private final IFrmEditarCertificado frm;
     private final IFrmCapacitacion frmA;
     private final FrmAdministrador frmB;
@@ -57,11 +57,11 @@ public class CtrlEditarCertificado implements ActionListener {
         if (e.getSource() == frm.btn_guardar && frm.btn_guardar.getText().equals("Guardar")) {
             mod.setNombre_Certificado(frm.txt_certificado.getText());
             mod.setGerente1(frm.txt_gerente1.getText());
-            mod.setGerente1(frm.txt_gerente1.getText());
+            mod.setPuesto1(frm.txt_puesto1.getText());
             mod.setGerente2(frm.txt_gerente2.getText());
-            mod.setGerente1(frm.txt_gerente1.getText());
+            mod.setPuesto2(frm.txt_puesto2.getText());
             mod.setGerente3(frm.txt_gerente3.getText());
-            mod.setGerente1(frm.txt_gerente1.getText());
+            mod.setPuesto3(frm.txt_puesto3.getText());
             if (!frm.cb_nocurso.isSelected()) {
                 if (modC.agregarCertificado(mod)) {
                     JOptionPane.showMessageDialog(frm,
@@ -69,7 +69,7 @@ public class CtrlEditarCertificado implements ActionListener {
                             JOptionPane.INFORMATION_MESSAGE);
                     frm.dispose();
                     DesignTabla.designCertificados(frmA);
-                }else{
+                } else {
                     JOptionPane.showMessageDialog(frm,
                             "Si el certificado no esta relacionado a ningun puesto, seleccionar la casilla 'Sin puestos asignados'", "Ajustes Certificado",
                             JOptionPane.INFORMATION_MESSAGE);
@@ -89,12 +89,12 @@ public class CtrlEditarCertificado implements ActionListener {
         if (e.getSource() == frm.btn_guardar && frm.btn_guardar.getText().equals("Actualizar")) {
             mod.setNombre_Certificado(frm.txt_certificado.getText());
             mod.setGerente1(frm.txt_gerente1.getText());
+            mod.setPuesto1(frm.txt_puesto1.getText());
             mod.setGerente2(frm.txt_gerente2.getText());
+            mod.setPuesto2(frm.txt_puesto2.getText());
             mod.setGerente3(frm.txt_gerente3.getText());
-            mod.setPuesto1(frm.txt_gerente1.getText());
-            mod.setPuesto2(frm.txt_gerente2.getText());
-            mod.setPuesto3(frm.txt_gerente3.getText());
-            
+            mod.setPuesto3(frm.txt_puesto3.getText());
+
             if (!frm.cb_nocurso.isSelected()) {
                 if (modC.actualizarCurso(mod)) {
                     JOptionPane.showMessageDialog(frm,
@@ -113,7 +113,7 @@ public class CtrlEditarCertificado implements ActionListener {
                 }
             }
         }
-        
+
         if (e.getSource() == frm.btn_AgregarPuesto && frm.btn_guardar.getText().equals("Guardar")) {
             ContextoAgregarPuesto contexto = new ContextoAgregarPuesto(mod, frm, texto);
             CtrlAgregarPuestoCertificado ctrl = new CtrlAgregarPuestoCertificado(contexto);
@@ -135,7 +135,7 @@ public class CtrlEditarCertificado implements ActionListener {
             int idPuesto = Integer.parseInt(
                     QueryFunctions.CapturaCondicionalSimple("puesto", "idPuesto", "nombre_puesto", Puesto));
             if (modCC.eliminar(mod.getIdCertificado(), idPuesto)) {
-                  DesignTabla.designCertificadoPuesto(frm, String.valueOf(mod.getIdCertificado()));
+                DesignTabla.designCertificadoPuesto(frm, String.valueOf(mod.getIdCertificado()));
             }
         }
     }

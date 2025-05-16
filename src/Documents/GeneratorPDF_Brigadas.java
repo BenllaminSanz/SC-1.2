@@ -39,21 +39,18 @@ public class GeneratorPDF_Brigadas extends Conexion {
         SimpleDateFormat formatFecha = new SimpleDateFormat("dd-MM-yyyy");
         String FechaS = formatFecha.format(fecha);
 
-        // Crear un JFileChooser para que el usuario elija la ubicación del archivo
+        // Elegir ubicación del archivo
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Guardar Lista de Emergencias");
-        fileChooser.setSelectedFile(new File("Lista General de Emergencia " + FechaS + ".pdf")); // Nombre predeterminado del archivo
+        fileChooser.setSelectedFile(new File("Lista General de Emergencia " + FechaS + ".pdf"));
 
         int userSelection = fileChooser.showSaveDialog(null);
-
         if (userSelection != JFileChooser.APPROVE_OPTION) {
-            // El usuario canceló la operación
             JOptionPane.showMessageDialog(null, "Operación cancelada por el usuario.");
             return false;
         }
 
-        File fileToSave = fileChooser.getSelectedFile();
-        String rutaDoc = fileToSave.getAbsolutePath();
+        String rutaDoc = fileChooser.getSelectedFile().getAbsolutePath();
 
         try {
             Connection con = conn.getConnection();
@@ -69,45 +66,49 @@ public class GeneratorPDF_Brigadas extends Conexion {
             logo.scalePercent(40F);
             logo.setAlignment(0);
 
-            PreparedStatement ps = con.prepareStatement("SELECT * FROM area");
-            ResultSet rs = ps.executeQuery();
+            // === Generar tablas por área y turno ===
+            PreparedStatement psArea = con.prepareStatement("SELECT * FROM area");
+            ResultSet rsArea = psArea.executeQuery();
 
-            while (rs.next()) {
-                PreparedStatement ps1 = con.prepareStatement("SELECT * FROM turno");
-                ResultSet rs1 = ps1.executeQuery();
+            while (rsArea.next()) {
+                int tipoProceso = rsArea.getInt("tipo_proceso");
 
-                while (rs1.next()) {
-                    float[] relativeWidths = {0.5F, 2F, 2, 0.7F};
+                if (tipoProceso == 2) {
+                    PreparedStatement psTrab = con.prepareStatement(
+                            "SELECT * FROM sistema_capacitacion.view_trabajador vt "
+                            + "LEFT JOIN brigadas b ON vt.brigada_idBrigada = b.idbrigadas "
+                            + "WHERE nombre_Area = ?"
+                    );
+                    psTrab.setString(1, rsArea.getString("Nombre_Area"));
+
+                    ResultSet rsTrab = psTrab.executeQuery();
+                    int cont = 0;
+
+                    float[] relativeWidths = {0.5F, 2F, 2F, 0.7F};
                     PdfPTable tabla = new PdfPTable(relativeWidths);
                     tabla.setWidthPercentage(100);
 
                     BaseColor color = new BaseColor(175, 196, 174);
-                    Font font1 = new Font();
-                    font1.setStyle(Font.BOLD);
-                    font1.setSize(10);
+                    Font fontBold = new Font();
+                    fontBold.setStyle(Font.BOLD);
+                    fontBold.setSize(10);
 
-                    tabla.addCell(createHeaderCell("NÚM. NOM", font1, color, 1));
-                    tabla.addCell(createHeaderCell("NOMBRE COMPLETO", font1, color, 1));
-                    tabla.addCell(createHeaderCell("BRIGADISTA", font1, color, 1));
-                    tabla.addCell(createHeaderCell("ASISTENCIA", font1, color, 1));
+                    tabla.addCell(createHeaderCell("NÚM. NOM", fontBold, color, 1));
+                    tabla.addCell(createHeaderCell("NOMBRE COMPLETO", fontBold, color, 1));
+                    tabla.addCell(createHeaderCell("BRIGADISTA", fontBold, color, 1));
+                    tabla.addCell(createHeaderCell("ASISTENCIA", fontBold, color, 1));
 
-                    PreparedStatement ps2 = con.prepareStatement("SELECT * FROM sistema_capacitacion.view_trabajador vt \n"
-                            + "LEFT JOIN brigadas b ON vt.brigada_idBrigada = b.idbrigadas WHERE nombre_Area = '" + rs.getString("Nombre_Area") + "'\n"
-                            + "AND nombre_turno = '" + rs1.getString("Nombre_Turno") + "'");
-                    ResultSet rs2 = ps2.executeQuery();
-                    int cont = 0;
-                    while (rs2.next()) {
-                        tabla.addCell(new Phrase(rs2.getString(1), font));
-                        tabla.addCell(new Phrase(rs2.getString(2), font));
-                        tabla.addCell(new Phrase(rs2.getString("nombre_brigada"), font));
+                    while (rsTrab.next()) {
+                        tabla.addCell(new Phrase(rsTrab.getString(1), font));
+                        tabla.addCell(new Phrase(rsTrab.getString(2), font));
+                        tabla.addCell(new Phrase(rsTrab.getString("nombre_brigada"), font));
                         tabla.addCell("");
                         cont++;
                     }
 
                     if (cont > 0) {
                         doc.add(logo);
-                        doc.add(new Paragraph("Lista de Emergencia, Área: " + rs.getString("Nombre_Area")
-                                + ", Turno: " + rs1.getString("Nombre_Turno")));
+                        doc.add(new Paragraph("Lista de Emergencia, Área: " + rsArea.getString("Nombre_Area")));
                         doc.add(new Paragraph("Fecha: " + FechaS));
                         doc.add(new Paragraph("\n"));
                         doc.add(tabla);
@@ -122,49 +123,115 @@ public class GeneratorPDF_Brigadas extends Conexion {
                         total.addCell(cell);
                         total.setHorizontalAlignment(0);
                         doc.add(total);
+                        doc.newPage();
                     }
-                    doc.newPage();
+
+                } else {
+                    PreparedStatement psTurno = con.prepareStatement("SELECT * FROM turno");
+                    ResultSet rsTurno = psTurno.executeQuery();
+                    while (rsTurno.next()) {
+                        PreparedStatement psTrab = con.prepareStatement(
+                                "SELECT * FROM sistema_capacitacion.view_trabajador vt "
+                                + "LEFT JOIN brigadas b ON vt.brigada_idBrigada = b.idbrigadas "
+                                + "WHERE nombre_Area = ? AND nombre_turno = ?"
+                        );
+                        psTrab.setString(1, rsArea.getString("Nombre_Area"));
+                        psTrab.setString(2, rsTurno.getString("Nombre_Turno"));
+
+                        ResultSet rsTrab = psTrab.executeQuery();
+                        int cont = 0;
+
+                        float[] relativeWidths = {0.5F, 2F, 2F, 0.7F};
+                        PdfPTable tabla = new PdfPTable(relativeWidths);
+                        tabla.setWidthPercentage(100);
+
+                        BaseColor color = new BaseColor(175, 196, 174);
+                        Font fontBold = new Font();
+                        fontBold.setStyle(Font.BOLD);
+                        fontBold.setSize(10);
+
+                        tabla.addCell(createHeaderCell("NÚM. NOM", fontBold, color, 1));
+                        tabla.addCell(createHeaderCell("NOMBRE COMPLETO", fontBold, color, 1));
+                        tabla.addCell(createHeaderCell("BRIGADISTA", fontBold, color, 1));
+                        tabla.addCell(createHeaderCell("ASISTENCIA", fontBold, color, 1));
+
+                        while (rsTrab.next()) {
+                            tabla.addCell(new Phrase(rsTrab.getString(1), font));
+                            tabla.addCell(new Phrase(rsTrab.getString(2), font));
+                            tabla.addCell(new Phrase(rsTrab.getString("nombre_brigada"), font));
+                            tabla.addCell("");
+                            cont++;
+                        }
+
+                        if (cont > 0) {
+                            doc.add(logo);
+                            doc.add(new Paragraph("Lista de Emergencia, Área: " + rsArea.getString("Nombre_Area")
+                                    + ", Turno: " + rsTurno.getString("Nombre_Turno")));
+                            doc.add(new Paragraph("Fecha: " + FechaS));
+                            doc.add(new Paragraph("\n"));
+                            doc.add(tabla);
+                            doc.add(new Paragraph("\n"));
+
+                            PdfPTable total = new PdfPTable(1);
+                            total.setWidthPercentage(30);
+                            PdfPCell cell = new PdfPCell();
+                            Paragraph paragraph = new Paragraph("Total de Asistentes: ____/" + cont);
+                            paragraph.setAlignment(Paragraph.ALIGN_RIGHT);
+                            cell.addElement(paragraph);
+                            total.addCell(cell);
+                            total.setHorizontalAlignment(0);
+                            doc.add(total);
+                            doc.newPage();
+                        }
+                    }
                 }
             }
 
-            PreparedStatement ps2 = con.prepareStatement("SELECT area_administrativo FROM sistema_capacitacion.administrativos group by area_administrativo;");
-            ResultSet rs2 = ps2.executeQuery();
+            // === Generar tablas por administrativos ===
+            PreparedStatement psAdminArea = con.prepareStatement(
+                    "SELECT area_administrativo FROM sistema_capacitacion.administrativos GROUP BY area_administrativo");
+            ResultSet rsAdminArea = psAdminArea.executeQuery();
 
-            int cont = 0;
-            float[] relativeWidths = {0.5F, 2F, 2, 0.7F};
-            PdfPTable tabla = new PdfPTable(relativeWidths);
-            tabla.setWidthPercentage(100);
+            while (rsAdminArea.next()) {
+                float[] relativeWidths = {0.5F, 2F, 2F, 0.7F};
+                PdfPTable tabla = new PdfPTable(relativeWidths);
+                tabla.setWidthPercentage(100);
 
-            BaseColor color = new BaseColor(175, 196, 174);
-            Font font1 = new Font();
-            font1.setStyle(Font.BOLD);
-            font1.setSize(10);
+                BaseColor color = new BaseColor(175, 196, 174);
+                Font fontBold = new Font();
+                fontBold.setStyle(Font.BOLD);
+                fontBold.setSize(10);
 
-            tabla.addCell(createHeaderCell("NÚM. NOM", font1, color, 1));
-            tabla.addCell(createHeaderCell("NOMBRE COMPLETO", font1, color, 1));
-            tabla.addCell(createHeaderCell("BRIGADISTA", font1, color, 1));
-            tabla.addCell(createHeaderCell("ASISTENCIA", font1, color, 1));
+                tabla.addCell(createHeaderCell("NÚM. NOM", fontBold, color, 1));
+                tabla.addCell(createHeaderCell("NOMBRE COMPLETO", fontBold, color, 1));
+                tabla.addCell(createHeaderCell("BRIGADISTA", fontBold, color, 1));
+                tabla.addCell(createHeaderCell("ASISTENCIA", fontBold, color, 1));
 
-            while (rs2.next()) {
-                
                 doc.add(logo);
-                doc.add(new Paragraph("Lista de Emergencia, Área Admnistrativa "));
+                doc.add(new Paragraph("Lista de Emergencia, " + rsAdminArea.getString("area_administrativo")));
                 doc.add(new Paragraph("Fecha: " + FechaS));
                 doc.add(new Paragraph("\n"));
-                
-                PreparedStatement ps3 = con.prepareStatement("SELECT turno FROM sistema_capacitacion.administrativos group by turno;");
-                ResultSet rs3 = ps3.executeQuery();
 
-                while (rs3.next()) {
-                    PreparedStatement ps4 = con.prepareStatement("SELECT * FROM sistema_capacitacion.administrativos vt \n"
-                            + "LEFT JOIN brigadas b ON vt.brigada_idBrigada = b.idbrigadas WHERE area_administrativo = '" + rs2.getString("area_administrativo") + "'\n"
-                            + "AND turno = '" + rs3.getString("turno") + "'");
-                    ResultSet rs4 = ps4.executeQuery();
+                PreparedStatement psTurnoAdmin = con.prepareStatement(
+                        "SELECT turno FROM sistema_capacitacion.administrativos GROUP BY turno ORDER BY turno");
+                ResultSet rsTurnoAdmin = psTurnoAdmin.executeQuery();
+                int cont = 0;
 
-                    while (rs4.next()) {
-                        tabla.addCell(new Phrase(rs4.getString(1), font));
-                        tabla.addCell(new Phrase(rs4.getString(2), font));
-                        tabla.addCell(new Phrase(rs4.getString("nombre_brigada"), font));
+                while (rsTurnoAdmin.next()) {
+                    
+                    PreparedStatement psTrabAdmin = con.prepareStatement(
+                            "SELECT * FROM sistema_capacitacion.administrativos vt "
+                            + "LEFT JOIN brigadas b ON vt.brigada_idBrigada = b.idbrigadas "
+                            + "WHERE area_administrativo = ? AND turno = ?"
+                    );
+                    psTrabAdmin.setString(1, rsAdminArea.getString("area_administrativo"));
+                    psTrabAdmin.setString(2, rsTurnoAdmin.getString("turno"));
+                    ResultSet rsTrabAdmin = psTrabAdmin.executeQuery();
+
+                    while (rsTrabAdmin.next()) {
+                        tabla.addCell(new Phrase(rsTrabAdmin.getString(1), font));
+                        tabla.addCell(new Phrase(rsTrabAdmin.getString(2), font));
+                        tabla.addCell(new Phrase(rsTrabAdmin.getString("nombre_brigada"), font));
                         tabla.addCell("");
                         cont++;
                     }
@@ -185,26 +252,28 @@ public class GeneratorPDF_Brigadas extends Conexion {
                     doc.add(total);
                     doc.newPage();
                 }
-
             }
+
             doc.close();
             JOptionPane.showMessageDialog(null, "Archivo Creado en " + rutaDoc);
+
+            // Abrir el archivo
             if (Desktop.isDesktopSupported()) {
                 Desktop desktop = Desktop.getDesktop();
                 if (desktop.isSupported(Desktop.Action.OPEN)) {
-                    // Abrir el documento
                     desktop.open(new File(rutaDoc));
                 }
             }
+
             return true;
+
         } catch (SQLException | FileNotFoundException ex) {
             Logger.getLogger(GeneratorExcel_LBU.class.getName()).log(Level.SEVERE, null, ex);
-            JOptionPane.showConfirmDialog(null, "Error al generar archivo: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
-        } catch (IOException ex) {
-            Logger.getLogger(GeneratorExcel_LBU.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (DocumentException ex) {
+            JOptionPane.showMessageDialog(null, "Error al generar archivo: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (IOException | DocumentException ex) {
             Logger.getLogger(GeneratorPDF_Brigadas.class.getName()).log(Level.SEVERE, null, ex);
         }
+
         return false;
     }
 
@@ -371,13 +440,19 @@ public class GeneratorPDF_Brigadas extends Conexion {
                 }
             }
             return true;
+
         } catch (SQLException | FileNotFoundException ex) {
-            Logger.getLogger(GeneratorExcel_LBU.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(GeneratorExcel_LBU.class
+                    .getName()).log(Level.SEVERE, null, ex);
             JOptionPane.showConfirmDialog(null, "Error al generar archivo: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
+
         } catch (IOException ex) {
-            Logger.getLogger(GeneratorExcel_LBU.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(GeneratorExcel_LBU.class
+                    .getName()).log(Level.SEVERE, null, ex);
+
         } catch (DocumentException ex) {
-            Logger.getLogger(GeneratorPDF_Brigadas.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(GeneratorPDF_Brigadas.class
+                    .getName()).log(Level.SEVERE, null, ex);
         }
         return false;
     }
@@ -537,13 +612,19 @@ public class GeneratorPDF_Brigadas extends Conexion {
                 }
             }
             return true;
+
         } catch (SQLException | FileNotFoundException ex) {
-            Logger.getLogger(GeneratorExcel_LBU.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(GeneratorExcel_LBU.class
+                    .getName()).log(Level.SEVERE, null, ex);
             JOptionPane.showConfirmDialog(null, "Error al generar archivo: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
+
         } catch (IOException ex) {
-            Logger.getLogger(GeneratorExcel_LBU.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(GeneratorExcel_LBU.class
+                    .getName()).log(Level.SEVERE, null, ex);
+
         } catch (DocumentException ex) {
-            Logger.getLogger(GeneratorPDF_Brigadas.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(GeneratorPDF_Brigadas.class
+                    .getName()).log(Level.SEVERE, null, ex);
         }
         return false;
     }
@@ -671,7 +752,8 @@ public class GeneratorPDF_Brigadas extends Conexion {
             return true;
 
         } catch (Exception ex) {
-            Logger.getLogger(GeneratorPDF_Brigadas.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(GeneratorPDF_Brigadas.class
+                    .getName()).log(Level.SEVERE, null, ex);
             JOptionPane.showConfirmDialog(null, "Error al generar archivo: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
         }
 

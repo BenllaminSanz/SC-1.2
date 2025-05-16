@@ -141,7 +141,6 @@ public class ConsultasCertificado extends Conexion {
             ps.setString(6, mod.getPuesto2());
             ps.setString(7, mod.getPuesto3());
             ps.setInt(8, mod.getIdCertificado());
-            System.out.println("3: " + ps);
             ps.execute();
             return true;
 
@@ -182,7 +181,6 @@ public class ConsultasCertificado extends Conexion {
             ps.setString(6, mod.getPuesto2());
             ps.setString(7, mod.getPuesto3());
             ps.setInt(8, mod.getIdCertificado());
-            System.out.println("2: " + ps);
             ps.execute();
             return true;
 
