@@ -98,6 +98,7 @@ public class DesingPDF_Diplomas extends Conexion {
 
                 Paragraph fecha = new Paragraph(fechaCertificacion, fechaFont);
                 fecha.setAlignment(Element.ALIGN_RIGHT);
+                fecha.setIndentationRight(25);
                 document.add(fecha);
 
                 espacio.setLeading(50f); // 11.5 cm en puntos

@@ -307,13 +307,13 @@ public class ButtonFunctions {
     public static void TxtBtnCertificacion(String texto, String folio, IFrmEditarCertificacion frm, PersonalCertificado mod, ConsultasPersonalCertificado modC) {
         switch (texto) {
             case "Guardar":
-                frm.setTitle("Agregar Certificado");
+                frm.setTitle("Agregar Certificación");
                 frm.btn_guardar.setText(texto);
                 QueryFunctions.LlenarComboBox("certificado", "nombre_Certificado", frm.cb_certificado);
                 frm.repaint();
                 break;
             case "Actualizar":
-                frm.setTitle("Modificar Certificado");
+                frm.setTitle("Modificar Certificación");
                 frm.btn_guardar.setText(texto);
                 QueryFunctions.LlenarComboBox("certificado", "nombre_Certificado", frm.cb_certificado);
                 mod.setIdCertificacion(Integer.parseInt(folio));

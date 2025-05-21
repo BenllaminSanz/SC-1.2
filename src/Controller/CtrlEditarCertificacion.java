@@ -43,37 +43,12 @@ public class CtrlEditarCertificacion implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == frm.btn_buscar) {
             String nomina = frm.txt_nomina.getText();
-            String nombre = QueryFunctions.CapturaCondicionalSimple(
-                    "Trabajador", "nombre_Trabajador", "folio_Trabajador", nomina);
-            if (nombre != null) {
-                frm.txt_nombre.setText(nombre);
-                String[] partes = nombre.split(" ");
-
-                String apellidos = "";
-                String nombres = "";
-
-                switch (partes.length) {
-                    case 2:
-                        apellidos = partes[0];
-                        nombres = partes[1];
-                        break;
-                    case 3:
-                        apellidos = partes[0] + " " + partes[1];
-                        nombres = partes[2];
-                        break;
-                    case 4:
-                        apellidos = partes[0] + " " + partes[1];
-                        nombres = partes[2] + " " + partes[3];
-                        break;
-                    default:
-                        break;
-                }
-
-                frm.txt_apellidos.setText(convertirPrimerasLetrasMayusculas(apellidos));
-                frm.txt_nombres.setText(convertirPrimerasLetrasMayusculas(nombres));
-            } else {
-                frm.txt_nombre.setText(null);
-            }
+            String nombres = QueryFunctions.CapturaCondicionalSimple(
+                    "asistentes_certificados", "Nombres", "asistentes_curso_idAsistente", nomina);
+            String apellidos = QueryFunctions.CapturaCondicionalSimple(
+                    "asistentes_certificados", "Apellidos", "asistentes_curso_idAsistente", nomina);
+            frm.txt_apellidos.setText(convertirPrimerasLetrasMayusculas(apellidos));
+            frm.txt_nombres.setText(convertirPrimerasLetrasMayusculas(nombres));
         }
 
         if (e.getSource() == frm.btn_guardar && frm.btn_guardar.getText().equals("Guardar")) {
