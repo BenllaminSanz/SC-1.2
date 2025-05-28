@@ -52,7 +52,7 @@ public class DesingPDF_Diplomas extends Conexion {
         try (Connection con = conn.getConnection()) {
             PreparedStatement ps = con.prepareStatement("SELECT * FROM sistema_capacitacion.view_asistentes_certificados "
                     + "WHERE MONTH(fecha_certificacion) = ? AND YEAR(fecha_certificacion) = ?;");
-            ps.setInt(1, mesSeleccionado + 1);
+            ps.setInt(1, mesSeleccionado);
             ps.setInt(2, añoSeleccionado);
             ResultSet rs = ps.executeQuery();
 

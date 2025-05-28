@@ -643,7 +643,7 @@ public class GeneratorPDF_Cursos extends Conexion {
             doc.add(new Paragraph("Fecha: " + FechaS));
             doc.add(new Paragraph("\n"));
 
-            PreparedStatement ps5 = con.prepareStatement("SELECT nombre_area,nombre_turno,SUM((CASE\n"
+            PreparedStatement ps5 = con.prepareStatement("SELECT nombre_area,nombre_turno,Nombre_Supervisor,SUM((CASE\n"
                     + "            WHEN (tipo_entrenamiento = 'PRIMERO') THEN 1\n"
                     + "            ELSE 0\n"
                     + "        END)) AS `PRIMERO`,\n"
@@ -702,6 +702,49 @@ public class GeneratorPDF_Cursos extends Conexion {
                 }
                 doc.add(tablaPuesto);
             }
+
+            doc.add(new Paragraph("\n"));
+
+            PdfPTable encabezadoConcentradoTurnosTotal = DesingPDF_Cursos.encabezadotablaEntrenamientoConcentradoTurnoGeneralSumatoria(font);
+            doc.add(encabezadoConcentradoTurnosTotal);
+
+            PreparedStatement ps7 = con.prepareStatement("SELECT nombre_area,nombre_turno, COUNT(*) AS 'TOTAL'\n"
+                    + "FROM sistema_capacitacion.view_asistentes_cursos\n"
+                    + "JOIN view_lbu ON view_asistentes_cursos.idAsistentes_Curso = view_lbu.Folio_Trabajador\n"
+                    + "WHERE status_entrenamiento = 'En Entrenamiento'\n"
+                    + "AND id_tipocurso = 2 GROUP BY nombre_area, nombre_turno ORDER BY idArea,idTurno;");
+
+            ResultSet rs7 = ps7.executeQuery();
+
+            PdfPTable tablaSumatorio = new PdfPTable(new float[]{1F, 1F, 1F, 1F, 1F});
+            tablaSumatorio.setWidthPercentage(75);
+            PdfPCell celda1 = new PdfPCell();
+            celda1.setHorizontalAlignment(Element.ALIGN_CENTER);
+            celda1.setVerticalAlignment(Element.ALIGN_MIDDLE);
+            celda1.setColspan(2);
+            tablaSumatorio.addCell(celda1);
+
+            while (rs7.next()) {
+                celda1.setPhrase(new Phrase(rs7.getString("Nombre_Area"), font));
+                switch (rs7.getString("nombre_turno")) {
+                    case "A":
+                        celda1.setPhrase(new Phrase(rs7.getString("TOTAL"), font));
+                        break;
+                    case "B":
+                        celda1.setPhrase(new Phrase(rs7.getString("TOTAL"), font));
+                        break;
+                    case "C":
+                        celda1.setPhrase(new Phrase(rs7.getString("TOTAL"), font));
+                        break;
+                    case "D":
+                        celda1.setPhrase(new Phrase(rs7.getString("TOTAL"), font));
+                        break;
+                    default:
+                        break;
+                }
+                tablaSumatorio.addCell(celda1);
+            }
+            doc.add(tablaSumatorio);
             doc.close();
             JOptionPane.showMessageDialog(null, "Archivo Creado en " + rutaDoc);
 

@@ -282,7 +282,51 @@ public class DesingPDF_Cursos {
             PdfPCell celda = new PdfPCell();
             celda.setHorizontalAlignment(Element.ALIGN_CENTER);
             celda.setVerticalAlignment(Element.ALIGN_MIDDLE);
-            celda.setPhrase(new Phrase(rs5.getString(columna), font));
+            if (columna.equals("Nombre_turno")) {
+                celda.setPhrase(new Phrase(rs5.getString(columna)
+                        + "\n" + rs5.getString("Nombre_Supervisor"), font));
+            } else {
+                celda.setPhrase(new Phrase(rs5.getString(columna), font));
+            }
+            tablaPuesto.addCell(celda);
+        }
+        return tablaPuesto;
+    }
+
+    static PdfPTable encabezadotablaEntrenamientoConcentradoTurnoGeneralSumatoria(Font font) {
+        PdfPTable tablaConcentrado = new PdfPTable(new float[]{1f, 1f, 1f, 1f, 1f});
+        tablaConcentrado.setWidthPercentage(75);
+        BaseColor color = new BaseColor(175, 196, 174);
+        Font font1 = new Font();
+        font1.setStyle(Font.BOLD);
+        font1.setSize(9);
+
+        // Agregar celda de encabezado
+        tablaConcentrado.addCell(createHeaderCell("Área", font1, color, 1));
+        tablaConcentrado.addCell(createHeaderCell("A", font1, color, 1));
+        tablaConcentrado.addCell(createHeaderCell("B", font1, color, 1));
+        tablaConcentrado.addCell(createHeaderCell("C", font1, color, 1));
+        tablaConcentrado.addCell(createHeaderCell("D", font1, color, 1));
+
+        return tablaConcentrado;
+    }
+
+    static PdfPTable tablaConcentradoTurnoGeneralSumatoria(Font font, ResultSet rs5) throws SQLException {
+        PdfPTable tablaPuesto = new PdfPTable(new float[]{1F, 1F, 1F, 1F, 1F});
+        tablaPuesto.setWidthPercentage(75);
+
+        // Agregar celdas de datos
+        String[] columnas = {"Nombre_Area", "Nombre_turno", "PRIMERO", "SEGUNDO"};
+        for (String columna : columnas) {
+            PdfPCell celda = new PdfPCell();
+            celda.setHorizontalAlignment(Element.ALIGN_CENTER);
+            celda.setVerticalAlignment(Element.ALIGN_MIDDLE);
+            if (columna.equals("Nombre_turno")) {
+                celda.setPhrase(new Phrase(rs5.getString(columna)
+                        + "\n" + rs5.getString("Nombre_Supervisor"), font));
+            } else {
+                celda.setPhrase(new Phrase(rs5.getString(columna), font));
+            }
             tablaPuesto.addCell(celda);
         }
         return tablaPuesto;
