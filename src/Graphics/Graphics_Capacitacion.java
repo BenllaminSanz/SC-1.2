@@ -43,7 +43,7 @@ public class Graphics_Capacitacion {
         Conexion conn = new Conexion();
         Connection con = conn.getConnection();
         ResultSet rs = null;
-        DefaultPieDataset datasetPie = new DefaultPieDataset();
+        DefaultPieDataset<String> datasetPie = new DefaultPieDataset<>();
 
         String mode = "SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));";
         String sql = "SELECT certificaciones,(CASE WHEN certificaciones = 0\n"

@@ -65,8 +65,8 @@ public class DesingPDF_Diplomas extends Conexion {
 
                 String nombreCompleto = rs.getString("Nombres") + " " + rs.getString("Apellidos");
 //                String tipoCertificado = rs.getString("tipo_certificacion");
-                String nombreCertificado = rs.getString("nombre_certificado");
-                SimpleDateFormat formatoFecha = new SimpleDateFormat("'Yecapixtla, Mor a' d 'de' MMMM 'del' yyyy.", new Locale("es", "MX"));
+                String nombreCertificado = rs.getString("nombre_certificado");                
+                SimpleDateFormat formatoFecha = new SimpleDateFormat("'Yecapixtla, Mor a' d 'de' MMMM 'del' yyyy.", Locale.forLanguageTag("es-MX"));
                 String fechaCertificacion = formatoFecha.format(rs.getDate("fecha_certificacion"));
 
                 Font tituloFont = new Font(Font.FontFamily.TIMES_ROMAN, 30, Font.BOLD);

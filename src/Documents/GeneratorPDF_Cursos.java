@@ -708,42 +708,75 @@ public class GeneratorPDF_Cursos extends Conexion {
             PdfPTable encabezadoConcentradoTurnosTotal = DesingPDF_Cursos.encabezadotablaEntrenamientoConcentradoTurnoGeneralSumatoria(font);
             doc.add(encabezadoConcentradoTurnosTotal);
 
-            PreparedStatement ps7 = con.prepareStatement("SELECT nombre_area,nombre_turno, COUNT(*) AS 'TOTAL'\n"
+            PreparedStatement ps7 = con.prepareStatement("SELECT \n"
+                    + "  idArea, nombre_area,\n"
+                    + "  SUM(CASE WHEN nombre_turno = 'A' THEN 1 ELSE 0 END) AS A,\n"
+                    + "  SUM(CASE WHEN nombre_turno = 'B' THEN 1 ELSE 0 END) AS B,\n"
+                    + "  SUM(CASE WHEN nombre_turno = 'C' THEN 1 ELSE 0 END) AS C,\n"
+                    + "  SUM(CASE WHEN nombre_turno = 'D' THEN 1 ELSE 0 END) AS D,\n"
+                    + "  SUM(CASE WHEN nombre_turno = 'LV' THEN 1 ELSE 0 END) AS LV\n"
                     + "FROM sistema_capacitacion.view_asistentes_cursos\n"
                     + "JOIN view_lbu ON view_asistentes_cursos.idAsistentes_Curso = view_lbu.Folio_Trabajador\n"
                     + "WHERE status_entrenamiento = 'En Entrenamiento'\n"
-                    + "AND id_tipocurso = 2 GROUP BY nombre_area, nombre_turno ORDER BY idArea,idTurno;");
+                    + "AND id_tipocurso = 2\n"
+                    + "GROUP BY nombre_area\n"
+                    + "ORDER BY idArea;");
 
             ResultSet rs7 = ps7.executeQuery();
 
-            PdfPTable tablaSumatorio = new PdfPTable(new float[]{1F, 1F, 1F, 1F, 1F});
+            PdfPTable tablaSumatorio = new PdfPTable(new float[]{1F, 1F, 1F, 1F, 1F, 1F});
             tablaSumatorio.setWidthPercentage(75);
             PdfPCell celda1 = new PdfPCell();
             celda1.setHorizontalAlignment(Element.ALIGN_CENTER);
             celda1.setVerticalAlignment(Element.ALIGN_MIDDLE);
-            celda1.setColspan(2);
-            tablaSumatorio.addCell(celda1);
+
+            int totalA = 0, totalB = 0, totalC = 0, totalD = 0, totalLV = 0;
 
             while (rs7.next()) {
-                celda1.setPhrase(new Phrase(rs7.getString("Nombre_Area"), font));
-                switch (rs7.getString("nombre_turno")) {
-                    case "A":
-                        celda1.setPhrase(new Phrase(rs7.getString("TOTAL"), font));
-                        break;
-                    case "B":
-                        celda1.setPhrase(new Phrase(rs7.getString("TOTAL"), font));
-                        break;
-                    case "C":
-                        celda1.setPhrase(new Phrase(rs7.getString("TOTAL"), font));
-                        break;
-                    case "D":
-                        celda1.setPhrase(new Phrase(rs7.getString("TOTAL"), font));
-                        break;
-                    default:
-                        break;
-                }
+                celda1.setPhrase(new Phrase(rs7.getString("nombre_area"), font));
+                tablaSumatorio.addCell(celda1);
+
+                int a = rs7.getInt("A");
+                int b = rs7.getInt("B");
+                int c = rs7.getInt("C");
+                int d = rs7.getInt("D");
+                int lv = rs7.getInt("LV");
+
+                totalA += a;
+                totalB += b;
+                totalC += c;
+                totalD += d;
+                totalLV += lv;
+
+                celda1.setPhrase(new Phrase(String.valueOf(a), font));
+                tablaSumatorio.addCell(celda1);
+                celda1.setPhrase(new Phrase(String.valueOf(b), font));
+                tablaSumatorio.addCell(celda1);
+                celda1.setPhrase(new Phrase(String.valueOf(c), font));
+                tablaSumatorio.addCell(celda1);
+                celda1.setPhrase(new Phrase(String.valueOf(d), font));
+                tablaSumatorio.addCell(celda1);
+                celda1.setPhrase(new Phrase(String.valueOf(lv), font));
                 tablaSumatorio.addCell(celda1);
             }
+
+            PdfPCell celdaTotal = new PdfPCell(new Phrase("TOTAL", font));
+            celdaTotal.setHorizontalAlignment(Element.ALIGN_CENTER);
+            celdaTotal.setVerticalAlignment(Element.ALIGN_MIDDLE);
+            tablaSumatorio.addCell(celdaTotal);
+
+            celda1.setPhrase(new Phrase(String.valueOf(totalA), font));
+            tablaSumatorio.addCell(celda1);
+            celda1.setPhrase(new Phrase(String.valueOf(totalB), font));
+            tablaSumatorio.addCell(celda1);
+            celda1.setPhrase(new Phrase(String.valueOf(totalC), font));
+            tablaSumatorio.addCell(celda1);
+            celda1.setPhrase(new Phrase(String.valueOf(totalD), font));
+            tablaSumatorio.addCell(celda1);
+            celda1.setPhrase(new Phrase(String.valueOf(totalLV), font));
+            tablaSumatorio.addCell(celda1);
+            
+
             doc.add(tablaSumatorio);
             doc.close();
             JOptionPane.showMessageDialog(null, "Archivo Creado en " + rutaDoc);

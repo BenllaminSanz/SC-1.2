@@ -39,7 +39,7 @@ public class Graphics_Cursos {
         Conexion conn = new Conexion();
         Connection con = conn.getConnection();
         ResultSet rs = null;
-
+        
         DefaultCategoryDataset dataset1 = new DefaultCategoryDataset();
         DefaultCategoryDataset dataset2 = new DefaultCategoryDataset();
 

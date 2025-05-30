@@ -14,7 +14,7 @@ public class Conexion {
     //Variables locales
     Connection conn = null;
     static String bd = "sistema_capacitacion";
-    static String host = "localhost"; /* "10.102.128.80" */
+    static String host = "10.102.128.80"; /* "10.102.128.80" */
 
     static int port = 3306;
     String url = "jdbc:mysql://" + host + ":" + port + "/" + bd + "?zeroDateTimeBehavior=CONVERT_TO_NULL";

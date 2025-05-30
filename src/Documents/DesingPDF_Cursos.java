@@ -294,7 +294,7 @@ public class DesingPDF_Cursos {
     }
 
     static PdfPTable encabezadotablaEntrenamientoConcentradoTurnoGeneralSumatoria(Font font) {
-        PdfPTable tablaConcentrado = new PdfPTable(new float[]{1f, 1f, 1f, 1f, 1f});
+        PdfPTable tablaConcentrado = new PdfPTable(new float[]{1f, 1f, 1f, 1f, 1f, 1f});
         tablaConcentrado.setWidthPercentage(75);
         BaseColor color = new BaseColor(175, 196, 174);
         Font font1 = new Font();
@@ -307,6 +307,7 @@ public class DesingPDF_Cursos {
         tablaConcentrado.addCell(createHeaderCell("B", font1, color, 1));
         tablaConcentrado.addCell(createHeaderCell("C", font1, color, 1));
         tablaConcentrado.addCell(createHeaderCell("D", font1, color, 1));
+        tablaConcentrado.addCell(createHeaderCell("LV", font1, color, 1));
 
         return tablaConcentrado;
     }
