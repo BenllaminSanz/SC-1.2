@@ -148,7 +148,7 @@ public class GeneratorExcel_BDs extends Conexion {
         String FechaS = formatFecha.format(fecha);
 
         Properties properties = new Properties();
-        properties.load(new FileInputStream("niveles.properties"));
+        properties.load(new FileInputStream("files/niveles.properties"));
 
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Guardar Respaldo de Certificados");
@@ -345,7 +345,7 @@ public class GeneratorExcel_BDs extends Conexion {
 
     private static String calcularNivel(double aDouble) throws FileNotFoundException, IOException {
         Properties properties = new Properties();
-        FileInputStream fis = new FileInputStream("niveles.properties");
+        FileInputStream fis = new FileInputStream("files/niveles.properties");
         properties.load(fis);
 
         // Obtener el salario del trabajador

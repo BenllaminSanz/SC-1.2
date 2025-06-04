@@ -290,7 +290,7 @@ public class ConsultasTrabajador extends Conexion {
         int indiceImss = Integer.parseInt(propiedades.getProperty("indice.imss"));
         int indiceEmail = Integer.parseInt(propiedades.getProperty("indice.email"));
         int indiceTelefono = Integer.parseInt(propiedades.getProperty("indice.telefono"));
-        try (FileInputStream fis = new FileInputStream("configIndiceT.properties")) {
+        try (FileInputStream fis = new FileInputStream("files/configIndiceT.properties")) {
             propiedades.load(fis);
         } catch (IOException ex) {
             Logger.getLogger(ConsultasTrabajador.class.getName()).log(Level.SEVERE, "No se pudo cargar el archivo de configuración", ex);
@@ -415,7 +415,7 @@ public class ConsultasTrabajador extends Conexion {
 
     public boolean modificarExcel(int folio, Row fila) {
         Properties propiedades = new Properties();
-        try (FileInputStream fis = new FileInputStream("configIndiceT.properties")) {
+        try (FileInputStream fis = new FileInputStream("files/configIndiceT.properties")) {
             propiedades.load(fis);
         } catch (IOException ex) {
             Logger.getLogger(ConsultasTrabajador.class.getName()).log(Level.SEVERE, "No se pudo cargar el archivo de configuración", ex);
@@ -432,7 +432,7 @@ public class ConsultasTrabajador extends Conexion {
         int indiceImss = Integer.parseInt(propiedades.getProperty("indice.imss"));
         int indiceEmail = Integer.parseInt(propiedades.getProperty("indice.email"));
         int indiceTelefono = Integer.parseInt(propiedades.getProperty("indice.telefono"));
-        try (FileInputStream fis = new FileInputStream("configIndiceT.properties")) {
+        try (FileInputStream fis = new FileInputStream("files/configIndiceT.properties")) {
             propiedades.load(fis);
         } catch (IOException ex) {
             Logger.getLogger(ConsultasTrabajador.class.getName()).log(Level.SEVERE, "No se pudo cargar el archivo de configuración", ex);

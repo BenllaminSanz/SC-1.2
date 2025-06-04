@@ -18,7 +18,7 @@ public class optenerNivel {
         FileInputStream fis = null;
         try {
             Properties properties = new Properties();
-            fis = new FileInputStream("niveles.properties");
+            fis = new FileInputStream("files/niveles.properties");
             properties.load(fis);
             
             // Obtener el salario del trabajador

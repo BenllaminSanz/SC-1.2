@@ -83,7 +83,7 @@ public class CargarTabla {
                 tbr.setStatus_Trabajador(rs.getString("Status_Trabajador"));
 
                 Properties properties = new Properties();
-                FileInputStream fis = new FileInputStream("niveles.properties");
+                FileInputStream fis = new FileInputStream("files/niveles.properties");
                 properties.load(fis);
 
                 // Obtener el salario del trabajador
@@ -1262,7 +1262,7 @@ public class CargarTabla {
                         rs.getString("SalarioDiario_Trabajador")));
                 tbr.setStatus_Trabajador(rs.getString("Status_Trabajador"));
                 Properties properties = new Properties();
-                FileInputStream fis = new FileInputStream("niveles.properties");
+                FileInputStream fis = new FileInputStream("files/niveles.properties");
                 properties.load(fis);
 
                 // Obtener el salario del trabajador

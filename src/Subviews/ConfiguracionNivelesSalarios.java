@@ -76,7 +76,7 @@ public class ConfiguracionNivelesSalarios extends JFrame {
     }
 
     private void cargarPropiedades() {
-        try (InputStream input = new FileInputStream("niveles.properties")) {
+        try (InputStream input = new FileInputStream("files/niveles.properties")) {
             propiedades.load(input);
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(this, "No se pudo cargar el archivo de propiedades.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -89,7 +89,7 @@ public class ConfiguracionNivelesSalarios extends JFrame {
             propiedades.setProperty(entry.getKey(), entry.getValue().getText());
         }
 
-        try (OutputStream output = new FileOutputStream("niveles.properties")) {
+        try (OutputStream output = new FileOutputStream("files/niveles.properties")) {
             propiedades.store(output, null);
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(this, "No se pudo guardar el archivo de propiedades.", "Error", JOptionPane.ERROR_MESSAGE);
