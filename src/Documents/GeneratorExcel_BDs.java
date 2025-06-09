@@ -243,15 +243,12 @@ public class GeneratorExcel_BDs extends Conexion {
         SimpleDateFormat formatFecha = new SimpleDateFormat("dd-MM-yyyy");
         String FechaS = formatFecha.format(fecha);
 
-        // Crear un JFileChooser para que el usuario elija la ubicación del archivo
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Guardar Respaldo de Certificados");
-        fileChooser.setSelectedFile(new File("Respaldo Lista de Trabajadores " + FechaS + ".xlsx")); // Nombre predeterminado del archivo
+        fileChooser.setSelectedFile(new File("Respaldo Lista de Trabajadores " + FechaS + ".xlsx"));
 
         int userSelection = fileChooser.showSaveDialog(null);
-
         if (userSelection != JFileChooser.APPROVE_OPTION) {
-            // El usuario canceló la operación
             JOptionPane.showMessageDialog(null, "Operación cancelada por el usuario.");
             return false;
         }
@@ -260,78 +257,60 @@ public class GeneratorExcel_BDs extends Conexion {
         String rutaDoc = fileToSave.getAbsolutePath();
         try {
             Workbook workbook = new XSSFWorkbook();
+            Sheet sheet = workbook.createSheet("Lista de Trabajadores");
+            int rowIndex = 0;
+
+            Row row = sheet.createRow(rowIndex++);
+            int colIndex = 0;
+            for (String campo : camposSeleccionados) {
+                row.createCell(colIndex++).setCellValue(camposDisponibles.get(campo));
+            }
+
             Connection con = conn.getConnection();
-            PreparedStatement ps = con.prepareStatement("SELECT * FROM area");
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM view_trabajador");
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                Sheet sheet = workbook.createSheet(rs.getString("nombre_Area"));
-                int rowIndex = 0;
-
-                Row row = sheet.createRow(rowIndex++);
-                row.createCell(0).setCellValue(rs.getString("Nombre_Area"));
-
-                PreparedStatement ps1 = con.prepareStatement("SELECT * FROM turno");
-                ResultSet rs1 = ps1.executeQuery();
-
-                while (rs1.next()) {
-                    row = sheet.createRow(rowIndex++);
-                    row.createCell(0).setCellValue("Turno " + rs1.getString("nombre_Turno"));
-
-                    PreparedStatement ps2 = con.prepareStatement("SELECT * FROM view_trabajador \n"
-                            + "WHERE nombre_area = ? AND nombre_turno = ?");
-                    ps2.setString(1, rs.getString("nombre_Area"));
-                    ps2.setString(2, rs1.getString("nombre_Turno"));
-                    ResultSet rs2 = ps2.executeQuery();
-
-                    row = sheet.createRow(rowIndex++);
-                    int colIndex = 0;
-                    for (String campo : camposSeleccionados) {
-                        row.createCell(colIndex++).setCellValue(camposDisponibles.get(campo));
-                    }
-
-                    while (rs2.next()) {
-                        row = sheet.createRow(rowIndex++);
-                        colIndex = 0;
-                        for (String campo : camposSeleccionados) {
-                            switch (campo) {
-                                case "Nivel":
-                                    String nivel = calcularNivel(rs2.getDouble("SalarioDiario_Trabajador")); // ejemplo
-                                    row.createCell(colIndex++).setCellValue(nivel);
-                                    break;
-                                case "Sexo":
-                                    String curp = rs2.getString("CURP_Trabajador");
-                                    String sexo = obtenerSexoDesdeCURP(curp);
-                                    row.createCell(colIndex++).setCellValue(sexo);
-                                    break;
-                                default:
-                                    if (campo.startsWith("fecha")) {
-                                        row.createCell(colIndex++).setCellValue(DateTools.MySQLtoString(rs2.getDate(campo)));
-                                    } else if (campo.equals("Folio_Trabajador")) {
-                                        row.createCell(colIndex++).setCellValue(rs2.getInt(campo));
-                                    } else {
-                                        row.createCell(colIndex++).setCellValue(rs2.getString(campo));
-                                    }
+                row = sheet.createRow(rowIndex++);
+                colIndex = 0;
+                for (String campo : camposSeleccionados) {
+                    switch (campo) {
+                        case "Nivel":
+                            String nivel = calcularNivel(rs.getDouble("SalarioDiario_Trabajador"));
+                            row.createCell(colIndex++).setCellValue(nivel);
+                            break;
+                        case "Sexo":
+                            String curp = rs.getString("CURP_Trabajador");
+                            String sexo = obtenerSexoDesdeCURP(curp);
+                            row.createCell(colIndex++).setCellValue(sexo);
+                            break;
+                        default:
+                            if (campo.startsWith("fecha")) {
+                                row.createCell(colIndex++).setCellValue(DateTools.MySQLtoString(rs.getDate(campo)));
+                            } else if (campo.equals("Folio_Trabajador")) {
+                                row.createCell(colIndex++).setCellValue(rs.getInt(campo));
+                            } else {
+                                row.createCell(colIndex++).setCellValue(rs.getString(campo));
                             }
-                        }
                     }
-
-                    for (int i = 0; i < camposSeleccionados.size(); i++) {
-                        sheet.autoSizeColumn(i);
-                    }
-
                 }
             }
+
+            for (int i = 0; i < camposSeleccionados.size(); i++) {
+                sheet.autoSizeColumn(i);
+            }
+
             FileOutputStream outputStream = new FileOutputStream(rutaDoc);
             workbook.write(outputStream);
             JOptionPane.showMessageDialog(null, "Respaldo Creado en " + rutaDoc);
+
             if (Desktop.isDesktopSupported()) {
                 Desktop desktop = Desktop.getDesktop();
                 if (desktop.isSupported(Desktop.Action.OPEN)) {
-                    // Abrir el documento
                     desktop.open(new File(rutaDoc));
                 }
             }
+
             ps.close();
             return true;
         } catch (SQLException | FileNotFoundException ex) {

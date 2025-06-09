@@ -37,12 +37,15 @@ import Tables.TableBrigadistas;
 import Tables.TableBrigadistasBrigada;
 import View.IFrmTrabajador;
 import com.toedter.calendar.JDateChooser;
+import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
@@ -57,13 +60,19 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -252,7 +261,7 @@ public class CtrlTrabajador implements ActionListener, KeyListener, MouseListene
             String folio = frmTrabajador.jTable_Bajas.getValueAt(
                     frmTrabajador.jTable_Bajas.getSelectedRow(), 0).toString();
             modBajas.setFolio_Trabajador(folio);
-            if (JOptionPane.showConfirmDialog(null, "¿Seguro de restaurar este Trabajador?") == JOptionPane.OK_OPTION 
+            if (JOptionPane.showConfirmDialog(null, "¿Seguro de restaurar este Trabajador?") == JOptionPane.OK_OPTION
                     && conBajas.buscar(modBajas)) {
                 modTrabajador.setFolio_Trabajador(modBajas.getFolio_Trabajador());
                 modTrabajador.setNombre_Trabajador(modBajas.getNombre_Trabajador());
@@ -288,9 +297,9 @@ public class CtrlTrabajador implements ActionListener, KeyListener, MouseListene
             int option = JOptionPane.showConfirmDialog(null,
                     "¿Seguro de eliminar este trabajador permanentemente?");
             if (option == JOptionPane.OK_OPTION && conBajas.eliminar(modBajas)) {
-                    JOptionPane.showMessageDialog(null, "Trabajador eliminado permanentemente");
-                    actualizarVistaTrabajador();
-                    DesignTabla.designBajas(frmTrabajador);
+                JOptionPane.showMessageDialog(null, "Trabajador eliminado permanentemente");
+                actualizarVistaTrabajador();
+                DesignTabla.designBajas(frmTrabajador);
             }
         }
 
@@ -666,7 +675,6 @@ public class CtrlTrabajador implements ActionListener, KeyListener, MouseListene
         }
 
         if (e.getSource() == frmTrabajador.btn_ListT) {
-            // Lista de campos disponibles
             Map<String, String> camposDisponibles = new LinkedHashMap<>();
             camposDisponibles.put("Folio_Trabajador", "Nomina");
             camposDisponibles.put("nombre_trabajador", "Nombre");
@@ -674,7 +682,7 @@ public class CtrlTrabajador implements ActionListener, KeyListener, MouseListene
             camposDisponibles.put("RFC_Trabajador", "RFC");
             camposDisponibles.put("IMSS_Trabajador", "IMSS");
             camposDisponibles.put("Fecha_Antiguedad", "Ingreso");
-            camposDisponibles.put("Nombre_Area", "Area");
+            camposDisponibles.put("Nombre_Area", "Área");
             camposDisponibles.put("Nombre_Puesto", "Puesto");
             camposDisponibles.put("nombre_turno", "Turno");
             camposDisponibles.put("Supervisor", "Supervisor");
@@ -685,26 +693,78 @@ public class CtrlTrabajador implements ActionListener, KeyListener, MouseListene
             camposDisponibles.put("Teléfono_Trabajador", "Teléfono");
             camposDisponibles.put("Sexo", "Sexo");
 
-            JPanel panel = new JPanel(new GridLayout(0, 1));
-            Map<String, JCheckBox> checkBoxes = new HashMap<>();
-
-            for (Map.Entry<String, String> entry : camposDisponibles.entrySet()) {
-                JCheckBox checkBox = new JCheckBox(entry.getValue(), true); // true para seleccionado por defecto
-                checkBoxes.put(entry.getKey(), checkBox);
-                panel.add(checkBox);
+            DefaultListModel<JCheckBox> listModel = new DefaultListModel<>();
+            for (String key : camposDisponibles.keySet()) {
+                JCheckBox checkBox = new JCheckBox(camposDisponibles.get(key), true);
+                listModel.addElement(checkBox);
             }
 
-            int result = JOptionPane.showConfirmDialog(null, panel, "Selecciona los campos a exportar",
+            JList<JCheckBox> list = new JList<>(listModel);
+            list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            list.setCellRenderer(new DefaultListCellRenderer() {
+                @Override
+                public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                    JCheckBox checkBox = (JCheckBox) value;
+                    checkBox.setBackground(isSelected ? list.getSelectionBackground() : list.getBackground());
+                    return checkBox;
+                }
+            });
+
+            // Listener para alternar el estado del checkbox con cada clic
+            list.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    int index = list.locationToIndex(e.getPoint());
+                    if (index != -1) {
+                        JCheckBox checkBox = listModel.getElementAt(index);
+                        checkBox.setSelected(!checkBox.isSelected());
+                        list.repaint();
+                    }
+                }
+            });
+
+            JScrollPane scrollPane = new JScrollPane(list);
+            JButton btnUp = new JButton("Subir");
+            JButton btnDown = new JButton("Bajar");
+
+            btnUp.addActionListener(ev -> {
+                int index = list.getSelectedIndex();
+                if (index > 0) {
+                    JCheckBox item = listModel.remove(index);
+                    listModel.add(index - 1, item);
+                    list.setSelectedIndex(index - 1);
+                }
+            });
+
+            btnDown.addActionListener(ev -> {
+                int index = list.getSelectedIndex();
+                if (index < listModel.getSize() - 1 && index != -1) {
+                    JCheckBox item = listModel.remove(index);
+                    listModel.add(index + 1, item);
+                    list.setSelectedIndex(index + 1);
+                }
+            });
+
+            JPanel panel = new JPanel(new BorderLayout());
+            panel.add(scrollPane, BorderLayout.CENTER);
+
+            JPanel buttonPanel = new JPanel(new GridLayout(1, 2));
+            buttonPanel.add(btnUp);
+            buttonPanel.add(btnDown);
+            panel.add(buttonPanel, BorderLayout.SOUTH);
+
+            int result = JOptionPane.showConfirmDialog(null, panel, "Selecciona y ordena los campos a exportar",
                     JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
             List<String> camposSeleccionados = new ArrayList<>();
-            for (Map.Entry<String, JCheckBox> entry : checkBoxes.entrySet()) {
-                if (entry.getValue().isSelected()) {
-                    camposSeleccionados.add(entry.getKey());
+            for (int i = 0; i < listModel.getSize(); i++) {
+                JCheckBox checkBox = listModel.getElementAt(i);
+                if (checkBox.isSelected()) {
+                    camposSeleccionados.add(getKeyByValue(camposDisponibles, checkBox.getText()));
                 }
             }
 
-            if (result != JOptionPane.OK_OPTION) {
+            if (result != JOptionPane.OK_OPTION || camposSeleccionados.isEmpty()) {
                 JOptionPane.showMessageDialog(null, "Operación cancelada por el usuario.");
             } else {
                 frmTrabajador.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
@@ -715,10 +775,10 @@ public class CtrlTrabajador implements ActionListener, KeyListener, MouseListene
                 }
             }
         }
-    }
+}
 
-    @Override
-    public void keyReleased(KeyEvent e) {
+@Override
+public void keyReleased(KeyEvent e) {
         if (e.getSource() == frmTrabajador.txt_buscar_Tbr) {
             String texto = frmTrabajador.txt_buscar_Tbr.getText();
             if (texto.equals("")) {
@@ -739,7 +799,7 @@ public class CtrlTrabajador implements ActionListener, KeyListener, MouseListene
     }
 
     @Override
-    public void mouseEntered(MouseEvent e) {
+public void mouseEntered(MouseEvent e) {
         if (e.getSource() == frmTrabajador.MenuEstado) {
             String folio = frmTrabajador.jTable_Trabajadores.getValueAt(
                     frmTrabajador.jTable_Trabajadores.getSelectedRow(), 0).toString();
@@ -890,38 +950,50 @@ public class CtrlTrabajador implements ActionListener, KeyListener, MouseListene
         frmTrabajador.jLabel5.setText("Listado de Todos los Brigadistas");
     }
 
+    /**
+     * Método auxiliar para obtener la clave de un valor en el mapa
+     */
+    public static String getKeyByValue(Map<String, String> map, String value) {
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            if (entry.getValue().equals(value)) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
     @Override
-    public void keyTyped(KeyEvent e) {
+public void keyTyped(KeyEvent e) {
         //
     }
 
     @Override
-    public void keyPressed(KeyEvent e) {
+public void keyPressed(KeyEvent e) {
         //
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {
+public void mouseClicked(MouseEvent e) {
         //
     }
 
     @Override
-    public void mousePressed(MouseEvent e) {
+public void mousePressed(MouseEvent e) {
         //
     }
 
     @Override
-    public void mouseReleased(MouseEvent e) {
+public void mouseReleased(MouseEvent e) {
         //
     }
 
     @Override
-    public void mouseExited(MouseEvent e) {
+public void mouseExited(MouseEvent e) {
         //
     }
 
     @Override
-    public void valueChanged(ListSelectionEvent e) {
+public void valueChanged(ListSelectionEvent e) {
         if (e.getSource() == frmTrabajador.jTable_brigadas.getSelectionModel()) {
             if (!e.getValueIsAdjusting()) {
                 if (frmTrabajador.jTable_brigadas.getSelectedRow() >= 0
