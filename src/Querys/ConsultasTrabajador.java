@@ -260,7 +260,7 @@ public class ConsultasTrabajador extends Conexion {
     //Funcion de Registro para Trabajadores a travez de archivo Excel
     public boolean cargarExcel(String file, int option) {
         Properties propiedades = new Properties();
-        File archivoConfig = new File("configIndiceT.properties");
+        File archivoConfig = new File("files/configIndiceT.properties");
         if (!archivoConfig.exists()) {
             try (FileOutputStream fos = new FileOutputStream(archivoConfig)) {
                 // Puedes escribir propiedades por defecto aquí si deseas:
@@ -316,7 +316,7 @@ public class ConsultasTrabajador extends Conexion {
 
         String consulta = "SELECT `trabajador`.`Folio_Trabajador`"
                 + "FROM `trabajador` "
-                + "WHERE `trabajador`.`Folio_Trabajador` = ?;";
+                + "WHERE `trabajador`.`Folio_Trabajador` = ? LIMIT 1;";
 
         try {
             Sheet hoja = getWorkbook(file);
@@ -393,16 +393,18 @@ public class ConsultasTrabajador extends Conexion {
                         } else {
                             ps.setNull(10, java.sql.Types.VARCHAR); // Si la celda de teléfono es null, establece el valor como NULL
                         }
-
                         ps.execute();
-
                         registros++;
                     }
                 }
             }
             return true;
         } catch (SQLException ex) {
-            Logger.getLogger(ConsultasTrabajador.class.getName()).log(Level.SEVERE, null, ex);
+            String logMsg = "Error al registrar trabajador en la base de datos. "
+                    + "SQLState: " + ex.getSQLState() + ", "
+                    + "Código de Error: " + ex.getErrorCode() + ", "
+                    + "Mensaje: " + ex.getMessage();
+            Logger.getLogger(ConsultasTrabajador.class.getName()).log(Level.SEVERE, logMsg, ex);
         } finally {
             try {
                 con.close();
@@ -502,7 +504,7 @@ public class ConsultasTrabajador extends Conexion {
             } else {
                 ps.setNull(9, java.sql.Types.VARCHAR); // Si la celda de teléfono es null, establece el valor como NULL
             }
-            
+
             Cell celdaFolio = fila.getCell(indiceFolio);
             if (celdaFolio != null && celdaFolio.getCellTypeEnum() == CellType.NUMERIC) {
                 ps.setInt(10, (int) celdaFolio.getNumericCellValue());
@@ -556,6 +558,7 @@ public class ConsultasTrabajador extends Conexion {
             }
             return hoja;
         } catch (IOException | InvalidFormatException | EncryptedDocumentException ex) {
+            JOptionPane.showMessageDialog(null, "Error: No se puede acceder al archivo porque está abierto en otro proceso.", "Error de acceso", JOptionPane.ERROR_MESSAGE);
             Logger.getLogger(ConsultasTrabajador.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
