@@ -70,6 +70,7 @@ public class IFrmLBU extends javax.swing.JInternalFrame {
         itemRptSup_PDF = new javax.swing.JMenuItem();
         itemRptSup_Excel = new javax.swing.JMenuItem();
         itemRptArea_Excel = new javax.swing.JMenuItem();
+        jMenuItem4 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
@@ -514,6 +515,10 @@ public class IFrmLBU extends javax.swing.JInternalFrame {
 
         itemReporte.add(jMenu1);
 
+        jMenuItem4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/IconList.png"))); // NOI18N
+        jMenuItem4.setText("Reporte de Áreas");
+        itemReporte.add(jMenuItem4);
+
         Bar_LBU.add(itemReporte);
 
         jMenu2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/IconList.png"))); // NOI18N
@@ -625,6 +630,7 @@ public class IFrmLBU extends javax.swing.JInternalFrame {
     public javax.swing.JMenuItem jMenuItem1;
     public javax.swing.JMenuItem jMenuItem2;
     public javax.swing.JMenuItem jMenuItem3;
+    public javax.swing.JMenuItem jMenuItem4;
     public javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;

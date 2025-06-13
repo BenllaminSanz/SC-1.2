@@ -343,7 +343,7 @@ public class GeneratorExcel_BDs extends Conexion {
                 double nivelSalario = Double.parseDouble(salarioStr);
 
                 // Si el salario del trabajador es mayor o igual al salario del nivel, asigna el nivel
-                if (salario >= nivelSalario) {
+                if (salario == nivelSalario) {
                     return key.replace("nivel.", "");  // Retorna el nivel
                 }
             }

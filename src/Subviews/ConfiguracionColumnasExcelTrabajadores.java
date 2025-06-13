@@ -137,7 +137,7 @@ public class ConfiguracionColumnasExcelTrabajadores extends JFrame {
         propiedades.setProperty("indice.email", txtEmail.getText());
         propiedades.setProperty("indice.telefono", txtTelefono.getText());
 
-        try (FileOutputStream fos = new FileOutputStream("files/config.properties")) {
+        try (FileOutputStream fos = new FileOutputStream("files/configIndiceT.properties")) {
             propiedades.store(fos, "Configuración de índices de columnas");
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(this, "No se pudo guardar el archivo de configuración.", "Error", JOptionPane.ERROR_MESSAGE);

@@ -50,6 +50,7 @@ public class CtrlLBUGeneral implements ActionListener {
         this.frm.jMenuItem1.addActionListener(this);
         this.frm.jMenuItem2.addActionListener(this);
         this.frm.jMenuItem3.addActionListener(this);
+        this.frm.jMenuItem4.addActionListener(this);
     }
 
     //Funcion de inicio
@@ -261,6 +262,17 @@ public class CtrlLBUGeneral implements ActionListener {
                 GeneratorPDF_Brigadas.Lista_EmergenciaPorTurno(turnoSeleccionado);
                 frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
+            }
+        }
+        
+        if (e.getSource() == frm.jMenuItem4) {
+            frm.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            try {
+                GeneratorExcel_LBU.LBUResumenAreas();
+                frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            } catch (Exception ex) {
+                Logger.getLogger(CtrlEditarTrabajador.class.getName()).log(Level.SEVERE, null, ex);
+                frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
             }
         }
     }

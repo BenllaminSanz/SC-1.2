@@ -21,6 +21,7 @@ import javax.swing.JOptionPane;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class GeneratorExcel_LBU extends Conexion {
@@ -32,7 +33,7 @@ public class GeneratorExcel_LBU extends Conexion {
         SimpleDateFormat formatFecha = new SimpleDateFormat("dd-MM-yyyy");
         String FechaS = formatFecha.format(fecha);
         LocalDate fechaActual = LocalDate.now();
-        
+
         // Crear un JFileChooser para que el usuario elija la ubicación del archivo
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Guardar Reporte de LBU");
@@ -48,7 +49,7 @@ public class GeneratorExcel_LBU extends Conexion {
 
         File fileToSave = fileChooser.getSelectedFile();
         String rutaDoc = fileToSave.getAbsolutePath();
-        
+
         try {
             Workbook workbook = new XSSFWorkbook();
             Connection con = conn.getConnection(); // Crear un archivo de Excel
@@ -133,7 +134,7 @@ public class GeneratorExcel_LBU extends Conexion {
         Date fecha = new Date();
         SimpleDateFormat formatFecha = new SimpleDateFormat("dd-MM-yyyy");
         String FechaS = formatFecha.format(fecha);
-        
+
         // Crear un JFileChooser para que el usuario elija la ubicación del archivo
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Guardar Resumen de Supervisores");
@@ -288,7 +289,7 @@ public class GeneratorExcel_LBU extends Conexion {
         Date fecha = new Date();
         SimpleDateFormat formatFecha = new SimpleDateFormat("dd-MM-yyyy");
         String FechaS = formatFecha.format(fecha);
-        
+
         // Crear un JFileChooser para que el usuario elija la ubicación del archivo
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Guardar Resumen de Áreas");
@@ -433,6 +434,92 @@ public class GeneratorExcel_LBU extends Conexion {
         } catch (FileNotFoundException ex) {
             Logger.getLogger(GeneratorExcel_LBU.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException | IOException ex) {
+            Logger.getLogger(GeneratorExcel_LBU.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+
+    public static boolean LBUResumenAreas() {
+        Date fecha = new Date();
+        SimpleDateFormat formatFecha = new SimpleDateFormat("dd-MM-yyyy");
+        String FechaS = formatFecha.format(fecha);
+
+        // Crear un JFileChooser para que el usuario elija la ubicación del archivo
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Guardar Resumen de Áreas y Puestos");
+        fileChooser.setSelectedFile(new File("Resumen de Áreas a " + FechaS + ".xlsx")); // Nombre predeterminado del archivo
+
+        int userSelection = fileChooser.showSaveDialog(null);
+
+        if (userSelection != JFileChooser.APPROVE_OPTION) {
+            // El usuario canceló la operación
+            JOptionPane.showMessageDialog(null, "Operación cancelada por el usuario.");
+            return false;
+        }
+
+        File fileToSave = fileChooser.getSelectedFile();
+        String rutaDoc = fileToSave.getAbsolutePath();
+
+        try (Connection con = conn.getConnection(); // Crear un archivo de Excel
+                 Workbook workbook = new XSSFWorkbook()) {
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM area");
+            ResultSet rs = ps.executeQuery();
+
+            Sheet sheet = workbook.createSheet("Áreas y Puestos");
+            Row headerRow = sheet.createRow(0);
+
+            headerRow.createCell(0).setCellValue("Área");
+            headerRow.createCell(1).setCellValue("Puesto");
+            headerRow.createCell(2).setCellValue("Total");
+            headerRow.createCell(3).setCellValue("Nivel");
+            
+
+            int rowNum = 1;
+            while (rs.next()) {
+                String idArea = rs.getString("idArea");
+                String nombreArea = rs.getString("Nombre_Area");
+
+                PreparedStatement ps1 = con.prepareStatement("SELECT * FROM puesto WHERE area_idArea = ?");
+                ps1.setString(1, idArea);
+                ResultSet rs1 = ps1.executeQuery();
+
+                int startRow = rowNum; // Guardamos la primera fila del área
+
+                while (rs1.next()) {
+                    Row row = sheet.createRow(rowNum++);
+                    row.createCell(1).setCellValue(rs1.getString("Nombre_Puesto"));
+                    row.createCell(2).setCellValue(rs1.getInt("Propuesto_Trabajadores"));
+                    row.createCell(3).setCellValue(rs1.getString("Nivel"));
+                }
+
+                // Fusionar celdas de la columna "Área"
+                if (startRow < rowNum - 1) {
+                    sheet.addMergedRegion(new CellRangeAddress(startRow, rowNum - 1, 0, 0));
+                }
+
+                // Escribir el área solo en la primera fila del grupo fusionado
+                sheet.getRow(startRow).createCell(0).setCellValue(nombreArea);
+            }
+            
+            // Autoajustar columnas
+            sheet.autoSizeColumn(0);
+            sheet.autoSizeColumn(1);
+
+            FileOutputStream outputStream = new FileOutputStream(rutaDoc);
+            workbook.write(outputStream);
+            JOptionPane.showMessageDialog(null, "Archivo Creado en " + rutaDoc);
+            if (Desktop.isDesktopSupported()) {
+                Desktop desktop = Desktop.getDesktop();
+                if (desktop.isSupported(Desktop.Action.OPEN)) {
+                    // Abrir el documento
+                    desktop.open(new File(rutaDoc));
+                }
+            }
+
+        } catch (SQLException | FileNotFoundException ex) {
+            Logger.getLogger(GeneratorExcel_LBU.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showConfirmDialog(null, "Error al generar archivo: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (IOException ex) {
             Logger.getLogger(GeneratorExcel_LBU.class.getName()).log(Level.SEVERE, null, ex);
         }
         return false;
