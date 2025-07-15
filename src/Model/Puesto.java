@@ -11,7 +11,33 @@ public class Puesto {
     private int Centro_de_Costo;
     private int Propuesto_Trabajadores;
     private int Propuesto_Turno;
+
+    public int getPropuesto_Turno() {
+        return Propuesto_Turno;
+    }
+
+    public void setPropuesto_Turno(int Propuesto_Turno) {
+        this.Propuesto_Turno = Propuesto_Turno;
+    }
+
+    public int getPropuesto_Turnos() {
+        return Propuesto_Turnos;
+    }
+
+    public void setPropuesto_Turnos(int Propuesto_Turnos) {
+        this.Propuesto_Turnos = Propuesto_Turnos;
+    }
+    private int Propuesto_Turnos;
     private int Diferencia_Trabajadores;
+
+    public int getTurnoLS() {
+        return TurnoLS;
+    }
+
+    public void setTurnoLS(int TurnoLS) {
+        this.TurnoLS = TurnoLS;
+    }
+    
     private int Plantilla_Trabajadores;
     private int area_idArea;
     private String area_NombreArea;
@@ -20,6 +46,7 @@ public class Puesto {
     private int TurnoC;
     private int TurnoD;
     private int TurnoLV;
+    private int TurnoLS;
 
     public int getIdPuesto() {
         return idPuesto;
@@ -75,14 +102,6 @@ public class Puesto {
 
     public void setPropuesto_Trabajadores(int Propuesto_Trabajadores) {
         this.Propuesto_Trabajadores = Propuesto_Trabajadores;
-    }
-    
-     public int getPropuesto_Turno() {
-        return Propuesto_Turno;
-    }
-
-    public void setPropuesto_Turno(int Propuesto_Turno) {
-        this.Propuesto_Turno = Propuesto_Turno;
     }
 
     public int getDiferencia_Trabajadores() {

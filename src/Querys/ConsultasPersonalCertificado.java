@@ -2,6 +2,7 @@ package Querys;
 
 import Functions.DateTools;
 import Model.PersonalCertificado;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -52,22 +53,21 @@ public class ConsultasPersonalCertificado extends Conexion {
 
     public boolean agregar(PersonalCertificado mod) {
         PreparedStatement ps = null;
+        CallableStatement cs = null;
         Connection con = getConnection();
 
-        String sql = "INSERT INTO `sistema_capacitacion`.`asistentes_certificados`\n"
-                + "(`asistentes_curso_idAsistente`,\n"
-                + "`certificado_idcertificado`,\n"
-                + "`fecha_inicio`,\n"
-                + "`fecha_certificacion`,\n"
-                + "`tipo_certificacion`,\n"
-                + "`Apellidos`,\n"
-                + "`Nombres`)\n"
-                + "VALUES\n"
-                + "(?,?,?,?,?,?,?);";
-
-        String sql1 = "CALL actualizar_certificados(?);";
+        String sql = "INSERT INTO `sistema_capacitacion`.`asistentes_certificados` "
+                + "(`asistentes_curso_idAsistente`, "
+                + "`certificado_idcertificado`, "
+                + "`fecha_inicio`, "
+                + "`fecha_certificacion`, "
+                + "`tipo_certificacion`, "
+                + "`Apellidos`, "
+                + "`Nombres`) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?);";
 
         try {
+            // Ejecutar INSERT
             ps = con.prepareStatement(sql);
             ps.setString(1, mod.getIdTrabajador_Certificado());
             ps.setInt(2, mod.getId_Certificado());
@@ -76,17 +76,27 @@ public class ConsultasPersonalCertificado extends Conexion {
             ps.setString(5, mod.getTipo_certificado());
             ps.setString(6, mod.getApellidos());
             ps.setString(7, mod.getNombres());
-            ps.execute();
+            ps.executeUpdate();
 
-            ps = con.prepareStatement(sql1);
-            ps.setString(1, mod.getIdTrabajador_Certificado());
-            ps.execute();
+            // Llamar procedimiento para actualizar certificados
+            cs = con.prepareCall("{CALL actualizar_certificados(?)}");
+            cs.setInt(1, Integer.parseInt(mod.getIdTrabajador_Certificado())); // Asegúrate que sea int
+            cs.execute();
+
             return true;
         } catch (SQLException ex) {
-            Logger.getLogger(ConsultasHistorialCurso.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ConsultasPersonalCertificado.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
-                con.close();
+                if (ps != null) {
+                    ps.close();
+                }
+                if (cs != null) {
+                    cs.close();
+                }
+                if (con != null) {
+                    con.close();
+                }
             } catch (SQLException e) {
                 System.err.println(e);
             }
@@ -96,22 +106,22 @@ public class ConsultasPersonalCertificado extends Conexion {
 
     public boolean actualizar(PersonalCertificado mod) {
         PreparedStatement ps = null;
+        CallableStatement cs = null;  // Para llamar al procedimiento almacenado
         Connection con = getConnection();
 
-        String sql = "UPDATE `sistema_capacitacion`.`asistentes_certificados`\n"
-                + "SET\n"
-                + "`asistentes_curso_idAsistente` = ?,\n"
-                + "`certificado_idcertificado` = ?,\n"
-                + "`fecha_inicio` = ?,\n"
-                + "`fecha_certificacion` = ?,\n"
-                + "`tipo_certificacion` = ?,\n"
-                + "`Apellidos` = ?,\n"
-                + "`Nombres` = ?\n"
+        String sql = "UPDATE `sistema_capacitacion`.`asistentes_certificados` "
+                + "SET "
+                + "`asistentes_curso_idAsistente` = ?, "
+                + "`certificado_idcertificado` = ?, "
+                + "`fecha_inicio` = ?, "
+                + "`fecha_certificacion` = ?, "
+                + "`tipo_certificacion` = ?, "
+                + "`Apellidos` = ?, "
+                + "`Nombres` = ? "
                 + "WHERE `idCertificacion` = ?;";
-        
-        String sql1 = "CALL actualizar_certificados(?);";
 
         try {
+            // 1. Ejecutar UPDATE
             ps = con.prepareStatement(sql);
             ps.setString(1, mod.getIdTrabajador_Certificado());
             ps.setInt(2, mod.getId_Certificado());
@@ -121,18 +131,29 @@ public class ConsultasPersonalCertificado extends Conexion {
             ps.setString(6, mod.getApellidos());
             ps.setString(7, mod.getNombres());
             ps.setInt(8, mod.getIdCertificacion());
-            ps.execute();
+            ps.executeUpdate();
 
-            System.out.println(ps);
-            ps = con.prepareStatement(sql1);
-            ps.setString(1, mod.getIdTrabajador_Certificado());
-            ps.execute();
+            // 2. Llamar al procedimiento almacenado
+            cs = con.prepareCall("{CALL actualizar_certificados(?)}");
+            // El parámetro que espera es el id del asistente, que en tu caso parece ser mod.getIdTrabajador_Certificado()
+            // pero mod.getIdTrabajador_Certificado() es String, tu procedimiento espera INT. Si es un int, adapta aquí.
+            cs.setInt(1, Integer.parseInt(mod.getIdTrabajador_Certificado()));
+            cs.execute();
+
             return true;
         } catch (SQLException ex) {
-            Logger.getLogger(ConsultasHistorialCurso.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ConsultasPersonalCertificado.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
-                con.close();
+                if (ps != null) {
+                    ps.close();
+                }
+                if (cs != null) {
+                    cs.close();
+                }
+                if (con != null) {
+                    con.close();
+                }
             } catch (SQLException e) {
                 System.err.println(e);
             }
@@ -142,21 +163,22 @@ public class ConsultasPersonalCertificado extends Conexion {
 
     public boolean eliminar(String idCertificacion, String idTrabajador) {
         PreparedStatement ps = null;
+        CallableStatement cs = null;
         Connection con = getConnection();
 
-        String sql = "DELETE FROM `sistema_capacitacion`.`asistentes_certificados`\n"
+        String sql = "DELETE FROM `sistema_capacitacion`.`asistentes_certificados` "
                 + "WHERE idCertificacion = ?;";
 
-        String sql1 = "CALL actualizar_certificados(?);";
-
         try {
+            // Ejecutar DELETE
             ps = con.prepareStatement(sql);
             ps.setString(1, idCertificacion);
-            ps.execute();
+            ps.executeUpdate();
 
-            ps = con.prepareCall(sql1);
-            ps.setString(1, idTrabajador);
-            ps.execute();
+            // Llamar procedimiento para actualizar certificados
+            cs = con.prepareCall("{CALL actualizar_certificados(?)}");
+            cs.setInt(1, Integer.parseInt(idTrabajador)); // asegúrate que sea int
+            cs.execute();
 
             return true;
         } catch (SQLException e) {
@@ -164,7 +186,15 @@ public class ConsultasPersonalCertificado extends Conexion {
             return false;
         } finally {
             try {
-                con.close();
+                if (ps != null) {
+                    ps.close();
+                }
+                if (cs != null) {
+                    cs.close();
+                }
+                if (con != null) {
+                    con.close();
+                }
             } catch (SQLException e) {
                 System.err.println(e);
             }

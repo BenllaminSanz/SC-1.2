@@ -469,11 +469,19 @@ public class GeneratorExcel_LBU extends Conexion {
             Row headerRow = sheet.createRow(0);
 
             headerRow.createCell(0).setCellValue("Área");
-            headerRow.createCell(1).setCellValue("Puesto");
-            headerRow.createCell(2).setCellValue("Total");
-            headerRow.createCell(3).setCellValue("Nivel");
-            
+            headerRow.createCell(1).setCellValue("Centro de Costo");
+            headerRow.createCell(2).setCellValue("Puesto");
+            headerRow.createCell(3).setCellValue("Position");
+            headerRow.createCell(4).setCellValue("Propuesto");
+            headerRow.createCell(5).setCellValue("Nivel");
+            headerRow.createCell(6).setCellValue("Total");
+            headerRow.createCell(7).setCellValue("Diferencia");
+            headerRow.createCell(8).setCellValue("Plantilla");
 
+            int totalGeneral = 0;
+            int totalResta = 0;
+            int totalPlantilla = 0;
+            
             int rowNum = 1;
             while (rs.next()) {
                 String idArea = rs.getString("idArea");
@@ -483,14 +491,33 @@ public class GeneratorExcel_LBU extends Conexion {
                 ps1.setString(1, idArea);
                 ResultSet rs1 = ps1.executeQuery();
 
+                int totalArea = 0;
                 int startRow = rowNum; // Guardamos la primera fila del área
 
                 while (rs1.next()) {
                     Row row = sheet.createRow(rowNum++);
-                    row.createCell(1).setCellValue(rs1.getString("Nombre_Puesto"));
-                    row.createCell(2).setCellValue(rs1.getInt("Propuesto_Trabajadores"));
-                    row.createCell(3).setCellValue(rs1.getString("Nivel"));
+                    row.createCell(1).setCellValue(rs1.getString("Centro_de_Costo"));
+                    row.createCell(2).setCellValue(rs1.getString("Nombre_Puesto"));
+                    row.createCell(3).setCellValue(rs1.getString("Nombre_Puesto_Ingles"));
+                    row.createCell(4).setCellValue(rs1.getInt("Propuesto_Trabajadores"));
+                    row.createCell(5).setCellValue(rs1.getString("Nivel"));
+                    totalArea = totalArea + rs1.getInt("Propuesto_Trabajadores");
                 }
+
+                PreparedStatement ps2 = con.prepareStatement("SELECT * FROM view_lbu_puesto WHERE Area= ?");
+                ps2.setString(1, nombreArea);
+                ResultSet rs2 = ps2.executeQuery();
+                
+                int totalReal = 0;
+                int totalDiferencia = 0;
+                while (rs2.next()) {
+                    totalReal = totalReal + rs2.getInt("Diferencia");
+                    totalDiferencia = totalDiferencia + rs2.getInt("Plantilla");
+                }
+
+                sheet.getRow(startRow).createCell(6).setCellValue(totalArea);
+                sheet.getRow(startRow).createCell(7).setCellValue(totalReal);
+                sheet.getRow(startRow).createCell(8).setCellValue(totalDiferencia);
 
                 // Fusionar celdas de la columna "Área"
                 if (startRow < rowNum - 1) {
@@ -499,11 +526,23 @@ public class GeneratorExcel_LBU extends Conexion {
 
                 // Escribir el área solo en la primera fila del grupo fusionado
                 sheet.getRow(startRow).createCell(0).setCellValue(nombreArea);
+
+                totalGeneral = totalGeneral + totalArea;
+                totalResta = totalResta + totalReal;
+                totalPlantilla = totalPlantilla + totalDiferencia;
             }
-            
+
+            // Crear una fila al final para mostrar el total general
+            Row totalRow = sheet.createRow(rowNum);
+            totalRow.createCell(6).setCellValue(totalGeneral);
+            totalRow.createCell(7).setCellValue(totalResta);
+            totalRow.createCell(8).setCellValue(totalPlantilla);
+
             // Autoajustar columnas
             sheet.autoSizeColumn(0);
             sheet.autoSizeColumn(1);
+            sheet.autoSizeColumn(2);
+            sheet.autoSizeColumn(3);
 
             FileOutputStream outputStream = new FileOutputStream(rutaDoc);
             workbook.write(outputStream);

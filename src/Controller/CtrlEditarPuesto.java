@@ -59,7 +59,7 @@ public class CtrlEditarPuesto implements ActionListener {
                     || frm.txt_nivel.getText().trim().isEmpty()
                     || frm.txt_centrocosto.getText().trim().isEmpty()
                     || frm.txt_totaltbr.getText().trim().isEmpty()
-                    || frm.txt_totalturno_tbr.getText().trim().isEmpty()
+                    || frm.txt_totalturno_A.getText().trim().isEmpty()
                     || frm.cb_AreaPuesto.getSelectedItem() == null
                     || frm.cb_AreaPuesto.getSelectedItem().toString().trim().isEmpty()) {
 
@@ -74,7 +74,12 @@ public class CtrlEditarPuesto implements ActionListener {
             mod.setNivel(frm.txt_nivel.getText());
             mod.setCentro_de_Costo(Integer.parseInt(frm.txt_centrocosto.getText()));
             mod.setPropuesto_Trabajadores(Integer.parseInt(frm.txt_totaltbr.getText()));
-            mod.setPropuesto_Turno(Integer.parseInt(frm.txt_totalturno_tbr.getText()));
+            mod.setTurnoA(Integer.parseInt(frm.txt_totalturno_A.getText()));
+            mod.setTurnoB(Integer.parseInt(frm.txt_totalturno_B.getText()));
+            mod.setTurnoC(Integer.parseInt(frm.txt_totalturno_C.getText()));
+            mod.setTurnoD(Integer.parseInt(frm.txt_totalturno_D.getText()));
+            mod.setTurnoLV(Integer.parseInt(frm.txt_totalturno_LV.getText()));
+            mod.setTurnoLS(Integer.parseInt(frm.txt_totalturno_LS.getText()));
             String area = frm.cb_AreaPuesto.getSelectedItem().toString();
             mod.setArea_idArea(Integer.parseInt(QueryFunctions.CapturaCondicionalSimple(
                     "area", "idArea", "Nombre_Area", area)));
@@ -97,7 +102,12 @@ public class CtrlEditarPuesto implements ActionListener {
                 mod.setNivel(frm.txt_nivel.getText());
                 mod.setCentro_de_Costo(Integer.parseInt(frm.txt_centrocosto.getText()));
                 mod.setPropuesto_Trabajadores(Integer.parseInt(frm.txt_totaltbr.getText()));
-                mod.setPropuesto_Turno(Integer.parseInt(frm.txt_totalturno_tbr.getText()));
+                mod.setTurnoA(Integer.parseInt(frm.txt_totalturno_A.getText()));
+                mod.setTurnoB(Integer.parseInt(frm.txt_totalturno_B.getText()));
+                mod.setTurnoC(Integer.parseInt(frm.txt_totalturno_C.getText()));
+                mod.setTurnoD(Integer.parseInt(frm.txt_totalturno_D.getText()));
+                mod.setTurnoLV(Integer.parseInt(frm.txt_totalturno_LV.getText()));
+                mod.setTurnoLS(Integer.parseInt(frm.txt_totalturno_LS.getText()));
                 String area = frm.cb_AreaPuesto.getSelectedItem().toString();
                 mod.setArea_idArea(Integer.parseInt(QueryFunctions.CapturaCondicionalSimple(
                         "area", "idArea", "Nombre_Area", area)));

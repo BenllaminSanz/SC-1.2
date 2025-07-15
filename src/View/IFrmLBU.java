@@ -72,7 +72,9 @@ public class IFrmLBU extends javax.swing.JInternalFrame {
         itemRptArea_Excel = new javax.swing.JMenuItem();
         jMenuItem4 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
+        jMenu3 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem5 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
 
@@ -524,14 +526,23 @@ public class IFrmLBU extends javax.swing.JInternalFrame {
         jMenu2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/IconList.png"))); // NOI18N
         jMenu2.setText("Listas de Emergencia");
 
+        jMenu3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/IconList.png"))); // NOI18N
+        jMenu3.setText("De toda la Planta");
+
         jMenuItem1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/IconList.png"))); // NOI18N
-        jMenuItem1.setText("De toda la de Planta");
+        jMenuItem1.setText("Concentrado");
         jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem1ActionPerformed(evt);
             }
         });
-        jMenu2.add(jMenuItem1);
+        jMenu3.add(jMenuItem1);
+
+        jMenuItem5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/IconList.png"))); // NOI18N
+        jMenuItem5.setText("Por Turnos");
+        jMenu3.add(jMenuItem5);
+
+        jMenu2.add(jMenu3);
 
         jMenuItem2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/IconList.png"))); // NOI18N
         jMenuItem2.setText("Especifica Áreas");
@@ -627,10 +638,12 @@ public class IFrmLBU extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JMenu jMenu1;
     public javax.swing.JMenu jMenu2;
+    public javax.swing.JMenu jMenu3;
     public javax.swing.JMenuItem jMenuItem1;
     public javax.swing.JMenuItem jMenuItem2;
     public javax.swing.JMenuItem jMenuItem3;
     public javax.swing.JMenuItem jMenuItem4;
+    public javax.swing.JMenuItem jMenuItem5;
     public javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;

@@ -1061,7 +1061,6 @@ public class GeneratorPDF_Certificados extends Conexion {
                 psT.executeUpdate();
                 
                 ps2 = con.prepareStatement("SELECT * FROM sistema_capacitacion.view_certificados_area_turno_total");
-                System.out.println("1");
             }
 
             ResultSet rs = ps.executeQuery();

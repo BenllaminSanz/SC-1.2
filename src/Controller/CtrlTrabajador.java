@@ -155,6 +155,8 @@ public class CtrlTrabajador implements ActionListener, KeyListener, MouseListene
         this.frmTrabajador.item_EliminarBrigadista.addActionListener(this);
         this.frmTrabajador.item_nivelesSalarios.addActionListener(this);
         this.frmTrabajador.btn_ListT.addActionListener(this);
+        this.frmTrabajador.btn_ListT1.addActionListener(this);
+        this.frmTrabajador.btn_ListT2.addActionListener(this);
     }
 
     //Funcion de inicio
@@ -671,7 +673,7 @@ public class CtrlTrabajador implements ActionListener, KeyListener, MouseListene
         if (e.getSource() == frmTrabajador.btn_agregarBrigadista) {
             JOptionPane.showMessageDialog(null, "Para agregar o modificar un Brigadista,\n"
                     + "busque su número de Nomina en su respectiva tabla. \n"
-                    + "Dele click a la opción de modificar y busque el apartodo de Brigadas.");
+                    + "Dele click a la opción de modificar y busque el apartado de Brigadas.");
         }
 
         if (e.getSource() == frmTrabajador.btn_ListT) {
@@ -775,10 +777,116 @@ public class CtrlTrabajador implements ActionListener, KeyListener, MouseListene
                 }
             }
         }
-}
 
-@Override
-public void keyReleased(KeyEvent e) {
+        if (e.getSource() == frmTrabajador.btn_ListT1) {
+            Map<String, String> camposDisponibles = new LinkedHashMap<>();
+            camposDisponibles.put("Folio_Administrativo", "Nomina");
+            camposDisponibles.put("Nombre_Administrativo", "Nombre");
+            camposDisponibles.put("CURP_administrativo", "CURP");
+            camposDisponibles.put("RFC_administrativo", "RFC");
+            camposDisponibles.put("IMSS_administrativo", "IMSS");
+            camposDisponibles.put("Fecha_antiguedad", "Ingreso");
+            camposDisponibles.put("cia_administrativo", "Compañia");
+            camposDisponibles.put("area_administrativo", "Area");
+            camposDisponibles.put("puesto_administrativo", "Puesto");
+            camposDisponibles.put("turno", "Turno");
+            camposDisponibles.put("Sexo", "Sexo");
+
+            DefaultListModel<JCheckBox> listModel = new DefaultListModel<>();
+            for (String key : camposDisponibles.keySet()) {
+                JCheckBox checkBox = new JCheckBox(camposDisponibles.get(key), true);
+                listModel.addElement(checkBox);
+            }
+
+            JList<JCheckBox> list = new JList<>(listModel);
+            list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            list.setCellRenderer(new DefaultListCellRenderer() {
+                @Override
+                public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                    JCheckBox checkBox = (JCheckBox) value;
+                    checkBox.setBackground(isSelected ? list.getSelectionBackground() : list.getBackground());
+                    return checkBox;
+                }
+            });
+
+            // Listener para alternar el estado del checkbox con cada clic
+            list.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    int index = list.locationToIndex(e.getPoint());
+                    if (index != -1) {
+                        JCheckBox checkBox = listModel.getElementAt(index);
+                        checkBox.setSelected(!checkBox.isSelected());
+                        list.repaint();
+                    }
+                }
+            });
+
+            JScrollPane scrollPane = new JScrollPane(list);
+            JButton btnUp = new JButton("Subir");
+            JButton btnDown = new JButton("Bajar");
+
+            btnUp.addActionListener(ev -> {
+                int index = list.getSelectedIndex();
+                if (index > 0) {
+                    JCheckBox item = listModel.remove(index);
+                    listModel.add(index - 1, item);
+                    list.setSelectedIndex(index - 1);
+                }
+            });
+
+            btnDown.addActionListener(ev -> {
+                int index = list.getSelectedIndex();
+                if (index < listModel.getSize() - 1 && index != -1) {
+                    JCheckBox item = listModel.remove(index);
+                    listModel.add(index + 1, item);
+                    list.setSelectedIndex(index + 1);
+                }
+            });
+
+            JPanel panel = new JPanel(new BorderLayout());
+            panel.add(scrollPane, BorderLayout.CENTER);
+
+            JPanel buttonPanel = new JPanel(new GridLayout(1, 2));
+            buttonPanel.add(btnUp);
+            buttonPanel.add(btnDown);
+            panel.add(buttonPanel, BorderLayout.SOUTH);
+
+            int result = JOptionPane.showConfirmDialog(null, panel, "Selecciona y ordena los campos a exportar",
+                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+            List<String> camposSeleccionados = new ArrayList<>();
+            for (int i = 0; i < listModel.getSize(); i++) {
+                JCheckBox checkBox = listModel.getElementAt(i);
+                if (checkBox.isSelected()) {
+                    camposSeleccionados.add(getKeyByValue(camposDisponibles, checkBox.getText()));
+                }
+            }
+
+            if (result != JOptionPane.OK_OPTION || camposSeleccionados.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Operación cancelada por el usuario.");
+            } else {
+                frmTrabajador.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                if (GeneratorExcel_BDs.BD_ADMINISTRATIVOS(camposDisponibles, camposSeleccionados)) {
+                    frmTrabajador.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                } else {
+                    frmTrabajador.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                }
+            }
+        }
+
+        if (e.getSource() == frmTrabajador.btn_ListT2) {
+            frmTrabajador.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            if (GeneratorExcel_BDs.BD_BRIGADAS()) {
+                frmTrabajador.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            } else {
+                frmTrabajador.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            }
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
         if (e.getSource() == frmTrabajador.txt_buscar_Tbr) {
             String texto = frmTrabajador.txt_buscar_Tbr.getText();
             if (texto.equals("")) {
@@ -799,7 +907,7 @@ public void keyReleased(KeyEvent e) {
     }
 
     @Override
-public void mouseEntered(MouseEvent e) {
+    public void mouseEntered(MouseEvent e) {
         if (e.getSource() == frmTrabajador.MenuEstado) {
             String folio = frmTrabajador.jTable_Trabajadores.getValueAt(
                     frmTrabajador.jTable_Trabajadores.getSelectedRow(), 0).toString();
@@ -963,37 +1071,37 @@ public void mouseEntered(MouseEvent e) {
     }
 
     @Override
-public void keyTyped(KeyEvent e) {
+    public void keyTyped(KeyEvent e) {
         //
     }
 
     @Override
-public void keyPressed(KeyEvent e) {
+    public void keyPressed(KeyEvent e) {
         //
     }
 
     @Override
-public void mouseClicked(MouseEvent e) {
+    public void mouseClicked(MouseEvent e) {
         //
     }
 
     @Override
-public void mousePressed(MouseEvent e) {
+    public void mousePressed(MouseEvent e) {
         //
     }
 
     @Override
-public void mouseReleased(MouseEvent e) {
+    public void mouseReleased(MouseEvent e) {
         //
     }
 
     @Override
-public void mouseExited(MouseEvent e) {
+    public void mouseExited(MouseEvent e) {
         //
     }
 
     @Override
-public void valueChanged(ListSelectionEvent e) {
+    public void valueChanged(ListSelectionEvent e) {
         if (e.getSource() == frmTrabajador.jTable_brigadas.getSelectionModel()) {
             if (!e.getValueIsAdjusting()) {
                 if (frmTrabajador.jTable_brigadas.getSelectedRow() >= 0

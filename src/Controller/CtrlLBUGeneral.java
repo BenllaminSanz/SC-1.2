@@ -51,6 +51,7 @@ public class CtrlLBUGeneral implements ActionListener {
         this.frm.jMenuItem2.addActionListener(this);
         this.frm.jMenuItem3.addActionListener(this);
         this.frm.jMenuItem4.addActionListener(this);
+        this.frm.jMenuItem5.addActionListener(this);
     }
 
     //Funcion de inicio
@@ -205,6 +206,17 @@ public class CtrlLBUGeneral implements ActionListener {
             frm.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             try {
                 GeneratorPDF_Brigadas.listaEmergencia();
+                frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            } catch (Exception ex) {
+                Logger.getLogger(CtrlEditarTrabajador.class.getName()).log(Level.SEVERE, null, ex);
+                frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            }
+        }
+        
+        if (e.getSource() == frm.jMenuItem5) {
+            frm.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            try {
+                GeneratorPDF_Brigadas.listaEmergenciaTurno();
                 frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
             } catch (Exception ex) {
                 Logger.getLogger(CtrlEditarTrabajador.class.getName()).log(Level.SEVERE, null, ex);

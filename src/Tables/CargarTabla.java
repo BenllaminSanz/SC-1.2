@@ -73,8 +73,7 @@ public class CargarTabla {
                 tbr.setNombre_Trabajador(rs.getString("Nombre_Trabajador"));
                 tbr.setCURP_Trabajador(rs.getString("Curp_Trabajador"));
                 tbr.setRFC_Trabajador(rs.getString("RFC_Trabajador"));
-                tbr.setFecha_Antiguedad(DateTools.MySQLtoString(
-                        rs.getDate("Fecha_Antiguedad")));
+                tbr.setFecha_Antiguedad(DateTools.MySQLtoString(rs.getDate("Fecha_Antiguedad")));
                 tbr.setNombre_Supervisor(rs.getString("Supervisor"));
                 tbr.setNombre_Area(rs.getString("Nombre_Area"));
                 tbr.setNombre_Turno(rs.getString("Nombre_Turno"));

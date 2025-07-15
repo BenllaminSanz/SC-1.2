@@ -244,7 +244,7 @@ public class GeneratorExcel_BDs extends Conexion {
         String FechaS = formatFecha.format(fecha);
 
         JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Guardar Respaldo de Certificados");
+        fileChooser.setDialogTitle("Guardar Respaldo de Trabajadores");
         fileChooser.setSelectedFile(new File("Respaldo Lista de Trabajadores " + FechaS + ".xlsx"));
 
         int userSelection = fileChooser.showSaveDialog(null);
@@ -297,6 +297,160 @@ public class GeneratorExcel_BDs extends Conexion {
             }
 
             for (int i = 0; i < camposSeleccionados.size(); i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            FileOutputStream outputStream = new FileOutputStream(rutaDoc);
+            workbook.write(outputStream);
+            JOptionPane.showMessageDialog(null, "Respaldo Creado en " + rutaDoc);
+
+            if (Desktop.isDesktopSupported()) {
+                Desktop desktop = Desktop.getDesktop();
+                if (desktop.isSupported(Desktop.Action.OPEN)) {
+                    desktop.open(new File(rutaDoc));
+                }
+            }
+
+            ps.close();
+            return true;
+        } catch (SQLException | FileNotFoundException ex) {
+            Logger.getLogger(GeneratorExcel_LBU.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showConfirmDialog(null, "Error al generar archivo: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (IOException ex) {
+            Logger.getLogger(GeneratorExcel_LBU.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+
+    public static boolean BD_ADMINISTRATIVOS(Map<String, String> camposDisponibles, List<String> camposSeleccionados) {
+        Date fecha = new Date();
+        SimpleDateFormat formatFecha = new SimpleDateFormat("dd-MM-yyyy");
+        String FechaS = formatFecha.format(fecha);
+
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Guardar Respaldo de Administrativos");
+        fileChooser.setSelectedFile(new File("Respaldo Lista de Administrativos " + FechaS + ".xlsx"));
+
+        int userSelection = fileChooser.showSaveDialog(null);
+        if (userSelection != JFileChooser.APPROVE_OPTION) {
+            JOptionPane.showMessageDialog(null, "Operación cancelada por el usuario.");
+            return false;
+        }
+
+        File fileToSave = fileChooser.getSelectedFile();
+        String rutaDoc = fileToSave.getAbsolutePath();
+        try {
+            Workbook workbook = new XSSFWorkbook();
+            Sheet sheet = workbook.createSheet("Lista de Administrativos");
+            int rowIndex = 0;
+
+            Row row = sheet.createRow(rowIndex++);
+            int colIndex = 0;
+            for (String campo : camposSeleccionados) {
+                row.createCell(colIndex++).setCellValue(camposDisponibles.get(campo));
+            }
+
+            Connection con = conn.getConnection();
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM administrativos");
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                row = sheet.createRow(rowIndex++);
+                colIndex = 0;
+                for (String campo : camposSeleccionados) {
+                    switch (campo) {
+                        case "Sexo":
+                            String curp = rs.getString("CURP_administrativo");
+                            String sexo = obtenerSexoDesdeCURP(curp);
+                            row.createCell(colIndex++).setCellValue(sexo);
+                            break;
+                        default:
+                            if (campo.startsWith("fecha")) {
+                                row.createCell(colIndex++).setCellValue(DateTools.MySQLtoString(rs.getDate(campo)));
+                            } else if (campo.equals("Folio_Administrativo")) {
+                                row.createCell(colIndex++).setCellValue(rs.getInt(campo));
+                            } else {
+                                row.createCell(colIndex++).setCellValue(rs.getString(campo));
+                            }
+                    }
+                }
+            }
+
+            for (int i = 0; i < camposSeleccionados.size(); i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            FileOutputStream outputStream = new FileOutputStream(rutaDoc);
+            workbook.write(outputStream);
+            JOptionPane.showMessageDialog(null, "Respaldo Creado en " + rutaDoc);
+
+            if (Desktop.isDesktopSupported()) {
+                Desktop desktop = Desktop.getDesktop();
+                if (desktop.isSupported(Desktop.Action.OPEN)) {
+                    desktop.open(new File(rutaDoc));
+                }
+            }
+
+            ps.close();
+            return true;
+        } catch (SQLException | FileNotFoundException ex) {
+            Logger.getLogger(GeneratorExcel_LBU.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showConfirmDialog(null, "Error al generar archivo: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (IOException ex) {
+            Logger.getLogger(GeneratorExcel_LBU.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+
+    public static boolean BD_BRIGADAS() {
+        Date fecha = new Date();
+        SimpleDateFormat formatFecha = new SimpleDateFormat("dd-MM-yyyy");
+        String FechaS = formatFecha.format(fecha);
+
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Guardar Respaldo de Brigadas");
+        fileChooser.setSelectedFile(new File("Respaldo Lista de Brigadas " + FechaS + ".xlsx"));
+
+        int userSelection = fileChooser.showSaveDialog(null);
+        if (userSelection != JFileChooser.APPROVE_OPTION) {
+            JOptionPane.showMessageDialog(null, "Operación cancelada por el usuario.");
+            return false;
+        }
+
+        File fileToSave = fileChooser.getSelectedFile();
+        String rutaDoc = fileToSave.getAbsolutePath();
+        try {
+            Workbook workbook = new XSSFWorkbook();
+            Sheet sheet = workbook.createSheet("Lista de Brigadas");
+            int rowIndex = 0;
+            Row row = sheet.createRow(rowIndex++);
+
+            row.createCell(0).setCellValue("Brigada");
+            row.createCell(1).setCellValue("Nomina");
+            row.createCell(2).setCellValue("Nombre");
+            row.createCell(3).setCellValue("Area");
+            row.createCell(4).setCellValue("Puesto");
+            row.createCell(5).setCellValue("Turno");
+            row.createCell(6).setCellValue("Tipo");
+
+            Connection con = conn.getConnection();
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM view_brigadistas ORDER BY idbrigadas");
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                row = sheet.createRow(rowIndex++);
+                row.createCell(0).setCellValue(rs.getString("nombre_brigada"));
+                row.createCell(1).setCellValue(rs.getString("Nomina"));
+                row.createCell(2).setCellValue(rs.getString("Nombre"));
+                row.createCell(3).setCellValue(rs.getString("Area"));
+                row.createCell(4).setCellValue(rs.getString("Puesto"));
+                row.createCell(5).setCellValue(rs.getString("Turno"));
+                row.createCell(6).setCellValue(rs.getString("trabajador"));
+            }
+
+            int totalColumnas = row.getLastCellNum();
+            for (int i = 0; i < totalColumnas; i++) {
                 sheet.autoSizeColumn(i);
             }
 

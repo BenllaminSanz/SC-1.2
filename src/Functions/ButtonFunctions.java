@@ -157,7 +157,13 @@ public class ButtonFunctions {
                     frm.txt_nivel.setText(mod.getNivel());
                     frm.txt_centrocosto.setText(String.valueOf(mod.getCentro_de_Costo()));
                     frm.txt_totaltbr.setText(String.valueOf(mod.getPropuesto_Trabajadores()));
-                    frm.txt_totalturno_tbr.setText(String.valueOf(mod.getPropuesto_Turno()));
+                    frm.txt_totalturno_A.setText(String.valueOf(mod.getTurnoA()));
+                    frm.txt_totalturno_B.setText(String.valueOf(mod.getTurnoB()));
+                    frm.txt_totalturno_C.setText(String.valueOf(mod.getTurnoC()));
+                    frm.txt_totalturno_D.setText(String.valueOf(mod.getTurnoD()));
+                    frm.txt_totalturno_LV.setText(String.valueOf(mod.getTurnoLV()));
+                    frm.txt_totalturno_LS.setText(String.valueOf(mod.getTurnoLS()));
+                    
                     frm.repaint();
                     break;
                 }

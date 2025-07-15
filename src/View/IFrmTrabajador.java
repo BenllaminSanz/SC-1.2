@@ -119,6 +119,7 @@ public class IFrmTrabajador extends javax.swing.JInternalFrame {
         jPanel6 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTable_Administrativos = new javax.swing.JTable();
+        btn_ListT1 = new javax.swing.JButton();
         jPanel7 = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -131,6 +132,7 @@ public class IFrmTrabajador extends javax.swing.JInternalFrame {
         btn_RefreshTabla3 = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
         btn_eliminarBrigadista = new javax.swing.JButton();
+        btn_ListT2 = new javax.swing.JButton();
         Bar_Trabajador = new javax.swing.JMenuBar();
         Menu_NuevoTrabajador = new javax.swing.JMenu();
         Item_NuevoTrabajador = new javax.swing.JMenuItem();
@@ -710,20 +712,30 @@ public class IFrmTrabajador extends javax.swing.JInternalFrame {
         ));
         jScrollPane3.setViewportView(jTable_Administrativos);
 
+        btn_ListT1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/IconPrint.png"))); // NOI18N
+        btn_ListT1.setToolTipText("Enlistar Trabajadores");
+        btn_ListT1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane3)
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 953, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(btn_ListT1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel6Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane3)
+                .addComponent(btn_ListT1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 477, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -792,6 +804,10 @@ public class IFrmTrabajador extends javax.swing.JInternalFrame {
         btn_eliminarBrigadista.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/IconMinus.png"))); // NOI18N
         btn_eliminarBrigadista.setText("Eliminar Brigadista");
 
+        btn_ListT2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/IconPrint.png"))); // NOI18N
+        btn_ListT2.setToolTipText("Enlistar Trabajadores");
+        btn_ListT2.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+
         javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
         jPanel9.setLayout(jPanel9Layout);
         jPanel9Layout.setHorizontalGroup(
@@ -808,6 +824,8 @@ public class IFrmTrabajador extends javax.swing.JInternalFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel9Layout.createSequentialGroup()
                         .addComponent(jLabel5)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btn_ListT2, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btn_RefreshTabla3, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
@@ -816,9 +834,10 @@ public class IFrmTrabajador extends javax.swing.JInternalFrame {
             .addGroup(jPanel9Layout.createSequentialGroup()
                 .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btn_RefreshTabla3, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel5))
+                    .addComponent(jLabel5)
+                    .addComponent(btn_ListT2, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 438, Short.MAX_VALUE)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 437, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btn_agregarBrigadista)
@@ -978,6 +997,8 @@ public class IFrmTrabajador extends javax.swing.JInternalFrame {
     public javax.swing.JRadioButton btn_LS;
     public javax.swing.JRadioButton btn_LV;
     public javax.swing.JButton btn_ListT;
+    public javax.swing.JButton btn_ListT1;
+    public javax.swing.JButton btn_ListT2;
     public javax.swing.JButton btn_RefreshTabla;
     public javax.swing.JButton btn_RefreshTabla2;
     public javax.swing.JButton btn_RefreshTabla3;
