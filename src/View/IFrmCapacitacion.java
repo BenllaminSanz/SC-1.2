@@ -68,17 +68,6 @@ public class IFrmCapacitacion extends javax.swing.JInternalFrame {
         jPanel23 = new javax.swing.JPanel();
         jPanel22 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
-        jPanel2 = new javax.swing.JPanel();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        jTable_Asistentes_Curso = new javax.swing.JTable();
-        btn_AgrTrabajador = new javax.swing.JButton();
-        txt_esperado = new javax.swing.JLabel();
-        txt_asistencia = new javax.swing.JLabel();
-        txt_asistencia1 = new javax.swing.JLabel();
-        txt_esperado1 = new javax.swing.JLabel();
-        btn_listaAsistentes = new javax.swing.JButton();
-        txt_instructor = new javax.swing.JLabel();
-        txt_instructores = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         JTable_HistorialCurso = new javax.swing.JTable();
@@ -92,6 +81,18 @@ public class IFrmCapacitacion extends javax.swing.JInternalFrame {
         txt_total1 = new javax.swing.JLabel();
         txt_total2 = new javax.swing.JLabel();
         txt_total3 = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jTable_Asistentes_Curso = new javax.swing.JTable();
+        btn_AgrTrabajador = new javax.swing.JButton();
+        txt_esperado = new javax.swing.JLabel();
+        txt_asistencia = new javax.swing.JLabel();
+        txt_asistencia1 = new javax.swing.JLabel();
+        txt_esperado1 = new javax.swing.JLabel();
+        btn_listaAsistentes = new javax.swing.JButton();
+        txt_instructor = new javax.swing.JLabel();
+        txt_instructores = new javax.swing.JLabel();
+        jButton4 = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane9 = new javax.swing.JScrollPane();
         jTree_Cursos = new javax.swing.JTree();
@@ -449,89 +450,6 @@ public class IFrmCapacitacion extends javax.swing.JInternalFrame {
 
         jTabbedPane2.addTab("Concentrado", jPanel19);
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Asistentes:"));
-        jPanel2.setMaximumSize(new java.awt.Dimension(600, 32767));
-
-        jTable_Asistentes_Curso.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {},
-                {},
-                {},
-                {}
-            },
-            new String [] {
-
-            }
-        ));
-        jScrollPane3.setViewportView(jTable_Asistentes_Curso);
-
-        btn_AgrTrabajador.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/IconPlus.png"))); // NOI18N
-        btn_AgrTrabajador.setText("Agregar Asistente");
-
-        txt_esperado.setText("Asistencia Esperada:");
-
-        txt_asistencia.setText("Asistencia Actual:");
-
-        txt_asistencia1.setText("Horas Hombre:");
-
-        txt_esperado1.setText("Tiempo total por persona:");
-
-        btn_listaAsistentes.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/IconList.png"))); // NOI18N
-        btn_listaAsistentes.setText("Enlistar Asistentes");
-
-        txt_instructor.setText("Instructor(es):");
-        txt_instructor.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(txt_instructor)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txt_instructores, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 438, Short.MAX_VALUE)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txt_asistencia)
-                            .addComponent(txt_esperado))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txt_asistencia1, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txt_esperado1, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(btn_listaAsistentes)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btn_AgrTrabajador)))
-                .addContainerGap())
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txt_asistencia)
-                    .addComponent(txt_esperado1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txt_esperado)
-                    .addComponent(txt_asistencia1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(txt_instructor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txt_instructores, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 396, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btn_listaAsistentes, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btn_AgrTrabajador)))
-        );
-
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Historial del Curso"));
 
         JTable_HistorialCurso.setModel(new javax.swing.table.DefaultTableModel(
@@ -573,7 +491,7 @@ public class IFrmCapacitacion extends javax.swing.JInternalFrame {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 525, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 531, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btn_agregarCursoH))
@@ -625,6 +543,96 @@ public class IFrmCapacitacion extends javax.swing.JInternalFrame {
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 360, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btn_agregarCursoH))
+        );
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Asistentes:"));
+        jPanel2.setMaximumSize(new java.awt.Dimension(600, 32767));
+
+        jTable_Asistentes_Curso.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {},
+                {},
+                {},
+                {}
+            },
+            new String [] {
+
+            }
+        ));
+        jScrollPane3.setViewportView(jTable_Asistentes_Curso);
+
+        btn_AgrTrabajador.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/IconPlus.png"))); // NOI18N
+        btn_AgrTrabajador.setText("Agregar Asistente");
+
+        txt_esperado.setText("Asistencia Esperada:");
+
+        txt_asistencia.setText("Asistencia Actual:");
+
+        txt_asistencia1.setText("Horas Hombre:");
+
+        txt_esperado1.setText("Tiempo total por persona:");
+
+        btn_listaAsistentes.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/IconList.png"))); // NOI18N
+        btn_listaAsistentes.setText("Enlistar Asistentes");
+
+        txt_instructor.setText("Instructor(es):");
+        txt_instructor.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+
+        jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/IconAreax16.png"))); // NOI18N
+        jButton4.setText("Generar Expedientes");
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(txt_instructor)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txt_instructores, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 445, Short.MAX_VALUE)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txt_asistencia)
+                            .addComponent(txt_esperado))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txt_asistencia1, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txt_esperado1, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(btn_listaAsistentes, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jButton4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btn_AgrTrabajador, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txt_asistencia)
+                    .addComponent(txt_esperado1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txt_esperado)
+                    .addComponent(txt_asistencia1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(txt_instructor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(txt_instructores, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btn_listaAsistentes, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btn_AgrTrabajador))
+                .addGap(2, 2, 2)
+                .addComponent(jButton4))
         );
 
         jPanel3.setMaximumSize(new java.awt.Dimension(309, 32767));
@@ -1476,6 +1484,7 @@ public class IFrmCapacitacion extends javax.swing.JInternalFrame {
     public javax.swing.JButton jButton1;
     public javax.swing.JButton jButton2;
     public javax.swing.JButton jButton3;
+    public javax.swing.JButton jButton4;
     public com.toedter.calendar.JDateChooser jDateChooser1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;

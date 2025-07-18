@@ -24,6 +24,7 @@ import Model.HistorialCurso;
 import Model.PersonalCertificado;
 import Model.RequerimientosCurso;
 import Model.RequerimientosCursoAsistente;
+import Querys.Conexion;
 import Querys.ConsultasAsistentesCurso;
 import Querys.ConsultasCertificado;
 import Querys.ConsultasCurso;
@@ -31,6 +32,7 @@ import Querys.ConsultasHistorialCurso;
 import Querys.ConsultasPersonalCertificado;
 import Querys.ConsultasRequerimientosCurso;
 import Tables.CargarTabla;
+import static Tables.CargarTabla.conn;
 import Tables.DesignTabla;
 import Tables.TableAsistentesCertificado;
 import Tables.TableAsistentesCertificados;
@@ -48,7 +50,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -56,6 +69,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -171,6 +185,7 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
         this.frm.jButton1.addActionListener(this);
         this.frm.jButton2.addActionListener(this);
         this.frm.jButton3.addActionListener(this);
+        this.frm.jButton4.addActionListener(this);
     }
 
     public void iniciar() {
@@ -397,6 +412,12 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
         }
 
         if (e.getSource() == frm.btn_listaAsistentes) {
+            int filaSeleccionada = frm.JTable_HistorialCurso.getSelectedRow();
+            if (filaSeleccionada == -1) {
+                JOptionPane.showMessageDialog(null, "Por favor, selecciona un curso en la tabla.");
+                return;
+            }
+
             String idHistorial = frm.JTable_HistorialCurso.getValueAt(
                     frm.JTable_HistorialCurso.getSelectedRow(), 0).toString();
 
@@ -666,7 +687,7 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
                 frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
             }
         }
-        
+
         if (e.getSource() == frm.jMenuItem13) {
             frm.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             try {
@@ -907,6 +928,89 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
 
         if (e.getSource() == frm.jButton1) {
             DesignTabla.designAllCursosActivos(frm);
+        }
+
+        if (e.getSource() == frm.jButton4) {
+            int filaSeleccionada = frm.JTable_HistorialCurso.getSelectedRow();
+            if (filaSeleccionada == -1) {
+                JOptionPane.showMessageDialog(null, "Por favor, selecciona un curso en la tabla.");
+                return;
+            }
+
+            int idCurso = Integer.parseInt(frm.JTable_HistorialCurso.getValueAt(filaSeleccionada, 0).toString());
+            String nombreCurso = frm.txt_curso_titulo.getText();
+
+            JFileChooser chooser = new JFileChooser();
+            chooser.setDialogTitle("Selecciona dónde crear la carpeta del curso");
+            chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
+            int resultado = chooser.showDialog(null, "Seleccionar");
+            if (resultado != JFileChooser.APPROVE_OPTION) {
+                JOptionPane.showMessageDialog(null, "Operación cancelada por el usuario.");
+                return;
+            }
+
+            File carpetaBase = chooser.getSelectedFile();
+            String nombreCarpetaCurso = nombreCurso.trim().replaceAll("[\\\\/:*?\"<>|]", "_") + "_" + idCurso;
+            File carpetaCurso = new File(carpetaBase, nombreCarpetaCurso);
+
+            if (!carpetaCurso.exists() && !carpetaCurso.mkdirs()) {
+                JOptionPane.showMessageDialog(null, "No se pudo crear la carpeta del curso.");
+                return;
+            }
+
+            try (Connection con = conn.getConnection(); PreparedStatement psAsistentes = con.prepareStatement(
+                    "SELECT idAsistentes_Curso, nombre_asistente FROM asistentes_curso WHERE idHistorial_Curso = ?"); PreparedStatement psDocs = con.prepareStatement(
+                            "SELECT nombre_documento, ruta_documento FROM documento_curso WHERE curso_idcurso = ?")) {
+
+                psAsistentes.setInt(1, idCurso);
+                ResultSet rsAsistentes = psAsistentes.executeQuery();
+
+                psDocs.setInt(1, idCurso);
+                ResultSet rsDocs = psDocs.executeQuery();
+
+                // Leer rutas de archivos desde la base
+                List<File> archivosCurso = new ArrayList<>();
+                while (rsDocs.next()) {
+                    String rutaArchivo = rsDocs.getString("ruta_archivo");
+                    File archivo = new File(rutaArchivo);
+                    if (archivo.exists()) {
+                        archivosCurso.add(archivo);
+                    } else {
+                        System.out.println("Archivo no encontrado: " + rutaArchivo);
+                    }
+                }
+
+                while (rsAsistentes.next()) {
+                    String idAsistente = rsAsistentes.getString("idAsistentes_Curso").trim();
+                    String nombreAsistente = rsAsistentes.getString("nombre_asistente").trim()
+                            .replaceAll("[\\\\/:*?\"<>|]", "_");
+
+                    File carpetaAsistente = new File(carpetaCurso, idAsistente + "_" + nombreAsistente);
+                    carpetaAsistente.mkdirs();
+
+                    for (File archivoOriginal : archivosCurso) {
+                        File destino = new File(carpetaAsistente, archivoOriginal.getName());
+                        try (InputStream in = new FileInputStream(archivoOriginal); OutputStream out = new FileOutputStream(destino)) {
+
+                            byte[] buffer = new byte[4096];
+                            int bytesRead;
+                            while ((bytesRead = in.read(buffer)) != -1) {
+                                out.write(buffer, 0, bytesRead);
+                            }
+
+                        } catch (IOException ex) {
+                            Logger.getLogger(CtrlCapacitacion.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }
+
+                JOptionPane.showMessageDialog(null, "Carpetas y archivos generados en:\n" + carpetaCurso.getAbsolutePath());
+
+            } catch (SQLException ex) {
+                Logger.getLogger(CtrlCapacitacion.class.getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showMessageDialog(null, "Error de base de datos: " + ex.getMessage());
+            }
         }
     }
 

@@ -2,11 +2,11 @@ package Subviews;
 
 import javax.swing.ImageIcon;
 
-public class IFrmEditarRequerimiento extends javax.swing.JInternalFrame {
+public class IFrmEditarDocumento extends javax.swing.JInternalFrame {
 
     ImageIcon icon = new ImageIcon(ClassLoader.getSystemResource("Images/IconParkdale.png"));
     
-    public IFrmEditarRequerimiento() {
+    public IFrmEditarDocumento() {
         initComponents();
         this.setFrameIcon(icon);
     }

@@ -28,7 +28,7 @@ import Subviews.IFrmEditarArea;
 import Subviews.IFrmEditarCertificacion;
 import Subviews.IFrmEditarCertificado;
 import Subviews.IFrmEditarCurso;
-import Subviews.IFrmEditarRequerimiento;
+import Subviews.IFrmEditarDocumento;
 import Subviews.IFrmEditarHistorialCurso;
 import Subviews.IFrmEditarPuesto;
 import Subviews.IFrmEditarTrabajador;
@@ -255,7 +255,7 @@ public class ButtonFunctions {
         }
     }
 
-    public static void TxtBtnRequerimiento(String texto, String folio, IFrmEditarRequerimiento frm, RequerimientosCurso mod, ConsultasRequerimientosCurso modC) {
+    public static void TxtBtnRequerimiento(String texto, String folio, IFrmEditarDocumento frm, RequerimientosCurso mod, ConsultasRequerimientosCurso modC) {
         switch (texto) {
             case "Guardar":
                 frm.setTitle("Agregar requerimiento al Curso");

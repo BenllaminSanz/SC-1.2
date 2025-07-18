@@ -6,7 +6,7 @@ import Functions.QueryFunctions;
 import Model.RequerimientosCurso;
 import Querys.ConsultasRequerimientosCurso;
 import Subviews.IFrmEditarCurso;
-import Subviews.IFrmEditarRequerimiento;
+import Subviews.IFrmEditarDocumento;
 import Tables.DesignTabla;
 import View.FrmAdministrador;
 import java.awt.event.ActionEvent;
@@ -24,7 +24,7 @@ public class CtrlEditarRequerimiento implements ActionListener {
 
     private final RequerimientosCurso mod = new RequerimientosCurso();
     private final ConsultasRequerimientosCurso modC = new ConsultasRequerimientosCurso();
-    private final IFrmEditarRequerimiento frm;
+    private final IFrmEditarDocumento frm;
     private final IFrmEditarCurso frmA;
     private final FrmAdministrador frmB;
     private final String curso;
