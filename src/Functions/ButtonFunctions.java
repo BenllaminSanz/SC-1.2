@@ -7,6 +7,7 @@ import Model.Administrativos;
 import Model.Area;
 import Model.Certificado;
 import Model.Curso;
+import Model.HabilidadesCurso;
 import Model.HistorialCurso;
 import Model.PersonalCertificado;
 import Querys.ConsultasArea;
@@ -20,6 +21,7 @@ import Querys.ConsultasAdministrativo;
 import Querys.ConsultasCertificado;
 import Querys.ConsultasCertificadoPuesto;
 import Querys.ConsultasCurso;
+import Querys.ConsultasHabilidadesCurso;
 import Querys.ConsultasHistorialCurso;
 import Querys.ConsultasPersonalCertificado;
 import Querys.ConsultasRequerimientosCurso;
@@ -29,6 +31,7 @@ import Subviews.IFrmEditarCertificacion;
 import Subviews.IFrmEditarCertificado;
 import Subviews.IFrmEditarCurso;
 import Subviews.IFrmEditarDocumento;
+import Subviews.IFrmEditarHabilidad;
 import Subviews.IFrmEditarHistorialCurso;
 import Subviews.IFrmEditarPuesto;
 import Subviews.IFrmEditarTrabajador;
@@ -201,6 +204,7 @@ public class ButtonFunctions {
                         frm.cb_certificado.setVisible(true);
                         frm.btn_certificado.setVisible(true);
                         DesignTabla.designRequerimientosCurso(frm, String.valueOf(mod.getIdCurso()));
+                        DesignTabla.designHabilidadesCurso(frm, String.valueOf(mod.getIdCurso()));
                     } else {
                         frm.jLabel3.setVisible(false);
                         frm.cb_certificado.setVisible(false);
@@ -274,6 +278,28 @@ public class ButtonFunctions {
                     frm.txt_requerimiento.setText(mod.getNombre_requerimiento());
                     frm.txt_descripcion.setText(mod.getDescp_requerimiento());
                     frm.txt_documento.setText(mod.getNombre_archivo());
+                }
+                break;
+        }
+    }
+    
+        public static void TxtBtnHabilidad(String texto, String folio, IFrmEditarHabilidad frm, HabilidadesCurso mod, ConsultasHabilidadesCurso modC) {
+        switch (texto) {
+            case "Guardar":
+                frm.setTitle("Agregar habilidad al Curso");
+                frm.btn_guardar.setText(texto);
+                frm.repaint();
+                break;
+
+            case "Actualizar":
+                frm.setTitle("Modificar habilidad del Curso");
+                frm.btn_guardar.setText(texto);
+                mod.setIdHabilidad(Integer.parseInt(folio));
+                if (modC.buscar(mod)) {
+                    String curso = QueryFunctions.CapturaCondicionalSimple("curso", "nombre_curso", "idCurso",
+                            String.valueOf(mod.getIdCurso()));
+                    frm.cb_cursos.setSelectedItem(curso);
+                    frm.txt_requerimiento.setText(mod.getNombre_habilidad());
                 }
                 break;
         }

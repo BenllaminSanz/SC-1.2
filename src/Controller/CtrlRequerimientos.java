@@ -9,7 +9,9 @@ import Model.RequerimientosCursoAsistente;
 import Querys.ConsultasRequerimientosCurso;
 import View.FrmAdministrador;
 import com.toedter.calendar.JDateChooser;
+import java.awt.Color;
 import java.awt.Desktop;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -23,6 +25,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -31,6 +34,7 @@ import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 public class CtrlRequerimientos {
@@ -55,17 +59,19 @@ public class CtrlRequerimientos {
         frame.setResizable(false);
 
         JPanel panelGeneral = new JPanel();
-        BoxLayout boxLayout = new BoxLayout(panelGeneral, BoxLayout.Y_AXIS);
-        panelGeneral.setLayout(boxLayout);
+        panelGeneral.setLayout(new BoxLayout(panelGeneral, BoxLayout.Y_AXIS));
+        panelGeneral.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Espaciado externo
 
         for (RequerimientosCurso requerimiento : requerimientos) {
-            JPanel panelRequerimiento = new JPanel();
-            BoxLayout boxLayout1 = new BoxLayout(panelRequerimiento, BoxLayout.X_AXIS);
-            panelRequerimiento.setLayout(boxLayout1);
+            JPanel panelRequerimiento = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            panelRequerimiento.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(Color.LIGHT_GRAY),
+                    BorderFactory.createEmptyBorder(5, 10, 5, 10) // Padding interno
+            ));
 
             JCheckBox cb_buton = new JCheckBox();
-            JLabel Requerimiento = new JLabel(requerimiento.getNombre_requerimiento());
-            JTextField fechaEntregaTextField = new JTextField();
+            JLabel lblRequerimiento = new JLabel(requerimiento.getNombre_requerimiento());
+            JTextField fechaEntregaTextField = new JTextField(10);
             JButton bt_consultar = new JButton("Consultar");
 
             cb_buton.addActionListener((ActionEvent e) -> {
@@ -83,15 +89,11 @@ public class CtrlRequerimientos {
                 }
             });
 
+            // Si ya fue marcado como cumplido
             if (modC.estadoRequerimiento(requerimiento.getIdRequerimiento(), mod)) {
                 cb_buton.setSelected(true);
-                panelRequerimiento.add(cb_buton);
-                panelRequerimiento.add(Requerimiento);
-
                 fechaEntregaTextField.setEditable(false);
-                String fechaEntrega = mod.getFecha_entrega();
-                fechaEntregaTextField.setText(fechaEntrega);
-                panelRequerimiento.add(fechaEntregaTextField);
+                fechaEntregaTextField.setText(mod.getFecha_entrega());
 
                 bt_consultar.addActionListener((ActionEvent e) -> {
                     File archivo = new File(mod.getRuta_archivo());
@@ -105,16 +107,21 @@ public class CtrlRequerimientos {
                         System.out.println("El archivo no existe.");
                     }
                 });
+
+                panelRequerimiento.add(cb_buton);
+                panelRequerimiento.add(lblRequerimiento);
+                panelRequerimiento.add(fechaEntregaTextField);
                 panelRequerimiento.add(bt_consultar);
             } else {
+                // Si no está marcado
                 panelRequerimiento.add(cb_buton);
-                panelRequerimiento.add(Requerimiento);
+                panelRequerimiento.add(lblRequerimiento);
             }
 
             panelGeneral.add(panelRequerimiento);
         }
 
-        frame.getContentPane().add(panelGeneral);
+        frame.getContentPane().add(new JScrollPane(panelGeneral)); // Soporte para scroll si hay muchos
         frame.pack();
         ViewTools.Centrar(frmA, frame);
 
@@ -149,30 +156,30 @@ public class CtrlRequerimientos {
         bt_Archivo.addActionListener((ActionEvent e) -> {
             JFileChooser fileChooser = new JFileChooser();
             int fileResult = fileChooser.showOpenDialog(null);
-            
+
             if (fileResult == JFileChooser.APPROVE_OPTION) {
                 try {
                     FileInputStream fis = null;
                     File selectedFile = fileChooser.getSelectedFile();
-                    
+
                     String rutaArchivo = selectedFile.getAbsolutePath();
                     String nombreArchivo = selectedFile.getName();
-                    
+
                     fis = new FileInputStream(selectedFile);
                     byte[] contenido = new byte[(int) selectedFile.length()];
                     fis.read(contenido);
                     fis.close();
-                    
+
                     mod.setRuta_archivo(rutaArchivo);
                     mod.setNombre_archivo(nombreArchivo);
-                    
+
                     txt_archivo.setText(nombreArchivo);
                 } catch (FileNotFoundException ex) {
                     Logger.getLogger(CtrlRequerimientos.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (IOException ex) {
                     Logger.getLogger(CtrlRequerimientos.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                
+
             }
         });
 
@@ -225,13 +232,23 @@ public class CtrlRequerimientos {
         }
     }
 
-    private static final String RUTA_CARPETA_PRINCIPAL = "Y:\\Capacitacion\\EXPEDIENTE\\";
-
     private void GenerarExpendiente(RequerimientosCursoAsistente mod) {
         String trabajador = QueryFunctions.CapturaCondicionalSimple("trabajador", "nombre_Trabajador",
                 "Folio_Trabajador", String.valueOf(mod.getIdAsistente()));
         // Construir la ruta completa de la carpeta del trabajador
-        String rutaCarpetaTrabajador = RUTA_CARPETA_PRINCIPAL + mod.getIdAsistente() + " " + trabajador;
+        JFileChooser selector = new JFileChooser();
+        selector.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY); // Solo permite seleccionar carpetas
+        selector.setDialogTitle("Selecciona la carpeta del expediente del Curso");
+
+        int resultado = selector.showOpenDialog(null);
+        String RUTA_CARPETA_PRINCIPAL = null;
+
+        if (resultado == JFileChooser.APPROVE_OPTION) {
+            RUTA_CARPETA_PRINCIPAL = selector.getSelectedFile().toString();
+            System.out.println("Carpeta seleccionada: " + RUTA_CARPETA_PRINCIPAL);
+        }
+
+        String rutaCarpetaTrabajador = RUTA_CARPETA_PRINCIPAL + "/" + mod.getIdAsistente() + "_" + trabajador;
 
         // Verificar si la carpeta del trabajador ya existe
         File carpetaTrabajador = new File(rutaCarpetaTrabajador);

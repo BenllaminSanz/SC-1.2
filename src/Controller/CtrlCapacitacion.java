@@ -24,7 +24,6 @@ import Model.HistorialCurso;
 import Model.PersonalCertificado;
 import Model.RequerimientosCurso;
 import Model.RequerimientosCursoAsistente;
-import Querys.Conexion;
 import Querys.ConsultasAsistentesCurso;
 import Querys.ConsultasCertificado;
 import Querys.ConsultasCurso;
@@ -52,7 +51,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -937,8 +935,12 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
                 return;
             }
 
-            int idCurso = Integer.parseInt(frm.JTable_HistorialCurso.getValueAt(filaSeleccionada, 0).toString());
+            int idHCurso = Integer.parseInt(frm.JTable_HistorialCurso.getValueAt(filaSeleccionada, 0).toString());
+            String idCursoS = String.valueOf(idHCurso);
             String nombreCurso = frm.txt_curso_titulo.getText();
+            
+            int idCurso = Integer.parseInt(QueryFunctions.CapturaCondicional("historial_curso", "idCurso", "idHistorial_Curso", idCursoS));
+            
 
             JFileChooser chooser = new JFileChooser();
             chooser.setDialogTitle("Selecciona dónde crear la carpeta del curso");
@@ -951,7 +953,7 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
             }
 
             File carpetaBase = chooser.getSelectedFile();
-            String nombreCarpetaCurso = nombreCurso.trim().replaceAll("[\\\\/:*?\"<>|]", "_") + "_" + idCurso;
+            String nombreCarpetaCurso = nombreCurso.trim().replaceAll("[\\\\/:*?\"<>|]", "_") + "_" + idHCurso;
             File carpetaCurso = new File(carpetaBase, nombreCarpetaCurso);
 
             if (!carpetaCurso.exists() && !carpetaCurso.mkdirs()) {
@@ -961,9 +963,9 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
 
             try (Connection con = conn.getConnection(); PreparedStatement psAsistentes = con.prepareStatement(
                     "SELECT idAsistentes_Curso, nombre_asistente FROM asistentes_curso WHERE idHistorial_Curso = ?"); PreparedStatement psDocs = con.prepareStatement(
-                            "SELECT nombre_documento, ruta_documento FROM documento_curso WHERE curso_idcurso = ?")) {
+                            "SELECT nombre_requerimiento, ruta_documento FROM requerimientos WHERE curso_idcurso = ?")) {
 
-                psAsistentes.setInt(1, idCurso);
+                psAsistentes.setInt(1, idHCurso);
                 ResultSet rsAsistentes = psAsistentes.executeQuery();
 
                 psDocs.setInt(1, idCurso);
@@ -972,12 +974,14 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
                 // Leer rutas de archivos desde la base
                 List<File> archivosCurso = new ArrayList<>();
                 while (rsDocs.next()) {
-                    String rutaArchivo = rsDocs.getString("ruta_archivo");
+                    String rutaArchivo = rsDocs.getString("ruta_documento");
                     File archivo = new File(rutaArchivo);
                     if (archivo.exists()) {
+                        JOptionPane.showMessageDialog(null, "Archivos Creados en los Expedientes del Curso");
                         archivosCurso.add(archivo);
                     } else {
-                        System.out.println("Archivo no encontrado: " + rutaArchivo);
+                        JOptionPane.showMessageDialog(null, "Uno o más archivos del Expediente no fueron encontrados "
+                                + "\n");
                     }
                 }
 

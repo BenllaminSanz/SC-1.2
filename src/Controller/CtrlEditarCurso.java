@@ -2,6 +2,7 @@ package Controller;
 
 import ContextController.ContextoEditarCertificado;
 import ContextController.ContextoEditarCurso;
+import ContextController.ContextoEditarHabilidad;
 import ContextController.ContextoEditarRequerimiento;
 import Functions.ButtonFunctions;
 import Functions.QueryFunctions;
@@ -47,6 +48,7 @@ public class CtrlEditarCurso implements ActionListener, ItemListener {
         this.frm.btn_AgregarRequerimiento.addActionListener(this);
         this.frm.Item_ModificarRequerimiento.addActionListener(this);
         this.frm.Item_EliminarRequerimiento.addActionListener(this);
+        this.frm.btn_AgregarHabilidad.addActionListener(this);
     }
 
     public void iniciar() {
@@ -136,6 +138,32 @@ public class CtrlEditarCurso implements ActionListener, ItemListener {
             ctrl.iniciar();
             ViewTools.Centrar(frmB, contexto.ventanaEditarRequerimiento);
         }
+
+        if (e.getSource() == frm.Item_ModificarRequerimiento) {
+            String requerimiento = frm.jTable_Requerimientos.getValueAt(frm.jTable_Requerimientos.getSelectedRow(), 0).toString();
+            String txtBoton = "Actualizar";
+            ContextoEditarRequerimiento contexto = new ContextoEditarRequerimiento(folio, txtBoton, requerimiento, frm, frmB);
+            CtrlEditarRequerimiento ctrl = new CtrlEditarRequerimiento(contexto);
+            ctrl.iniciar();
+            ViewTools.Centrar(frmB, contexto.ventanaEditarRequerimiento);
+        }
+
+        if (e.getSource() == frm.Item_EliminarRequerimiento) {
+            String requerimiento = frm.jTable_Requerimientos.getValueAt(frm.jTable_Requerimientos.getSelectedRow(), 0).toString();
+            modD.setIdRequerimiento(Integer.parseInt(requerimiento));
+            if (modDC.eliminar(modD)) {
+                DesignTabla.designRequerimientosCurso(frm, String.valueOf(mod.getIdCurso()));
+            }
+        }
+        
+        if (e.getSource() == frm.btn_AgregarHabilidad) {
+            String txtBoton = "Guardar";
+            ContextoEditarHabilidad contexto = new ContextoEditarHabilidad(folio, txtBoton, null, frm, frmB);
+            CtrlEditarHabilidades ctrl = new CtrlEditarHabilidades(contexto);
+            ctrl.iniciar();
+            ViewTools.Centrar(frmB, contexto.ventanaEditarHabilidad);
+        }
+        
 
         if (e.getSource() == frm.Item_ModificarRequerimiento) {
             String requerimiento = frm.jTable_Requerimientos.getValueAt(frm.jTable_Requerimientos.getSelectedRow(), 0).toString();
