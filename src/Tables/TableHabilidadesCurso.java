@@ -8,7 +8,7 @@ import javax.swing.table.AbstractTableModel;
 public class TableHabilidadesCurso extends AbstractTableModel {
 
     private List<HabilidadesCurso> cap = new ArrayList<>();
-    private final String[] columnas = {"Orden", "Habilidad"};
+    private final String[] columnas = {"ID", "Orden", "Habilidad"};
 
     public TableHabilidadesCurso(List<HabilidadesCurso> cap) {
         this.cap = cap;
@@ -33,8 +33,10 @@ public class TableHabilidadesCurso extends AbstractTableModel {
     public Object getValueAt(int rowIndex, int columnIndex) {
         switch (columnIndex) {
             case 0:
-                return cap.get(rowIndex).getOrden_habilidad();
+                return cap.get(rowIndex).getIdHabilidad();
             case 1:
+                return cap.get(rowIndex).getOrden_habilidad();
+            case 2:
                 return cap.get(rowIndex).getNombre_habilidad();
             default:
                 return null;

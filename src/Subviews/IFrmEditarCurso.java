@@ -20,6 +20,9 @@ public class IFrmEditarCurso extends javax.swing.JInternalFrame {
         Item_ModificarRequerimiento = new javax.swing.JMenuItem();
         Item_EliminarRequerimiento = new javax.swing.JMenuItem();
         PopMenu_Habilidades = new javax.swing.JPopupMenu();
+        Item_AgregarHabilidad = new javax.swing.JMenuItem();
+        Item_ModificarHabilidad = new javax.swing.JMenuItem();
+        Item_EliminarHabilidad = new javax.swing.JMenuItem();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTable_Requerimientos = new javax.swing.JTable();
@@ -55,6 +58,18 @@ public class IFrmEditarCurso extends javax.swing.JInternalFrame {
         Item_EliminarRequerimiento.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/IconClosex16.png"))); // NOI18N
         Item_EliminarRequerimiento.setText("Eliminar Requerimiento");
         PopMenu_Requerimientos.add(Item_EliminarRequerimiento);
+
+        Item_AgregarHabilidad.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/IconPlus.png"))); // NOI18N
+        Item_AgregarHabilidad.setText("Agregar Requerimiento");
+        PopMenu_Habilidades.add(Item_AgregarHabilidad);
+
+        Item_ModificarHabilidad.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/IconEdit.png"))); // NOI18N
+        Item_ModificarHabilidad.setText("Modificar Requerimiento");
+        PopMenu_Habilidades.add(Item_ModificarHabilidad);
+
+        Item_EliminarHabilidad.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/IconClosex16.png"))); // NOI18N
+        Item_EliminarHabilidad.setText("Eliminar Requerimiento");
+        PopMenu_Habilidades.add(Item_EliminarHabilidad);
 
         setClosable(true);
         setPreferredSize(new java.awt.Dimension(700, 420));
@@ -235,8 +250,11 @@ public class IFrmEditarCurso extends javax.swing.JInternalFrame {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    public javax.swing.JMenuItem Item_AgregarHabilidad;
     public javax.swing.JMenuItem Item_AgregarRequerimiento;
+    public javax.swing.JMenuItem Item_EliminarHabilidad;
     public javax.swing.JMenuItem Item_EliminarRequerimiento;
+    public javax.swing.JMenuItem Item_ModificarHabilidad;
     public javax.swing.JMenuItem Item_ModificarRequerimiento;
     public javax.swing.JPopupMenu PopMenu_Habilidades;
     public javax.swing.JPopupMenu PopMenu_Requerimientos;

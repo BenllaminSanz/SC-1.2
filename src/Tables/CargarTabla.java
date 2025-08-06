@@ -1013,6 +1013,7 @@ public class CargarTabla {
             rs = ps.executeQuery();
             while (rs.next()) {
                 HabilidadesCurso tbr = new HabilidadesCurso();
+                tbr.setIdHabilidad(rs.getInt("idhabilidad"));
                 tbr.setOrden_habilidad(rs.getInt("orden"));
                 tbr.setNombre_habilidad(rs.getString("nombre_Habilidad"));
                 lbu.add(tbr);

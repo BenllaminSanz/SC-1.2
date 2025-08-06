@@ -721,8 +721,9 @@ public class DesignTabla {
         });
         //Difino diseño de la columnas
         TableColumnModel colum = table.getColumnModel();
-        colum.getColumn(0).setPreferredWidth(10);
-        colum.getColumn(1).setPreferredWidth(200);
+        colum.getColumn(0).setPreferredWidth(5);
+        colum.getColumn(1).setPreferredWidth(10);
+        colum.getColumn(2).setPreferredWidth(200);
 
         table.setComponentPopupMenu(frm.PopMenu_Habilidades);
     }

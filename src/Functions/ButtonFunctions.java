@@ -299,7 +299,9 @@ public class ButtonFunctions {
                     String curso = QueryFunctions.CapturaCondicionalSimple("curso", "nombre_curso", "idCurso",
                             String.valueOf(mod.getIdCurso()));
                     frm.cb_cursos.setSelectedItem(curso);
+                    frm.txt_orden1.setText(String.valueOf(mod.getIdHabilidad()));
                     frm.txt_requerimiento.setText(mod.getNombre_habilidad());
+                    frm.txt_orden.setText(String.valueOf(mod.getOrden_habilidad()));
                 }
                 break;
         }

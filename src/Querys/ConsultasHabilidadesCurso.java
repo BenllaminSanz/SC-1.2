@@ -24,8 +24,9 @@ public class ConsultasHabilidadesCurso extends Conexion {
             rs = ps.executeQuery();
 
             if (rs.next()) {
+                mod.setIdHabilidad(rs.getInt("id_Habilidad"));
                 mod.setNombre_habilidad(rs.getString("nombre"));
-
+                mod.setOrden_habilidad(rs.getInt("orden"));
                 return true;
             }
             return false;
@@ -90,13 +91,37 @@ public class ConsultasHabilidadesCurso extends Conexion {
 
         String sql = "UPDATE `sistema_capacitacion`.`habilidad`\n"
                 + "SET\n"
-                + "`id_habilidad` = ?,\n"
                 + "`nombre` = ?,\n"
                 + "`orden` = ?\n"
                 + "WHERE `id_habilidad` = ?;";
         try {
             ps = con.prepareStatement(sql);
-            ps.setInt(1, mod.getIdCurso());
+            ps.setString(1, mod.getNombre_habilidad());
+            ps.setInt(2, mod.getOrden_habilidad());
+            ps.setInt(3, mod.getIdHabilidad());
+            ps.execute();
+            return true;
+        } catch (SQLException ex) {
+            Logger.getLogger(ConsultasHistorialCurso.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                con.close();
+            } catch (SQLException e) {
+                System.err.println(e);
+            }
+        }
+        return false;
+    }
+
+    public boolean eliminar(HabilidadesCurso mod) {
+        PreparedStatement ps = null;
+        Connection con = getConnection();
+
+        String sql = "DELETE FROM `sistema_capacitacion`.`habilidad`\n"
+                + "WHERE id_habilidad = ?;";
+        try {
+            ps = con.prepareStatement(sql);
+            ps.setInt(1, mod.getIdHabilidad());
             ps.execute();
             return true;
         } catch (SQLException ex) {

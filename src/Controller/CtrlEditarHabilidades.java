@@ -7,7 +7,6 @@ import Model.HabilidadesCurso;
 import Querys.ConsultasHabilidadesCurso;
 import Subviews.IFrmEditarCurso;
 import Subviews.IFrmEditarHabilidad;
-import Tables.CargarTabla;
 import Tables.DesignTabla;
 import View.FrmAdministrador;
 import java.awt.event.ActionEvent;
@@ -33,6 +32,7 @@ public class CtrlEditarHabilidades implements ActionListener {
         this.boton = contexto.boton;
         this.folio = contexto.folio;
         this.frm.btn_guardar.addActionListener(this);
+        this.frm.btn_cancelar.addActionListener(this);
     }
 
     void iniciar() {
@@ -48,7 +48,8 @@ public class CtrlEditarHabilidades implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == frm.btn_guardar && frm.btn_guardar.getText().equals("Guardar")) {
-            int idCurso = Integer.parseInt(QueryFunctions.CapturaCondicionalSimple("curso", "idCurso", "nombre_curso",
+            int idCurso = Integer.parseInt(QueryFunctions.CapturaCondicionalSimple(
+                    "curso", "idCurso", "nombre_curso",
                     frm.cb_cursos.getSelectedItem().toString()));
             mod.setIdCurso(idCurso);
             mod.setNombre_habilidad(frm.txt_requerimiento.getText());
@@ -63,14 +64,21 @@ public class CtrlEditarHabilidades implements ActionListener {
 
         if (e.getSource() == frm.btn_guardar && frm.btn_guardar.getText().equals("Actualizar")) {
             int idCurso = Integer.parseInt(QueryFunctions.CapturaCondicionalSimple(
-                    "requerimientos", "curso_idCurso", "idRequerimientos", folio));
+                    "curso", "idCurso", "nombre_curso",
+                    frm.cb_cursos.getSelectedItem().toString()));
+            mod.setIdHabilidad(Integer.parseInt(folio));
             mod.setIdCurso(idCurso);
             mod.setNombre_habilidad(frm.txt_requerimiento.getText());
+            mod.setOrden_habilidad(Integer.parseInt(frm.txt_orden.getText()));
             if (modC.actualizar(mod)) {
-                JOptionPane.showMessageDialog(frm, "Actualización Exitosa del Requerimiento");
+                JOptionPane.showMessageDialog(frm, "Actualización Exitosa de la habilidad");
                 frm.dispose();
-                DesignTabla.designRequerimientosCurso(frmA, String.valueOf(idCurso));
+                DesignTabla.designHabilidadesCurso(frmA, String.valueOf(idCurso));
             }
+        }
+        
+        if (e.getSource() == frm.btn_cancelar){
+            frm.dispose();
         }
     }
 

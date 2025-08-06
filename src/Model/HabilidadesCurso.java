@@ -6,8 +6,6 @@ public class HabilidadesCurso {
     private String nombre_habilidad;
     private int orden_habilidad;
     private int idCurso;
-    private String nombre_archivo;
-    private String ruta_Docuemento;
 
     public int getIdHabilidad() {
         return idHabilidad;
@@ -39,21 +37,5 @@ public class HabilidadesCurso {
 
     public void setIdCurso(int idCurso) {
         this.idCurso = idCurso;
-    }
-
-    public String getNombre_archivo() {
-        return nombre_archivo;
-    }
-
-    public void setNombre_archivo(String nombre_archivo) {
-        this.nombre_archivo = nombre_archivo;
-    }
-
-    public String getRuta_Docuemento() {
-        return ruta_Docuemento;
-    }
-
-    public void setRuta_Docuemento(String ruta_Docuemento) {
-        this.ruta_Docuemento = ruta_Docuemento;
     }
 }

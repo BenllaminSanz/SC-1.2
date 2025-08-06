@@ -8,8 +8,10 @@ import Functions.ButtonFunctions;
 import Functions.QueryFunctions;
 import Functions.ViewTools;
 import Model.Curso;
+import Model.HabilidadesCurso;
 import Model.RequerimientosCurso;
 import Querys.ConsultasCurso;
+import Querys.ConsultasHabilidadesCurso;
 import Querys.ConsultasRequerimientosCurso;
 import Subviews.IFrmEditarCurso;
 import Tables.CargarTabla;
@@ -28,6 +30,8 @@ public class CtrlEditarCurso implements ActionListener, ItemListener {
     private final ConsultasCurso modC = new ConsultasCurso();
     private final RequerimientosCurso modD = new RequerimientosCurso();
     private final ConsultasRequerimientosCurso modDC = new ConsultasRequerimientosCurso();
+    private final HabilidadesCurso modH = new HabilidadesCurso();
+    private final ConsultasHabilidadesCurso modHC = new ConsultasHabilidadesCurso();
     private final IFrmEditarCurso frm;
     private final IFrmCapacitacion frmA;
     private final FrmAdministrador frmB;
@@ -49,6 +53,9 @@ public class CtrlEditarCurso implements ActionListener, ItemListener {
         this.frm.Item_ModificarRequerimiento.addActionListener(this);
         this.frm.Item_EliminarRequerimiento.addActionListener(this);
         this.frm.btn_AgregarHabilidad.addActionListener(this);
+        this.frm.Item_AgregarHabilidad.addActionListener(this);
+        this.frm.Item_ModificarHabilidad.addActionListener(this);
+        this.frm.Item_EliminarHabilidad.addActionListener(this);
     }
 
     public void iniciar() {
@@ -165,20 +172,20 @@ public class CtrlEditarCurso implements ActionListener, ItemListener {
         }
         
 
-        if (e.getSource() == frm.Item_ModificarRequerimiento) {
-            String requerimiento = frm.jTable_Requerimientos.getValueAt(frm.jTable_Requerimientos.getSelectedRow(), 0).toString();
+        if (e.getSource() == frm.Item_ModificarHabilidad) {
             String txtBoton = "Actualizar";
-            ContextoEditarRequerimiento contexto = new ContextoEditarRequerimiento(folio, txtBoton, requerimiento, frm, frmB);
-            CtrlEditarRequerimiento ctrl = new CtrlEditarRequerimiento(contexto);
+            String habilidad = frm.jTable_Habilidades.getValueAt(frm.jTable_Habilidades.getSelectedRow(), 0).toString();
+            ContextoEditarHabilidad contexto = new ContextoEditarHabilidad(folio, txtBoton, habilidad, frm, frmB);
+            CtrlEditarHabilidades ctrl = new CtrlEditarHabilidades(contexto);
             ctrl.iniciar();
-            ViewTools.Centrar(frmB, contexto.ventanaEditarRequerimiento);
+            ViewTools.Centrar(frmB, contexto.ventanaEditarHabilidad);
         }
 
-        if (e.getSource() == frm.Item_EliminarRequerimiento) {
-            String requerimiento = frm.jTable_Requerimientos.getValueAt(frm.jTable_Requerimientos.getSelectedRow(), 0).toString();
-            modD.setIdRequerimiento(Integer.parseInt(requerimiento));
-            if (modDC.eliminar(modD)) {
-                DesignTabla.designRequerimientosCurso(frm, String.valueOf(mod.getIdCurso()));
+        if (e.getSource() == frm.Item_EliminarHabilidad) {
+            String posicion = frm.jTable_Habilidades.getValueAt(frm.jTable_Habilidades.getSelectedRow(), 0).toString();
+            modH.setIdHabilidad(Integer.parseInt(posicion));
+            if (modHC.eliminar(modH)) {
+                DesignTabla.designHabilidadesCurso(frm, String.valueOf(mod.getIdCurso()));
             }
         }
 
