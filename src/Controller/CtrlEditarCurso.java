@@ -163,7 +163,15 @@ public class CtrlEditarCurso implements ActionListener, ItemListener {
             }
         }
         
-        if (e.getSource() == frm.btn_AgregarHabilidad) {
+        if (e.getSource() == frm.btn_AgregarHabilidad ) {
+            String txtBoton = "Guardar";
+            ContextoEditarHabilidad contexto = new ContextoEditarHabilidad(folio, txtBoton, null, frm, frmB);
+            CtrlEditarHabilidades ctrl = new CtrlEditarHabilidades(contexto);
+            ctrl.iniciar();
+            ViewTools.Centrar(frmB, contexto.ventanaEditarHabilidad);
+        }
+        
+        if (e.getSource() == frm.Item_AgregarHabilidad ) {
             String txtBoton = "Guardar";
             ContextoEditarHabilidad contexto = new ContextoEditarHabilidad(folio, txtBoton, null, frm, frmB);
             CtrlEditarHabilidades ctrl = new CtrlEditarHabilidades(contexto);

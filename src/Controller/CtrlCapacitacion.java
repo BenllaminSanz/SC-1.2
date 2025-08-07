@@ -394,9 +394,10 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
             modRa.setIdAsistente(Integer.parseInt(idasistente));
             String idCurso = QueryFunctions.CapturaCondicionalSimple(
                     "historial_curso", "idcurso", "idHistorial_curso", idHistorial);
+            int curso = Integer.parseInt(idCurso);
             List<RequerimientosCurso> requisitos = modCRa.consultar(idCurso);
             if (!requisitos.isEmpty()) {
-                ContextoEditarRequerimientos contexto = new ContextoEditarRequerimientos(requisitos, modRa, frmA);
+                ContextoEditarRequerimientos contexto = new ContextoEditarRequerimientos(requisitos, modRa, frmA, curso);
                 CtrlRequerimientos ctrl = new CtrlRequerimientos(contexto);
                 ctrl.iniciar();
             }

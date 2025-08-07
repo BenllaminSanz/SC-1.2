@@ -1,35 +1,33 @@
 package Controller;
 
 import ContextController.ContextoEditarRequerimientos;
-import Functions.DateTools;
-import Functions.QueryFunctions;
-import Functions.ViewTools;
+import Functions.ArchivoHelper;
+import Functions.ConsultaHelper;
+import Model.HabilidadesCurso;
 import Model.RequerimientosCurso;
 import Model.RequerimientosCursoAsistente;
+import Querys.ConsultasHabilidadesCurso;
 import Querys.ConsultasRequerimientosCurso;
 import View.FrmAdministrador;
 import com.toedter.calendar.JDateChooser;
 import java.awt.Color;
-import java.awt.Desktop;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Map;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -37,149 +35,181 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
+// Archivo principal: CtrlRequerimientos.java
 public class CtrlRequerimientos {
 
     private final FrmAdministrador frmA;
     private final RequerimientosCursoAsistente mod;
     private final ConsultasRequerimientosCurso modC = new ConsultasRequerimientosCurso();
     private final List<RequerimientosCurso> requerimientos;
+    private final int curso;
 
     public CtrlRequerimientos(ContextoEditarRequerimientos contexto) {
         this.frmA = contexto.ventanaAdministrador;
         this.mod = contexto.modeloRequerimientosAsistente;
         this.requerimientos = contexto.listaRequerimientos;
+        this.curso = contexto.idCurso;
     }
 
     public void iniciar() {
-        System.out.println(mod.getIdAsistente());
-        System.out.println(mod.getIdHistorial());
-
         JInternalFrame frame = new JInternalFrame("Lista de Requerimientos: " + mod.getIdAsistente());
         frame.setClosable(true);
         frame.setResizable(false);
 
+// Panel principal con padding
         JPanel panelGeneral = new JPanel();
         panelGeneral.setLayout(new BoxLayout(panelGeneral, BoxLayout.Y_AXIS));
-        panelGeneral.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Espaciado externo
+        panelGeneral.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        for (RequerimientosCurso requerimiento : requerimientos) {
-            JPanel panelRequerimiento = new JPanel(new FlowLayout(FlowLayout.LEFT));
-            panelRequerimiento.setBorder(BorderFactory.createCompoundBorder(
+// -------- PANEL DE REQUERIMIENTOS --------
+        JPanel panelRequerimientos = new JPanel();
+        panelRequerimientos.setLayout(new BoxLayout(panelRequerimientos, BoxLayout.Y_AXIS));
+        panelRequerimientos.setBorder(BorderFactory.createTitledBorder("Requerimientos"));
+
+        for (RequerimientosCurso req : requerimientos) {
+            JCheckBox cb = new JCheckBox();
+            JLabel lbl = new JLabel(req.getNombre_requerimiento());
+            JTextField txtFecha = new JTextField(10);
+            JButton btnConsulta = new JButton("Consultar");
+
+            JPanel panelReq = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
+            panelReq.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createLineBorder(Color.LIGHT_GRAY),
-                    BorderFactory.createEmptyBorder(5, 10, 5, 10) // Padding interno
+                    BorderFactory.createEmptyBorder(5, 10, 5, 10)
             ));
 
-            JCheckBox cb_buton = new JCheckBox();
-            JLabel lblRequerimiento = new JLabel(requerimiento.getNombre_requerimiento());
-            JTextField fechaEntregaTextField = new JTextField(10);
-            JButton bt_consultar = new JButton("Consultar");
-
-            cb_buton.addActionListener((ActionEvent e) -> {
-                if (cb_buton.isSelected()) {
-                    requerimentoSelected(requerimiento, panelRequerimiento, fechaEntregaTextField, bt_consultar);
+            cb.addActionListener(e -> {
+                if (cb.isSelected()) {
+                    mostrarDialogoRegistro(req, panelReq, txtFecha, btnConsulta);
                 } else {
-                    mod.setIdRequerimiento(requerimiento.getIdRequerimiento());
+                    mod.setIdRequerimiento(req.getIdRequerimiento());
                     if (modC.eliminarRequerimiento(mod)) {
-                        panelRequerimiento.remove(fechaEntregaTextField);
-                        panelRequerimiento.remove(bt_consultar);
-                        panelRequerimiento.revalidate();
-                        panelRequerimiento.repaint();
-                        System.out.println("Registro Eliminado");
+                        panelReq.remove(txtFecha);
+                        panelReq.remove(btnConsulta);
+                        panelReq.revalidate();
+                        panelReq.repaint();
                     }
                 }
             });
 
-            // Si ya fue marcado como cumplido
-            if (modC.estadoRequerimiento(requerimiento.getIdRequerimiento(), mod)) {
-                cb_buton.setSelected(true);
-                fechaEntregaTextField.setEditable(false);
-                fechaEntregaTextField.setText(mod.getFecha_entrega());
+            if (modC.estadoRequerimiento(req.getIdRequerimiento(), mod)) {
+                cb.setSelected(true);
+                txtFecha.setEditable(false);
+                txtFecha.setText(mod.getFecha_entrega());
+                btnConsulta.addActionListener(ev -> abrirArchivo(mod.getRuta_archivo()));
 
-                bt_consultar.addActionListener((ActionEvent e) -> {
-                    File archivo = new File(mod.getRuta_archivo());
-                    if (archivo.exists()) {
-                        try {
-                            Desktop.getDesktop().open(archivo);
-                        } catch (IOException ex) {
-                            Logger.getLogger(CtrlRequerimientos.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    } else {
-                        System.out.println("El archivo no existe.");
-                    }
-                });
-
-                panelRequerimiento.add(cb_buton);
-                panelRequerimiento.add(lblRequerimiento);
-                panelRequerimiento.add(fechaEntregaTextField);
-                panelRequerimiento.add(bt_consultar);
+                panelReq.add(cb);
+                panelReq.add(lbl);
+                panelReq.add(txtFecha);
+                panelReq.add(btnConsulta);
             } else {
-                // Si no está marcado
-                panelRequerimiento.add(cb_buton);
-                panelRequerimiento.add(lblRequerimiento);
+                panelReq.add(cb);
+                panelReq.add(lbl);
             }
 
-            panelGeneral.add(panelRequerimiento);
+            panelRequerimientos.add(panelReq);
         }
 
-        frame.getContentPane().add(new JScrollPane(panelGeneral)); // Soporte para scroll si hay muchos
-        frame.pack();
-        ViewTools.Centrar(frmA, frame);
+        panelGeneral.add(panelRequerimientos);
+        panelGeneral.add(Box.createVerticalStrut(20)); // Separación visual
 
-//        int x = (frmA.Desktop_Administrador.getWidth() / 2) - frame.getWidth() / 2;
-//        int y = (frmA.Desktop_Administrador.getHeight() / 2) - frame.getHeight() / 2;
-//
-//        frmA.Desktop_Administrador.add(frame);
-//
-//        frame.setVisible(true);
-//        if (frame.isShowing()) {
-//            frame.setLocation(x, y);
-//        } else {
-//            frmA.Desktop_Administrador.add(frame);
-//            frame.setLocation(x, y);
-//            frame.show();
-//        }
+// -------- PANEL ILUO --------
+        JPanel panelILUO = new JPanel();
+        panelILUO.setLayout(new BoxLayout(panelILUO, BoxLayout.Y_AXIS));
+        panelILUO.setBorder(BorderFactory.createTitledBorder("Gestión ILUO"));
+
+// Cabecera
+        JPanel header = new JPanel(new GridLayout(1, 2));
+        header.add(new JLabel("Habilidad"));
+        header.add(new JLabel("Estado ILUO"));
+        panelILUO.add(header);
+
+        panelILUO.add(Box.createVerticalStrut(10)); // Espacio entre cabecera y contenido
+
+        List<HabilidadesCurso> listaHabilidades = new ConsultasHabilidadesCurso().obtenerHabilidadesPorCurso(curso);
+        Map<HabilidadesCurso, JComboBox<String>> mapHabilidadILUO = new HashMap<>();
+
+        for (HabilidadesCurso habilidad : listaHabilidades) {
+            JPanel fila = new JPanel(new GridLayout(1, 2, 10, 0));
+            fila.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+
+            fila.add(new JLabel(habilidad.getNombre_habilidad()));
+            JComboBox<String> comboILUO = new JComboBox<>(new String[]{"I", "L", "U", "O"});
+            comboILUO.setPreferredSize(new Dimension(50, 25)); // ancho, alto
+
+            fila.add(comboILUO);
+
+            panelILUO.add(fila);
+            mapHabilidadILUO.put(habilidad, comboILUO);
+        }
+
+        panelILUO.add(Box.createVerticalStrut(10)); // Espacio antes del botón
+
+        JButton btnGuardarILUO = new JButton("Guardar ILUO");
+        btnGuardarILUO.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnGuardarILUO.addActionListener(e -> {
+            java.sql.Date fechaActual = new java.sql.Date(System.currentTimeMillis());
+            ConsultasHabilidadesCurso consulta = new ConsultasHabilidadesCurso(); // Asegúrate de tener esta clase
+
+            int errores = 0;
+            for (Map.Entry<HabilidadesCurso, JComboBox<String>> entry : mapHabilidadILUO.entrySet()) {
+                HabilidadesCurso hab = entry.getKey();
+                String nivel = (String) entry.getValue().getSelectedItem();
+
+                boolean ok = consulta.guardarOActualizarEvaluacion(
+                        mod.getIdAsistente(),
+                        hab.getIdHabilidad(),
+                        mod.getIdHistorial(),
+                        nivel,
+                        fechaActual
+                );
+
+                if (!ok) {
+                    errores++;
+                }
+            }
+
+            if (errores == 0) {
+                JOptionPane.showMessageDialog(null, "Todos los niveles ILUO fueron guardados correctamente.");
+            } else {
+                JOptionPane.showMessageDialog(null, "Hubo errores al guardar algunas evaluaciones ILUO.");
+            }
+        });
+
+        panelILUO.add(btnGuardarILUO);
+        panelGeneral.add(panelILUO);
+
+// -------- VENTANA FINAL --------
+        JFrame ventana = new JFrame("Gestión de Requerimientos e ILUO");
+        ventana.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        ventana.setSize(600, 600);
+        ventana.setLocationRelativeTo(null); // Centra la ventana
+        ventana.setContentPane(new JScrollPane(panelGeneral)); // Scroll si hay muchos datos
+        ventana.setVisible(true);
+
     }
 
-    private void requerimentoSelected(RequerimientosCurso requerimiento, JPanel panelRequerimiento, JTextField fechaEntregaTextField, JButton bt_consultar) {
+    private void mostrarDialogoRegistro(RequerimientosCurso requerimiento, JPanel panelRequerimiento,
+            JTextField fechaEntregaTextField, JButton bt_consultar) {
+
         JPanel panelCargar = new JPanel(new GridLayout(0, 1));
         JDateChooser dateChooser = new JDateChooser();
         JTextField txt_archivo = new JTextField();
-        JButton bt_Archivo = new JButton();
+        JButton bt_Archivo = new JButton("Agregar");
 
-        bt_Archivo.setText("Agregar");
         panelCargar.add(new JLabel("Seleccione la fecha de Registro:"));
         panelCargar.add(dateChooser);
         panelCargar.add(new JLabel("Seleccione el archivo:"));
         panelCargar.add(txt_archivo);
         panelCargar.add(bt_Archivo);
 
-        bt_Archivo.addActionListener((ActionEvent e) -> {
+        bt_Archivo.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
-            int fileResult = fileChooser.showOpenDialog(null);
-
-            if (fileResult == JFileChooser.APPROVE_OPTION) {
-                try {
-                    FileInputStream fis = null;
-                    File selectedFile = fileChooser.getSelectedFile();
-
-                    String rutaArchivo = selectedFile.getAbsolutePath();
-                    String nombreArchivo = selectedFile.getName();
-
-                    fis = new FileInputStream(selectedFile);
-                    byte[] contenido = new byte[(int) selectedFile.length()];
-                    fis.read(contenido);
-                    fis.close();
-
-                    mod.setRuta_archivo(rutaArchivo);
-                    mod.setNombre_archivo(nombreArchivo);
-
-                    txt_archivo.setText(nombreArchivo);
-                } catch (FileNotFoundException ex) {
-                    Logger.getLogger(CtrlRequerimientos.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IOException ex) {
-                    Logger.getLogger(CtrlRequerimientos.class.getName()).log(Level.SEVERE, null, ex);
-                }
-
+            if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = fileChooser.getSelectedFile();
+                mod.setRuta_archivo(selectedFile.getAbsolutePath());
+                mod.setNombre_archivo(selectedFile.getName());
+                txt_archivo.setText(selectedFile.getName());
             }
         });
 
@@ -187,111 +217,56 @@ public class CtrlRequerimientos {
                 "Registro del requerimiento:", JOptionPane.OK_CANCEL_OPTION);
 
         if (result == JOptionPane.OK_OPTION) {
-            if (dateChooser.getDate() == null || txt_archivo.getText() == null) {
-                JOptionPane.showMessageDialog(
-                        null, "Debe seleccionar una fecha de aceptación y un archivo",
+            if (dateChooser.getDate() == null || txt_archivo.getText().trim().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Debe seleccionar una fecha y un archivo",
                         "Error", JOptionPane.ERROR_MESSAGE);
-            } else {
-                SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
-                Date fechaSeleccionada = dateChooser.getDate();
-                String fecha = formato.format(fechaSeleccionada);
+                return;
+            }
 
-                mod.setIdRequerimiento(requerimiento.getIdRequerimiento());
+            String fecha = new SimpleDateFormat("yyyy-MM-dd").format(dateChooser.getDate());
+            mod.setIdRequerimiento(requerimiento.getIdRequerimiento());
 
-                if (modC.agregarRequerimiento(mod, fecha)) {
-                    GenerarExpendiente(mod);
-                    System.out.println("Registro Exitoso");
-
-                    if (modC.estadoRequerimiento(requerimiento.getIdRequerimiento(), mod)) {
-                        fechaEntregaTextField.setEditable(false);
-                        String fechaEntrega = mod.getFecha_entrega();
-                        fechaEntregaTextField.setText(fechaEntrega);
-
-                        bt_consultar.addActionListener((ActionEvent e) -> {
-                            File archivo = new File(mod.getRuta_archivo());
-                            Desktop desktop = Desktop.getDesktop();
-                            if (archivo.exists()) {
-                                try {
-                                    desktop.open(archivo);
-                                } catch (IOException ex) {
-                                    Logger.getLogger(CtrlRequerimientos.class.getName()).log(
-                                            Level.SEVERE, null, ex);
-                                }
-                            } else {
-                                System.out.println("El archivo no existe.");
-                            }
-                        });
-
-                        panelRequerimiento.add(fechaEntregaTextField);
-                        panelRequerimiento.add(bt_consultar);
-                        panelRequerimiento.revalidate();
-                        panelRequerimiento.repaint();
-                    }
+            if (modC.agregarRequerimiento(mod, fecha)) {
+                generarExpediente(mod);
+                if (modC.estadoRequerimiento(requerimiento.getIdRequerimiento(), mod)) {
+                    fechaEntregaTextField.setEditable(false);
+                    fechaEntregaTextField.setText(mod.getFecha_entrega());
+                    bt_consultar.addActionListener(ev -> abrirArchivo(mod.getRuta_archivo()));
+                    panelRequerimiento.add(fechaEntregaTextField);
+                    panelRequerimiento.add(bt_consultar);
+                    panelRequerimiento.revalidate();
+                    panelRequerimiento.repaint();
                 }
             }
         }
     }
 
-    private void GenerarExpendiente(RequerimientosCursoAsistente mod) {
-        String trabajador = QueryFunctions.CapturaCondicionalSimple("trabajador", "nombre_Trabajador",
-                "Folio_Trabajador", String.valueOf(mod.getIdAsistente()));
-        // Construir la ruta completa de la carpeta del trabajador
-        JFileChooser selector = new JFileChooser();
-        selector.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY); // Solo permite seleccionar carpetas
-        selector.setDialogTitle("Selecciona la carpeta del expediente del Curso");
+    private void abrirArchivo(String rutaArchivo) {
+        ArchivoHelper.abrirArchivo(rutaArchivo);
+    }
 
-        int resultado = selector.showOpenDialog(null);
-        String RUTA_CARPETA_PRINCIPAL = null;
-
-        if (resultado == JFileChooser.APPROVE_OPTION) {
-            RUTA_CARPETA_PRINCIPAL = selector.getSelectedFile().toString();
-            System.out.println("Carpeta seleccionada: " + RUTA_CARPETA_PRINCIPAL);
+    private void generarExpediente(RequerimientosCursoAsistente mod) {
+        File carpetaPrincipal = ArchivoHelper.seleccionarCarpeta();
+        if (carpetaPrincipal == null) {
+            JOptionPane.showMessageDialog(null, "No se seleccionó carpeta. Operación cancelada.");
+            return;
         }
 
-        String rutaCarpetaTrabajador = RUTA_CARPETA_PRINCIPAL + "/" + mod.getIdAsistente() + "_" + trabajador;
-
-        // Verificar si la carpeta del trabajador ya existe
-        File carpetaTrabajador = new File(rutaCarpetaTrabajador);
+        String trabajador = ConsultaHelper.obtenerNombreTrabajador(mod.getIdAsistente());
+        File carpetaTrabajador = new File(carpetaPrincipal, mod.getIdAsistente() + "_" + trabajador);
         if (!carpetaTrabajador.exists()) {
-            // La carpeta del trabajador no existe, así que la creamos
-            if (carpetaTrabajador.mkdirs()) {
-                System.out.println("Carpeta del trabajador creada: " + rutaCarpetaTrabajador);
-            } else {
-                System.out.println("No se pudo crear la carpeta del trabajador: " + rutaCarpetaTrabajador);
-            }
+            carpetaTrabajador.mkdirs();
         }
-        String Curso = QueryFunctions.CapturaCondicionalAnidado("historial_curso",
-                "curso", "idCurso", "idCurso", "nombre_Curso", "idHistorial_Curso",
-                String.valueOf(mod.getIdHistorial()));
 
-        String FechaSQL = QueryFunctions.CapturaCondicionalSimple("historial_Curso", "fecha_inicio",
-                "idHistorial_Curso", String.valueOf(mod.getIdHistorial()));
-
-        String Fecha = DateTools.DateLocaltoString(FechaSQL);
-
-        // Construir la ruta completa de la carpeta del trabajador
-        String rutaCarpetaCurso = rutaCarpetaTrabajador + "\\" + Curso + " " + Fecha;
-
-        // Verificar si la carpeta del trabajador ya existe
-        File carpetaCurso = new File(rutaCarpetaCurso);
+        String curso = ConsultaHelper.obtenerCurso(mod.getIdHistorial());
+        String fecha = ConsultaHelper.obtenerFechaCurso(mod.getIdHistorial());
+        File carpetaCurso = new File(carpetaTrabajador, curso + " " + fecha);
         if (!carpetaCurso.exists()) {
-            // La carpeta del trabajador no existe, así que la creamos
-            if (carpetaCurso.mkdirs()) {
-                System.out.println("Carpeta del trabajador creada: " + carpetaCurso);
-            } else {
-                System.out.println("No se pudo crear la carpeta del trabajador: " + carpetaCurso);
-            }
+            carpetaCurso.mkdirs();
         }
 
-        // Copiar el archivo de referencia en la carpeta del trabajador
-        try {
-
-            Files.copy(new File(mod.getRuta_archivo()).toPath(),
-                    new File(carpetaCurso + "\\" + mod.getNombre_archivo()).toPath(),
-                    StandardCopyOption.REPLACE_EXISTING);
-            System.out.println("Archivo de referencia copiado en la carpeta del trabajador.");
-        } catch (IOException e) {
-            System.out.println("Error al copiar el archivo de referencia: " + e.getMessage());
-        }
+        File origen = new File(mod.getRuta_archivo());
+        File destino = new File(carpetaCurso, mod.getNombre_archivo());
+        ArchivoHelper.copiarArchivo(origen, destino);
     }
 }
