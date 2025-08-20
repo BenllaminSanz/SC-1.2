@@ -680,7 +680,7 @@ public class CargarTabla {
         List<HistorialCurso> lbu = new ArrayList<>();
         Connection con = conn.getConnection();
 
-        String sql = "SELECT * FROM sistema_capacitacion.view_historialcursos;";
+        String sql = "SELECT * FROM sistema_capacitacion.view_historialcursos ORDER BY fecha_inicio DESC;";
 
         try {
             ps = con.prepareStatement(sql);
@@ -717,7 +717,7 @@ public class CargarTabla {
         Connection con = conn.getConnection();
 
         String sql = "SELECT * FROM sistema_capacitacion.view_historialcursos \n"
-                + "WHERE id_tipocurso = ?;";
+                + "WHERE id_tipocurso = ? ORDER BY fecha_inicio DESC;";
 
         try {
             ps = con.prepareStatement(sql);
@@ -757,7 +757,7 @@ public class CargarTabla {
         Connection con = conn.getConnection();
 
         String sql = "SELECT * FROM sistema_capacitacion.view_historialcursos \n"
-                + "WHERE idCurso = ?;";
+                + "WHERE idCurso = ? ORDER BY fecha_inicio DESC ;";
 
         try {
             ps = con.prepareStatement(sql);
@@ -795,7 +795,7 @@ public class CargarTabla {
         Connection con = conn.getConnection();
 
         String sql = "SELECT * FROM sistema_capacitacion.view_historialcurso_nombres \n"
-                + "WHERE idCurso = ?;";
+                + "WHERE idCurso = ? ORDER BY fecha_inicio DESC;";
 
         try {
             ps = con.prepareStatement(sql);

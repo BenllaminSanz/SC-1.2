@@ -360,6 +360,7 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
                     modH.setIdHistorialCurso(Integer.parseInt(idHistorial));
                     if (modCH.restaurar(modH)) {
                         JOptionPane.showMessageDialog(frm, "Curso Restaurado");
+                        DesignTabla.designHistorialCurso(frm, Integer.parseInt(idCurso));
                     }
                 }
             } else {

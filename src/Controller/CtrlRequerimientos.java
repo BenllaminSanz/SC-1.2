@@ -3,6 +3,7 @@ package Controller;
 import ContextController.ContextoEditarRequerimientos;
 import Functions.ArchivoHelper;
 import Functions.ConsultaHelper;
+import Model.HabilidadEvaluada;
 import Model.HabilidadesCurso;
 import Model.RequerimientosCurso;
 import Model.RequerimientosCursoAsistente;
@@ -122,6 +123,9 @@ public class CtrlRequerimientos {
         JPanel header = new JPanel(new GridLayout(1, 2));
         header.add(new JLabel("Habilidad"));
         header.add(new JLabel("Estado ILUO"));
+        header.add(new JLabel("Ultima Fehca de Evaluación"));
+        header.add(new JLabel("Observaciones"));
+
         panelILUO.add(header);
 
         panelILUO.add(Box.createVerticalStrut(10)); // Espacio entre cabecera y contenido
@@ -129,18 +133,64 @@ public class CtrlRequerimientos {
         List<HabilidadesCurso> listaHabilidades = new ConsultasHabilidadesCurso().obtenerHabilidadesPorCurso(curso);
         Map<HabilidadesCurso, JComboBox<String>> mapHabilidadILUO = new HashMap<>();
 
+// Además, un map para guardar componentes de fecha y observación si quieres actualizar o leer luego
+        Map<HabilidadesCurso, JLabel> mapFechaEvaluacion = new HashMap<>();
+        Map<HabilidadesCurso, JTextField> mapObservaciones = new HashMap<>();
+
         for (HabilidadesCurso habilidad : listaHabilidades) {
-            JPanel fila = new JPanel(new GridLayout(1, 2, 10, 0));
+            JPanel fila = new JPanel(new GridLayout(1, 4, 10, 0));  // 4 columnas ahora
             fila.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
 
             fila.add(new JLabel(habilidad.getNombre_habilidad()));
-            JComboBox<String> comboILUO = new JComboBox<>(new String[]{"I", "L", "U", "O"});
-            comboILUO.setPreferredSize(new Dimension(50, 25)); // ancho, alto
 
+            JComboBox<String> comboILUO = new JComboBox<>(new String[]{"I", "L", "U", "O"});
+            comboILUO.setPreferredSize(new Dimension(50, 25));
             fila.add(comboILUO);
 
+            JLabel labelFecha = new JLabel(""); // aquí irá la fecha
+            fila.add(labelFecha);
+
+            JTextField campoObservacion = new JTextField();  // observación editable o solo lectura
+            campoObservacion.setPreferredSize(new Dimension(150, 25));
+            fila.add(campoObservacion);
+
             panelILUO.add(fila);
+
             mapHabilidadILUO.put(habilidad, comboILUO);
+            mapFechaEvaluacion.put(habilidad, labelFecha);
+            mapObservaciones.put(habilidad, campoObservacion);
+        }
+
+// Luego, obtienes las evaluaciones y actualizas también fecha y observación
+        List<HabilidadEvaluada> habilidadesEvaluadas = new ConsultasHabilidadesCurso().obtenerHabilidadesConEvaluacion(curso, mod.getIdAsistente(), mod.getIdHistorial());
+
+        for (HabilidadEvaluada habilidadEval : habilidadesEvaluadas) {
+            for (HabilidadesCurso habilidadCurso : mapHabilidadILUO.keySet()) {
+                if (habilidadCurso.getIdHabilidad() == habilidadEval.getIdHabilidad()) {
+                    JComboBox<String> combo = mapHabilidadILUO.get(habilidadCurso);
+                    JLabel labelFecha = mapFechaEvaluacion.get(habilidadCurso);
+                    JTextField campoObs = mapObservaciones.get(habilidadCurso);
+
+                    if (habilidadEval.getNivelAlcanzado() != null) {
+                        combo.setSelectedItem(habilidadEval.getNivelAlcanzado());
+                    } else {
+                        combo.setSelectedItem(null);
+                    }
+
+                    if (habilidadEval.getFechaEvaluacion() != null) {
+                        labelFecha.setText(habilidadEval.getFechaEvaluacion().toString()); // Formatear si quieres
+                    } else {
+                        labelFecha.setText("");
+                    }
+
+                    if (habilidadEval.getObservaciones() != null) {
+                        campoObs.setText(habilidadEval.getObservaciones());
+                    } else {
+                        campoObs.setText("");
+                    }
+                    break;
+                }
+            }
         }
 
         panelILUO.add(Box.createVerticalStrut(10)); // Espacio antes del botón
@@ -155,13 +205,18 @@ public class CtrlRequerimientos {
             for (Map.Entry<HabilidadesCurso, JComboBox<String>> entry : mapHabilidadILUO.entrySet()) {
                 HabilidadesCurso hab = entry.getKey();
                 String nivel = (String) entry.getValue().getSelectedItem();
+                
+                // Obtener la observación para esta habilidad desde el mapa (que debes tener disponible)
+                JTextField campoObs = mapObservaciones.get(hab);
+                String observacion = campoObs != null ? campoObs.getText() : null;
 
                 boolean ok = consulta.guardarOActualizarEvaluacion(
                         mod.getIdAsistente(),
                         hab.getIdHabilidad(),
                         mod.getIdHistorial(),
                         nivel,
-                        fechaActual
+                        fechaActual,
+                        observacion
                 );
 
                 if (!ok) {
@@ -182,7 +237,7 @@ public class CtrlRequerimientos {
 // -------- VENTANA FINAL --------
         JFrame ventana = new JFrame("Gestión de Requerimientos e ILUO");
         ventana.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        ventana.setSize(600, 600);
+        ventana.setSize(800, 600);
         ventana.setLocationRelativeTo(null); // Centra la ventana
         ventana.setContentPane(new JScrollPane(panelGeneral)); // Scroll si hay muchos datos
         ventana.setVisible(true);
