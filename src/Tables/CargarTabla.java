@@ -12,6 +12,7 @@ import Model.Brigadas;
 import Model.Brigadistas;
 import Model.Certificado;
 import Model.Curso;
+import Model.HabilidadesCurso;
 import Model.HistorialCurso;
 import Querys.Conexion;
 import Model.LBU;
@@ -679,7 +680,7 @@ public class CargarTabla {
         List<HistorialCurso> lbu = new ArrayList<>();
         Connection con = conn.getConnection();
 
-        String sql = "SELECT * FROM sistema_capacitacion.view_historialcursos;";
+        String sql = "SELECT * FROM sistema_capacitacion.view_historialcursos ORDER BY fecha_inicio DESC;";
 
         try {
             ps = con.prepareStatement(sql);
@@ -716,7 +717,7 @@ public class CargarTabla {
         Connection con = conn.getConnection();
 
         String sql = "SELECT * FROM sistema_capacitacion.view_historialcursos \n"
-                + "WHERE id_tipocurso = ?;";
+                + "WHERE id_tipocurso = ? ORDER BY fecha_inicio DESC;";
 
         try {
             ps = con.prepareStatement(sql);
@@ -756,7 +757,7 @@ public class CargarTabla {
         Connection con = conn.getConnection();
 
         String sql = "SELECT * FROM sistema_capacitacion.view_historialcursos \n"
-                + "WHERE idCurso = ?;";
+                + "WHERE idCurso = ? ORDER BY fecha_inicio DESC ;";
 
         try {
             ps = con.prepareStatement(sql);
@@ -794,7 +795,7 @@ public class CargarTabla {
         Connection con = conn.getConnection();
 
         String sql = "SELECT * FROM sistema_capacitacion.view_historialcurso_nombres \n"
-                + "WHERE idCurso = ?;";
+                + "WHERE idCurso = ? ORDER BY fecha_inicio DESC;";
 
         try {
             ps = con.prepareStatement(sql);
@@ -982,6 +983,39 @@ public class CargarTabla {
                 tbr.setDescp_requerimiento(rs.getString("descp_requerimiento"));
                 tbr.setRuta_Docuemento(rs.getString("ruta_documento"));
                 tbr.setIdCurso(rs.getInt("idcurso"));
+                lbu.add(tbr);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(CargarTabla.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(CargarTabla.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return lbu;
+    }
+    
+        public static List<HabilidadesCurso> cargarTablaHabilidadesCurso(String idCurso) {
+        List<HabilidadesCurso> lbu = new ArrayList<>();
+        Connection con = conn.getConnection();
+
+        String sql1 = "SET @id_curso:=?";
+        String sql = "SELECT * FROM sistema_capacitacion.view_habilidades_curso;";
+
+        try {
+            ps = con.prepareStatement(sql1);
+            ps.setInt(1, Integer.parseInt(idCurso));
+            ps.executeUpdate();
+
+            ps = con.prepareStatement(sql);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                HabilidadesCurso tbr = new HabilidadesCurso();
+                tbr.setIdHabilidad(rs.getInt("idhabilidad"));
+                tbr.setOrden_habilidad(rs.getInt("orden"));
+                tbr.setNombre_habilidad(rs.getString("nombre_Habilidad"));
                 lbu.add(tbr);
             }
         } catch (SQLException ex) {

@@ -1,16 +1,16 @@
 package Tables;
 
-import Model.RequerimientosCurso;
+import Model.HabilidadesCurso;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
-public class TableRequerimientosCurso extends AbstractTableModel {
+public class TableHabilidadesCurso extends AbstractTableModel {
 
-    private List<RequerimientosCurso> cap = new ArrayList<>();
-    private final String[] columnas = {"ID", "Requerimiento", "Dirección del Documento"};
+    private List<HabilidadesCurso> cap = new ArrayList<>();
+    private final String[] columnas = {"ID", "Orden", "Habilidad"};
 
-    public TableRequerimientosCurso(List<RequerimientosCurso> cap) {
+    public TableHabilidadesCurso(List<HabilidadesCurso> cap) {
         this.cap = cap;
     }
 
@@ -33,13 +33,14 @@ public class TableRequerimientosCurso extends AbstractTableModel {
     public Object getValueAt(int rowIndex, int columnIndex) {
         switch (columnIndex) {
             case 0:
-                return cap.get(rowIndex).getIdRequerimiento();
+                return cap.get(rowIndex).getIdHabilidad();
             case 1:
-                return cap.get(rowIndex).getNombre_requerimiento();
+                return cap.get(rowIndex).getOrden_habilidad();
             case 2:
-                return cap.get(rowIndex).getRuta_Docuemento();
+                return cap.get(rowIndex).getNombre_habilidad();
             default:
                 return null;
+
         }
     }
 
@@ -47,4 +48,5 @@ public class TableRequerimientosCurso extends AbstractTableModel {
     public boolean isCellEditable(int rowIndex, int columnIndex) {
         return false;
     }
+
 }

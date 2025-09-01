@@ -705,6 +705,28 @@ public class DesignTabla {
 
         table.setComponentPopupMenu(frm.PopMenu_Requerimientos);
     }
+    
+    public static void designHabilidadesCurso(IFrmEditarCurso frm, String idCurso) {
+        TableHabilidadesCurso tableModel = new TableHabilidadesCurso(
+                CargarTabla.cargarTablaHabilidadesCurso(idCurso));
+        JTable table = frm.jTable_Habilidades;
+        table.setModel(tableModel);
+        // Alinear el texto del encabezado al centro
+        JTableHeader header = table.getTableHeader();
+        header.setDefaultRenderer(new DefaultTableCellRenderer() {
+            {
+                setBackground(new Color(175, 196, 174));
+                setHorizontalAlignment(JLabel.CENTER);
+            }
+        });
+        //Difino diseño de la columnas
+        TableColumnModel colum = table.getColumnModel();
+        colum.getColumn(0).setPreferredWidth(5);
+        colum.getColumn(1).setPreferredWidth(10);
+        colum.getColumn(2).setPreferredWidth(200);
+
+        table.setComponentPopupMenu(frm.PopMenu_Habilidades);
+    }
 
     public static void designCertificados(IFrmCapacitacion frm) {
         TableCertificado tableModel = new TableCertificado(

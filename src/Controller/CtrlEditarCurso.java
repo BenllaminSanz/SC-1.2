@@ -2,13 +2,16 @@ package Controller;
 
 import ContextController.ContextoEditarCertificado;
 import ContextController.ContextoEditarCurso;
+import ContextController.ContextoEditarHabilidad;
 import ContextController.ContextoEditarRequerimiento;
 import Functions.ButtonFunctions;
 import Functions.QueryFunctions;
 import Functions.ViewTools;
 import Model.Curso;
+import Model.HabilidadesCurso;
 import Model.RequerimientosCurso;
 import Querys.ConsultasCurso;
+import Querys.ConsultasHabilidadesCurso;
 import Querys.ConsultasRequerimientosCurso;
 import Subviews.IFrmEditarCurso;
 import Tables.CargarTabla;
@@ -27,6 +30,8 @@ public class CtrlEditarCurso implements ActionListener, ItemListener {
     private final ConsultasCurso modC = new ConsultasCurso();
     private final RequerimientosCurso modD = new RequerimientosCurso();
     private final ConsultasRequerimientosCurso modDC = new ConsultasRequerimientosCurso();
+    private final HabilidadesCurso modH = new HabilidadesCurso();
+    private final ConsultasHabilidadesCurso modHC = new ConsultasHabilidadesCurso();
     private final IFrmEditarCurso frm;
     private final IFrmCapacitacion frmA;
     private final FrmAdministrador frmB;
@@ -47,6 +52,10 @@ public class CtrlEditarCurso implements ActionListener, ItemListener {
         this.frm.btn_AgregarRequerimiento.addActionListener(this);
         this.frm.Item_ModificarRequerimiento.addActionListener(this);
         this.frm.Item_EliminarRequerimiento.addActionListener(this);
+        this.frm.btn_AgregarHabilidad.addActionListener(this);
+        this.frm.Item_AgregarHabilidad.addActionListener(this);
+        this.frm.Item_ModificarHabilidad.addActionListener(this);
+        this.frm.Item_EliminarHabilidad.addActionListener(this);
     }
 
     public void iniciar() {
@@ -151,6 +160,40 @@ public class CtrlEditarCurso implements ActionListener, ItemListener {
             modD.setIdRequerimiento(Integer.parseInt(requerimiento));
             if (modDC.eliminar(modD)) {
                 DesignTabla.designRequerimientosCurso(frm, String.valueOf(mod.getIdCurso()));
+            }
+        }
+        
+        if (e.getSource() == frm.btn_AgregarHabilidad ) {
+            String txtBoton = "Guardar";
+            ContextoEditarHabilidad contexto = new ContextoEditarHabilidad(folio, txtBoton, null, frm, frmB);
+            CtrlEditarHabilidades ctrl = new CtrlEditarHabilidades(contexto);
+            ctrl.iniciar();
+            ViewTools.Centrar(frmB, contexto.ventanaEditarHabilidad);
+        }
+        
+        if (e.getSource() == frm.Item_AgregarHabilidad ) {
+            String txtBoton = "Guardar";
+            ContextoEditarHabilidad contexto = new ContextoEditarHabilidad(folio, txtBoton, null, frm, frmB);
+            CtrlEditarHabilidades ctrl = new CtrlEditarHabilidades(contexto);
+            ctrl.iniciar();
+            ViewTools.Centrar(frmB, contexto.ventanaEditarHabilidad);
+        }
+        
+
+        if (e.getSource() == frm.Item_ModificarHabilidad) {
+            String txtBoton = "Actualizar";
+            String habilidad = frm.jTable_Habilidades.getValueAt(frm.jTable_Habilidades.getSelectedRow(), 0).toString();
+            ContextoEditarHabilidad contexto = new ContextoEditarHabilidad(folio, txtBoton, habilidad, frm, frmB);
+            CtrlEditarHabilidades ctrl = new CtrlEditarHabilidades(contexto);
+            ctrl.iniciar();
+            ViewTools.Centrar(frmB, contexto.ventanaEditarHabilidad);
+        }
+
+        if (e.getSource() == frm.Item_EliminarHabilidad) {
+            String posicion = frm.jTable_Habilidades.getValueAt(frm.jTable_Habilidades.getSelectedRow(), 0).toString();
+            modH.setIdHabilidad(Integer.parseInt(posicion));
+            if (modHC.eliminar(modH)) {
+                DesignTabla.designHabilidadesCurso(frm, String.valueOf(mod.getIdCurso()));
             }
         }
 

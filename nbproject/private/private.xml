@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
-    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="7">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="8">
         <file>
             <url>src/Model/ConsultasTrabajador.java</url>
             <bookmark id="2">
@@ -17,10 +17,18 @@
                 <key/>
             </bookmark>
         </file>
+        <file>
+            <url>src/Controller/CtrlEditarCurso.java</url>
+            <bookmark id="8">
+                <name/>
+                <line>140</line>
+                <key/>
+            </bookmark>
+        </file>
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/Documents/Proyectos%20de%20Trabajo/Software%20Capacitación%20v1.2/src/Tables/CargarTabla.java</file>
+            <file>file:/D:/Documents/Proyectos%20de%20Trabajo/SC-1.2-main/SC-1.2-main/test/RellenarDocx.java</file>
         </group>
     </open-files>
 </project-private>
