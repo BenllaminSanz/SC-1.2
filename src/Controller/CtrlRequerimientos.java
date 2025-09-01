@@ -210,7 +210,7 @@ public class CtrlRequerimientos {
                 JTextField campoObs = mapObservaciones.get(hab);
                 String observacion = campoObs != null ? campoObs.getText() : null;
 
-                boolean ok = consulta.guardarOActualizarEvaluacion(
+                boolean ok = consulta.guardarEvaluacion(
                         mod.getIdAsistente(),
                         hab.getIdHabilidad(),
                         mod.getIdHistorial(),

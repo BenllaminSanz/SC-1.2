@@ -56,7 +56,6 @@ public class CtrlEditarRequerimiento implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == frm.btn_filechooser) {
             JFileChooser fileChooser = new JFileChooser();
-//            fileChooser.setFileFilter(new FileNameExtensionFilter("Archivos de Word", "docx"));
             int seleccion = fileChooser.showSaveDialog(null);
             if (seleccion == JFileChooser.APPROVE_OPTION) {
                 FileInputStream fis = null;
@@ -64,7 +63,6 @@ public class CtrlEditarRequerimiento implements ActionListener {
                     File archivoSeleccionado = fileChooser.getSelectedFile();
                     String nombreArchivo = archivoSeleccionado.getName();
                     String rutaArchivo = archivoSeleccionado.getAbsolutePath();
-//                    String extensionArchivo = nombreArchivo.substring(nombreArchivo.lastIndexOf(".") + 1);
                     fis = new FileInputStream(archivoSeleccionado);
                     byte[] contenido = new byte[(int) archivoSeleccionado.length()];
                     fis.read(contenido);

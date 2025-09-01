@@ -940,9 +940,8 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
             int idHCurso = Integer.parseInt(frm.JTable_HistorialCurso.getValueAt(filaSeleccionada, 0).toString());
             String idCursoS = String.valueOf(idHCurso);
             String nombreCurso = frm.txt_curso_titulo.getText();
-            
+
             int idCurso = Integer.parseInt(QueryFunctions.CapturaCondicional("historial_curso", "idCurso", "idHistorial_Curso", idCursoS));
-            
 
             JFileChooser chooser = new JFileChooser();
             chooser.setDialogTitle("Selecciona dónde crear la carpeta del curso");
@@ -975,16 +974,25 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
 
                 // Leer rutas de archivos desde la base
                 List<File> archivosCurso = new ArrayList<>();
+                boolean todosExisten = true; // bandera para verificar si todos existen
+
                 while (rsDocs.next()) {
                     String rutaArchivo = rsDocs.getString("ruta_documento");
                     File archivo = new File(rutaArchivo);
                     if (archivo.exists()) {
-                        JOptionPane.showMessageDialog(null, "Archivos Creados en los Expedientes del Curso");
                         archivosCurso.add(archivo);
                     } else {
-                        JOptionPane.showMessageDialog(null, "Uno o más archivos del Expediente no fueron encontrados "
-                                + "\n");
+                        todosExisten = false; // al menos uno no existe
                     }
+                }
+
+                // Mostrar un solo mensaje al final
+                if (archivosCurso.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "No se encontraron archivos en el expediente del curso.");
+                } else if (todosExisten) {
+                    JOptionPane.showMessageDialog(null, "Archivos creados en los expedientes del curso.");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Uno o más archivos del expediente no fueron encontrados.");
                 }
 
                 while (rsAsistentes.next()) {

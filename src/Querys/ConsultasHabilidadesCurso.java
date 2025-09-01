@@ -8,7 +8,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -175,7 +174,7 @@ public class ConsultasHabilidadesCurso extends Conexion {
                 + "JOIN habilidad h ON ch.id_habilidad = h.id_habilidad "
                 + "LEFT JOIN evaluacion_habilidad_asistente e ON e.id_habilidad = h.id_habilidad "
                 + "AND e.id_asistente = ? AND e.id_historialCurso = ? "
-                + "WHERE ch.id_curso = ? ORDER BY h.orden";
+                + "WHERE ch.id_curso = ? ORDER BY fecha_evaluacion";
 
         try (Connection con = getConnection(); PreparedStatement pst = con.prepareStatement(sql)) {
 
@@ -202,42 +201,23 @@ public class ConsultasHabilidadesCurso extends Conexion {
         return lista;
     }
 
-    public boolean guardarOActualizarEvaluacion(int idAsistente, int idHabilidad, int idHistorialCurso, String nivelAlcanzado, Date fecha, String observacion) {
-        String querySelect = "SELECT COUNT(*) FROM evaluacion_habilidad_asistente WHERE id_asistente = ? AND id_habilidad = ? AND id_historialCurso = ?";
-        String queryInsert = "INSERT INTO evaluacion_habilidad_asistente (id_asistente, id_habilidad, nivel_alcanzado, fecha_evaluacion, id_historialCurso, observaciones) VALUES (?, ?, ?, ?, ?, ?)";
-        String queryUpdate = "UPDATE evaluacion_habilidad_asistente SET nivel_alcanzado = ?, fecha_evaluacion = ?, observaciones = ? WHERE id_asistente = ? AND id_habilidad = ? AND id_historialCurso = ?";
+    public boolean guardarEvaluacion(int idAsistente, int idHabilidad, int idHistorialCurso,
+            String nivelAlcanzado, Date fecha, String observacion) {
+        String queryInsert = "INSERT INTO evaluacion_habilidad_asistente "
+                + "(id_asistente, id_habilidad, nivel_alcanzado, fecha_evaluacion, id_historialCurso, observaciones) "
+                + "VALUES (?, ?, ?, ?, ?, ?)";
 
         Conexion conexion = new Conexion();
-        try (Connection con = conexion.getConnection(); PreparedStatement psSelect = con.prepareStatement(querySelect)) {
+        try (Connection con = conexion.getConnection(); PreparedStatement psInsert = con.prepareStatement(queryInsert)) {
 
-            psSelect.setInt(1, idAsistente);
-            psSelect.setInt(2, idHabilidad);
-            psSelect.setInt(3, idHistorialCurso);
+            psInsert.setInt(1, idAsistente);
+            psInsert.setInt(2, idHabilidad);
+            psInsert.setString(3, nivelAlcanzado);
+            psInsert.setDate(4, fecha);
+            psInsert.setInt(5, idHistorialCurso);
+            psInsert.setString(6, observacion);
 
-            ResultSet rs = psSelect.executeQuery();
-            if (rs.next() && rs.getInt(1) > 0) {
-                // Ya existe → actualizar
-                try (PreparedStatement psUpdate = con.prepareStatement(queryUpdate)) {
-                    psUpdate.setString(1, nivelAlcanzado);
-                    psUpdate.setDate(2, fecha);
-                     psUpdate.setString(3, observacion);
-                    psUpdate.setInt(4, idAsistente);
-                    psUpdate.setInt(5, idHabilidad);
-                    psUpdate.setInt(6, idHistorialCurso);
-                    return psUpdate.executeUpdate() > 0;
-                }
-            } else {
-                // No existe → insertar
-                try (PreparedStatement psInsert = con.prepareStatement(queryInsert)) {
-                    psInsert.setInt(1, idAsistente);
-                    psInsert.setInt(2, idHabilidad);
-                    psInsert.setString(3, nivelAlcanzado);
-                    psInsert.setDate(4, fecha);
-                    psInsert.setInt(5, idHistorialCurso);
-                    psInsert.setString(6, observacion); // Observaciones nulas por ahora
-                    return psInsert.executeUpdate() > 0;
-                }
-            }
+            return psInsert.executeUpdate() > 0;
 
         } catch (SQLException e) {
             e.printStackTrace();
