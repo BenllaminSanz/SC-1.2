@@ -2,7 +2,6 @@ package Controller;
 
 import ContextController.ContextoEditarRequerimientos;
 import Functions.ArchivoHelper;
-import Functions.ConsultaHelper;
 import Model.HabilidadEvaluada;
 import Model.HabilidadesCurso;
 import Model.RequerimientosCurso;
@@ -13,7 +12,6 @@ import View.FrmAdministrador;
 import com.toedter.calendar.JDateChooser;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.io.File;
@@ -29,14 +27,13 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 
-// Archivo principal: CtrlRequerimientos.java
 public class CtrlRequerimientos {
 
     private final FrmAdministrador frmA;
@@ -44,6 +41,9 @@ public class CtrlRequerimientos {
     private final ConsultasRequerimientosCurso modC = new ConsultasRequerimientosCurso();
     private final List<RequerimientosCurso> requerimientos;
     private final int curso;
+
+    // Mapa único para filas ILUO
+    private final Map<HabilidadesCurso, FilaILUO> mapFilasILUO = new HashMap<>();
 
     public CtrlRequerimientos(ContextoEditarRequerimientos contexto) {
         this.frmA = contexto.ventanaAdministrador;
@@ -53,16 +53,24 @@ public class CtrlRequerimientos {
     }
 
     public void iniciar() {
-        JInternalFrame frame = new JInternalFrame("Lista de Requerimientos: " + mod.getIdAsistente());
-        frame.setClosable(true);
-        frame.setResizable(false);
-
-// Panel principal con padding
         JPanel panelGeneral = new JPanel();
         panelGeneral.setLayout(new BoxLayout(panelGeneral, BoxLayout.Y_AXIS));
         panelGeneral.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-// -------- PANEL DE REQUERIMIENTOS --------
+        panelGeneral.add(crearPanelRequerimientos());
+        panelGeneral.add(Box.createVerticalStrut(20));
+        panelGeneral.add(crearPanelILUO());
+
+        JFrame ventana = new JFrame("Gestión de Requerimientos e ILUO");
+        ventana.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        ventana.setSize(800, 600);
+        ventana.setLocationRelativeTo(null);
+        ventana.setContentPane(new JScrollPane(panelGeneral));
+        ventana.setVisible(true);
+    }
+
+    // ---------------- PANEL REQUERIMIENTOS ----------------
+    private JPanel crearPanelRequerimientos() {
         JPanel panelRequerimientos = new JPanel();
         panelRequerimientos.setLayout(new BoxLayout(panelRequerimientos, BoxLayout.Y_AXIS));
         panelRequerimientos.setBorder(BorderFactory.createTitledBorder("Requerimientos"));
@@ -111,141 +119,124 @@ public class CtrlRequerimientos {
             panelRequerimientos.add(panelReq);
         }
 
-        panelGeneral.add(panelRequerimientos);
-        panelGeneral.add(Box.createVerticalStrut(20)); // Separación visual
+        return panelRequerimientos;
+    }
 
-// -------- PANEL ILUO --------
+    // ---------------- PANEL ILUO ----------------
+    private JPanel crearPanelILUO() {
         JPanel panelILUO = new JPanel();
         panelILUO.setLayout(new BoxLayout(panelILUO, BoxLayout.Y_AXIS));
         panelILUO.setBorder(BorderFactory.createTitledBorder("Gestión ILUO"));
 
-// Cabecera
-        JPanel header = new JPanel(new GridLayout(1, 2));
+        // Cabecera
+        JPanel header = new JPanel(new GridLayout(1, 5));
         header.add(new JLabel("Habilidad"));
         header.add(new JLabel("Estado ILUO"));
-        header.add(new JLabel("Ultima Fehca de Evaluación"));
+        header.add(new JLabel("Última Fecha de Evaluación"));
         header.add(new JLabel("Observaciones"));
-
+        header.add(new JLabel("Historial Habilidad"));
         panelILUO.add(header);
-
-        panelILUO.add(Box.createVerticalStrut(10)); // Espacio entre cabecera y contenido
+        panelILUO.add(Box.createVerticalStrut(10));
 
         List<HabilidadesCurso> listaHabilidades = new ConsultasHabilidadesCurso().obtenerHabilidadesPorCurso(curso);
-        Map<HabilidadesCurso, JComboBox<String>> mapHabilidadILUO = new HashMap<>();
-
-// Además, un map para guardar componentes de fecha y observación si quieres actualizar o leer luego
-        Map<HabilidadesCurso, JLabel> mapFechaEvaluacion = new HashMap<>();
-        Map<HabilidadesCurso, JTextField> mapObservaciones = new HashMap<>();
 
         for (HabilidadesCurso habilidad : listaHabilidades) {
-            JPanel fila = new JPanel(new GridLayout(1, 4, 10, 0));  // 4 columnas ahora
-            fila.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-
-            fila.add(new JLabel(habilidad.getNombre_habilidad()));
-
-            JComboBox<String> comboILUO = new JComboBox<>(new String[]{"I", "L", "U", "O"});
-            comboILUO.setPreferredSize(new Dimension(50, 25));
-            fila.add(comboILUO);
-
-            JLabel labelFecha = new JLabel(""); // aquí irá la fecha
-            fila.add(labelFecha);
-
-            JTextField campoObservacion = new JTextField();  // observación editable o solo lectura
-            campoObservacion.setPreferredSize(new Dimension(150, 25));
-            fila.add(campoObservacion);
-
+            JPanel fila = crearFilaHabilidad(habilidad);
             panelILUO.add(fila);
-
-            mapHabilidadILUO.put(habilidad, comboILUO);
-            mapFechaEvaluacion.put(habilidad, labelFecha);
-            mapObservaciones.put(habilidad, campoObservacion);
         }
 
-// Luego, obtienes las evaluaciones y actualizas también fecha y observación
-        List<HabilidadEvaluada> habilidadesEvaluadas = new ConsultasHabilidadesCurso().obtenerHabilidadesConEvaluacion(curso, mod.getIdAsistente(), mod.getIdHistorial());
+        cargarEvaluacionesILUO();
 
-        for (HabilidadEvaluada habilidadEval : habilidadesEvaluadas) {
-            for (HabilidadesCurso habilidadCurso : mapHabilidadILUO.keySet()) {
-                if (habilidadCurso.getIdHabilidad() == habilidadEval.getIdHabilidad()) {
-                    JComboBox<String> combo = mapHabilidadILUO.get(habilidadCurso);
-                    JLabel labelFecha = mapFechaEvaluacion.get(habilidadCurso);
-                    JTextField campoObs = mapObservaciones.get(habilidadCurso);
+        panelILUO.add(Box.createVerticalStrut(10));
 
-                    if (habilidadEval.getNivelAlcanzado() != null) {
-                        combo.setSelectedItem(habilidadEval.getNivelAlcanzado());
-                    } else {
-                        combo.setSelectedItem(null);
-                    }
+        JButton btnGuardarILUO = new JButton("Guardar ILUO");
+        btnGuardarILUO.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnGuardarILUO.addActionListener(e -> guardarILUO());
 
-                    if (habilidadEval.getFechaEvaluacion() != null) {
-                        labelFecha.setText(habilidadEval.getFechaEvaluacion().toString()); // Formatear si quieres
-                    } else {
-                        labelFecha.setText("");
-                    }
+        panelILUO.add(btnGuardarILUO);
 
-                    if (habilidadEval.getObservaciones() != null) {
-                        campoObs.setText(habilidadEval.getObservaciones());
-                    } else {
-                        campoObs.setText("");
-                    }
+        return panelILUO;
+    }
+
+    private JPanel crearFilaHabilidad(HabilidadesCurso habilidad) {
+        JPanel fila = new JPanel(new GridLayout(1, 5, 10, 0));
+        fila.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+
+        JLabel lblNombre = new JLabel(habilidad.getNombre_habilidad());
+        JComboBox<String> comboNivel = new JComboBox<>(new String[]{"I", "L", "U", "O"});
+        JLabel lblFecha = new JLabel("");
+        JTextField txtObs = new JTextField();
+        JButton btnHistorial = crearBotonHistorial(habilidad);
+
+        fila.add(lblNombre);
+        fila.add(comboNivel);
+        fila.add(lblFecha);
+        fila.add(txtObs);
+        fila.add(btnHistorial);
+
+        mapFilasILUO.put(habilidad, new FilaILUO(comboNivel, lblFecha, txtObs, btnHistorial));
+
+        return fila;
+    }
+
+    private JButton crearBotonHistorial(HabilidadesCurso habilidad) {
+        JButton btn = new JButton("Historial");
+        btn.addActionListener(e -> mostrarHistorial(habilidad, mod.getIdAsistente(), mod.getIdHistorial()));
+        return btn;
+    }
+
+    private void cargarEvaluacionesILUO() {
+        List<HabilidadEvaluada> habilidadesEvaluadas = new ConsultasHabilidadesCurso()
+                .obtenerHabilidadesConEvaluacion(curso, mod.getIdAsistente(), mod.getIdHistorial());
+
+        for (HabilidadEvaluada eval : habilidadesEvaluadas) {
+            for (HabilidadesCurso habilidadCurso : mapFilasILUO.keySet()) {
+                if (habilidadCurso.getIdHabilidad() == eval.getIdHabilidad()) {
+                    FilaILUO fila = mapFilasILUO.get(habilidadCurso);
+
+                    if (eval.getNivelAlcanzado() != null)
+                        fila.comboNivel.setSelectedItem(eval.getNivelAlcanzado());
+                    else
+                        fila.comboNivel.setSelectedItem(null);
+
+                    fila.lblFecha.setText(eval.getFechaEvaluacion() != null ? eval.getFechaEvaluacion().toString() : "");
+                    fila.txtObservacion.setText(eval.getObservaciones() != null ? eval.getObservaciones() : "");
+
                     break;
                 }
             }
         }
-
-        panelILUO.add(Box.createVerticalStrut(10)); // Espacio antes del botón
-
-        JButton btnGuardarILUO = new JButton("Guardar ILUO");
-        btnGuardarILUO.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btnGuardarILUO.addActionListener(e -> {
-            java.sql.Date fechaActual = new java.sql.Date(System.currentTimeMillis());
-            ConsultasHabilidadesCurso consulta = new ConsultasHabilidadesCurso(); // Asegúrate de tener esta clase
-
-            int errores = 0;
-            for (Map.Entry<HabilidadesCurso, JComboBox<String>> entry : mapHabilidadILUO.entrySet()) {
-                HabilidadesCurso hab = entry.getKey();
-                String nivel = (String) entry.getValue().getSelectedItem();
-                
-                // Obtener la observación para esta habilidad desde el mapa (que debes tener disponible)
-                JTextField campoObs = mapObservaciones.get(hab);
-                String observacion = campoObs != null ? campoObs.getText() : null;
-
-                boolean ok = consulta.guardarEvaluacion(
-                        mod.getIdAsistente(),
-                        hab.getIdHabilidad(),
-                        mod.getIdHistorial(),
-                        nivel,
-                        fechaActual,
-                        observacion
-                );
-
-                if (!ok) {
-                    errores++;
-                }
-            }
-
-            if (errores == 0) {
-                JOptionPane.showMessageDialog(null, "Todos los niveles ILUO fueron guardados correctamente.");
-            } else {
-                JOptionPane.showMessageDialog(null, "Hubo errores al guardar algunas evaluaciones ILUO.");
-            }
-        });
-
-        panelILUO.add(btnGuardarILUO);
-        panelGeneral.add(panelILUO);
-
-// -------- VENTANA FINAL --------
-        JFrame ventana = new JFrame("Gestión de Requerimientos e ILUO");
-        ventana.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        ventana.setSize(800, 600);
-        ventana.setLocationRelativeTo(null); // Centra la ventana
-        ventana.setContentPane(new JScrollPane(panelGeneral)); // Scroll si hay muchos datos
-        ventana.setVisible(true);
-
     }
 
+    private void guardarILUO() {
+        java.sql.Date fechaActual = new java.sql.Date(System.currentTimeMillis());
+        ConsultasHabilidadesCurso consulta = new ConsultasHabilidadesCurso();
+
+        int errores = 0;
+        for (Map.Entry<HabilidadesCurso, FilaILUO> entry : mapFilasILUO.entrySet()) {
+            HabilidadesCurso hab = entry.getKey();
+            FilaILUO fila = entry.getValue();
+
+            boolean ok = consulta.guardarEvaluacion(
+                    mod.getIdAsistente(),
+                    hab.getIdHabilidad(),
+                    mod.getIdHistorial(),
+                    (String) fila.comboNivel.getSelectedItem(),
+                    fechaActual,
+                    fila.txtObservacion.getText()
+            );
+
+            if (!ok) errores++;
+        }
+
+        JOptionPane.showMessageDialog(null,
+                errores == 0 ? "Todos los niveles ILUO fueron guardados correctamente."
+                        : "Hubo errores al guardar algunas evaluaciones ILUO.");
+    }
+
+    // ---------------- REQUERIMIENTOS ----------------
     private void mostrarDialogoRegistro(RequerimientosCurso requerimiento, JPanel panelRequerimiento,
-            JTextField fechaEntregaTextField, JButton bt_consultar) {
+                                        JTextField fechaEntregaTextField, JButton bt_consultar) {
 
         JPanel panelCargar = new JPanel(new GridLayout(0, 1));
         JDateChooser dateChooser = new JDateChooser();
@@ -275,14 +266,13 @@ public class CtrlRequerimientos {
             if (dateChooser.getDate() == null || txt_archivo.getText().trim().isEmpty()) {
                 JOptionPane.showMessageDialog(null, "Debe seleccionar una fecha y un archivo",
                         "Error", JOptionPane.ERROR_MESSAGE);
-                return;
             }
 
             String fecha = new SimpleDateFormat("yyyy-MM-dd").format(dateChooser.getDate());
             mod.setIdRequerimiento(requerimiento.getIdRequerimiento());
 
             if (modC.agregarRequerimiento(mod, fecha)) {
-                generarExpediente(mod);
+//                generarExpediente(mod);
                 if (modC.estadoRequerimiento(requerimiento.getIdRequerimiento(), mod)) {
                     fechaEntregaTextField.setEditable(false);
                     fechaEntregaTextField.setText(mod.getFecha_entrega());
@@ -301,27 +291,45 @@ public class CtrlRequerimientos {
     }
 
     private void generarExpediente(RequerimientosCursoAsistente mod) {
-        File carpetaPrincipal = ArchivoHelper.seleccionarCarpeta();
-        if (carpetaPrincipal == null) {
-            JOptionPane.showMessageDialog(null, "No se seleccionó carpeta. Operación cancelada.");
-            return;
+        ArchivoHelper.generarExpediente(mod);
+    }
+
+    // ---------------- HISTORIAL ----------------
+    private void mostrarHistorial(HabilidadesCurso habilidad, int idAsistente, int idHistorial) {
+        List<HabilidadEvaluada> historial = new ConsultasHabilidadesCurso()
+                .obtenerHistorialEvaluaciones(idAsistente, idHistorial, habilidad.getIdHabilidad());
+
+        String[] columnas = {"Semana", "Última Fecha de evaluación", "Nivel ILUO", "Observaciones"};
+        Object[][] datos = new Object[historial.size()][4];
+
+        for (int i = 0; i < historial.size(); i++) {
+            HabilidadEvaluada eval = historial.get(i);
+            datos[i][0] = eval.getSemanaCurso();
+            datos[i][1] = eval.getFechaEvaluacion();
+            datos[i][2] = eval.getNivelAlcanzado();
+            datos[i][3] = eval.getObservaciones();
         }
 
-        String trabajador = ConsultaHelper.obtenerNombreTrabajador(mod.getIdAsistente());
-        File carpetaTrabajador = new File(carpetaPrincipal, mod.getIdAsistente() + "_" + trabajador);
-        if (!carpetaTrabajador.exists()) {
-            carpetaTrabajador.mkdirs();
-        }
+        JTable tabla = new JTable(datos, columnas);
+        JScrollPane scrollPane = new JScrollPane(tabla);
 
-        String curso = ConsultaHelper.obtenerCurso(mod.getIdHistorial());
-        String fecha = ConsultaHelper.obtenerFechaCurso(mod.getIdHistorial());
-        File carpetaCurso = new File(carpetaTrabajador, curso + " " + fecha);
-        if (!carpetaCurso.exists()) {
-            carpetaCurso.mkdirs();
-        }
+        JOptionPane.showMessageDialog(null, scrollPane,
+                "Historial de evaluaciones - " + habilidad.getNombre_habilidad(),
+                JOptionPane.INFORMATION_MESSAGE);
+    }
 
-        File origen = new File(mod.getRuta_archivo());
-        File destino = new File(carpetaCurso, mod.getNombre_archivo());
-        ArchivoHelper.copiarArchivo(origen, destino);
+    // ---------------- CLASE AUXILIAR PARA FILA ILUO ----------------
+    private static class FilaILUO {
+        JComboBox<String> comboNivel;
+        JLabel lblFecha;
+        JTextField txtObservacion;
+        JButton btnHistorial;
+
+        public FilaILUO(JComboBox<String> comboNivel, JLabel lblFecha, JTextField txtObservacion, JButton btnHistorial) {
+            this.comboNivel = comboNivel;
+            this.lblFecha = lblFecha;
+            this.txtObservacion = txtObservacion;
+            this.btnHistorial = btnHistorial;
+        }
     }
 }

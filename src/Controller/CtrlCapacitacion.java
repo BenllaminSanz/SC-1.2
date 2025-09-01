@@ -184,6 +184,7 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
         this.frm.jButton2.addActionListener(this);
         this.frm.jButton3.addActionListener(this);
         this.frm.jButton4.addActionListener(this);
+        this.frm.jButton5.addActionListener(this);
     }
 
     public void iniciar() {
@@ -1025,6 +1026,10 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
                 Logger.getLogger(CtrlCapacitacion.class.getName()).log(Level.SEVERE, null, ex);
                 JOptionPane.showMessageDialog(null, "Error de base de datos: " + ex.getMessage());
             }
+        }
+        
+        if (e.getSource() == frm.jButton5) {
+            DesignTabla.designAllCursosActivos(frm);
         }
     }
 

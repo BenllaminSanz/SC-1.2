@@ -3,11 +3,30 @@ package Model;
 import java.util.Date;
 
 public class HabilidadEvaluada {
-        private int idHabilidad;
+    private int idHabilidad;
     private String nombreHabilidad;
     private int ordenHabilidad;
     private String nivelAlcanzado; // I, L, U, O o null si no evaluado
     private Date fechaEvaluacion;
+    private int semanaCurso;
+    
+    public HabilidadEvaluada(int semana, Date fechaEvaluacion, String nivelILUO, String observaciones) {
+        this.semanaCurso = semana;
+        this.fechaEvaluacion = fechaEvaluacion;
+        this.nivelAlcanzado = nivelILUO;
+        this.observaciones = observaciones;
+    }
+
+    public HabilidadEvaluada() {
+    }
+
+    public int getSemanaCurso() {
+        return semanaCurso;
+    }
+
+    public void setSemanaCurso(int semanaCurso) {
+        this.semanaCurso = semanaCurso;
+    }
     private String observaciones;
 
     public int getIdHabilidad() {

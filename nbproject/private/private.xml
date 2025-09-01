@@ -28,7 +28,9 @@
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/Documents/Proyectos%20de%20Trabajo/SC-1.2-main/SC-1.2-main/test/RellenarDocx.java</file>
+            <file>file:/D:/Documents/Proyectos%20de%20Trabajo/SC-1.2-main/SC-1.2-main/src/Controller/CtrlCapacitacion.java</file>
+            <file>file:/D:/Documents/Proyectos%20de%20Trabajo/SC-1.2-main/SC-1.2-main/src/View/IFrmCapacitacion.java</file>
+            <file>file:/D:/Documents/Proyectos%20de%20Trabajo/SC-1.2-main/SC-1.2-main/src/Controller/CtrlRequerimientos.java</file>
         </group>
     </open-files>
 </project-private>

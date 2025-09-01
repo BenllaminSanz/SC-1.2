@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 public class ConsultasHabilidadesCurso extends Conexion {
 
@@ -220,8 +221,45 @@ public class ConsultasHabilidadesCurso extends Conexion {
             return psInsert.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            e.printStackTrace();
             return false;
         }
+    }
+
+    public List<HabilidadEvaluada> obtenerHistorialEvaluaciones(int idAsistente, int idHistorialCurso, int idHabilidad) {
+        List<HabilidadEvaluada> historial = new ArrayList<>();
+
+        String sql = "SELECT FLOOR(DATEDIFF(e.fecha_evaluacion, h.fecha_inicio) / 7) + 1 AS Semana,\n" 
+                + "        e.fecha_evaluacion AS fecha,\n" 
+                + "        e.nivel_alcanzado AS nivel,\n" 
+                + "        e.observaciones AS observaciones\n" 
+                + "    FROM\n" + "        evaluacion_habilidad_asistente e\n" 
+                + "    JOIN\n" + "        historial_curso h ON e.id_historialCurso = h.idHistorial_Curso\n" 
+                + "    WHERE\n" + "        e.id_asistente = ? AND e.id_historialCurso = ? AND e.id_habilidad = ?\n" 
+                + "    ORDER BY\n" + "        e.fecha_evaluacion ASC\n";
+        
+        Conexion conexion = new Conexion();
+        try (Connection con = conexion.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, idAsistente);
+            ps.setInt(2, idHistorialCurso);
+            ps.setInt(3, idHabilidad);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    int semana = rs.getInt("Semana");
+                    Date fecha = rs.getDate("fecha");
+                    String nivel = rs.getString("nivel");
+                    String obs = rs.getString("observaciones");
+
+                    historial.add(new HabilidadEvaluada(semana, fecha, nivel, obs));
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error al obtener historial de evaluaciones:\n" + e.getMessage());
+        }
+
+        return historial;
     }
 }

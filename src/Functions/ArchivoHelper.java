@@ -1,5 +1,6 @@
 package Functions;
 
+import Model.RequerimientosCursoAsistente;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
@@ -10,10 +11,9 @@ import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
-
 // Archivo auxiliar: ArchivoHelper.java
-
 public class ArchivoHelper {
+
     public static void abrirArchivo(String ruta) {
         File archivo = new File(ruta);
         if (archivo.exists()) {
@@ -47,5 +47,30 @@ public class ArchivoHelper {
             return selector.getSelectedFile();
         }
         return null;
+    }
+
+    public static void generarExpediente(RequerimientosCursoAsistente mod) {
+        File carpetaPrincipal = ArchivoHelper.seleccionarCarpeta();
+        if (carpetaPrincipal == null) {
+            JOptionPane.showMessageDialog(null, "No se seleccionó carpeta. Operación cancelada.");
+            return;
+        }
+
+        String trabajador = ConsultaHelper.obtenerNombreTrabajador(mod.getIdAsistente());
+        File carpetaTrabajador = new File(carpetaPrincipal, mod.getIdAsistente() + "_" + trabajador);
+        if (!carpetaTrabajador.exists()) {
+            carpetaTrabajador.mkdirs();
+        }
+
+        String curso = ConsultaHelper.obtenerCurso(mod.getIdHistorial());
+        String fecha = ConsultaHelper.obtenerFechaCurso(mod.getIdHistorial());
+        File carpetaCurso = new File(carpetaTrabajador, curso + " " + fecha);
+        if (!carpetaCurso.exists()) {
+            carpetaCurso.mkdirs();
+        }
+
+        File origen = new File(mod.getRuta_archivo());
+        File destino = new File(carpetaCurso, mod.getNombre_archivo());
+        ArchivoHelper.copiarArchivo(origen, destino);
     }
 }
