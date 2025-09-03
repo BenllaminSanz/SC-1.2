@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JCheckBox;
+import javax.swing.JOptionPane;
 
 public class ConsultasHistorialCurso extends Conexion {
 
@@ -333,7 +334,6 @@ public class ConsultasHistorialCurso extends Conexion {
     }
 
     public boolean concluir(HistorialCurso mod) {
-        System.out.println(mod.getStatus_curso());
         PreparedStatement ps = null;
         Connection con = getConnection();
 
@@ -345,34 +345,82 @@ public class ConsultasHistorialCurso extends Conexion {
 
         String sql1 = "SET @estado_curso:=?;";
         String sql2 = "SET @id_historial_curso:=?;";
-        String sql3 = "SET @id_tipo_curso:=?";
+        String sql3 = "SET @id_tipo_curso:=?;";
         String call = "{CALL `sistema_capacitacion`.`concluir_curso`()}";
 
+        // Consulta asistentes aprobados
+        String sqlAprobados = "SELECT a.nombre, a.apellido_paterno, a.apellido_materno "
+                + "FROM asistentes a "
+                + "JOIN asistentes_curso ac ON a.idAsistente = ac.idAsistente "
+                + "WHERE ac.idHistorial_curso = ? "
+                + "AND (ac.status_entrenamiento = 'En Proceso de Certificación' "
+                + "     OR ac.status_entrenamiento = 'Concluido')";
+
+        // Consulta asistentes que no aprobaron
+        String sqlNoAprobados = "SELECT a.nombre, a.apellido_paterno, a.apellido_materno "
+                + "FROM asistentes a "
+                + "JOIN asistentes_curso ac ON a.idAsistente = ac.idAsistente "
+                + "WHERE ac.idHistorial_curso = ? "
+                + "AND ac.status_entrenamiento = 'En Entrenamiento'";
+
         try {
+            // 1. Actualizar estado en historial_curso
             ps = con.prepareStatement(sql);
             ps.setString(1, DateTools.StringtoMySQL(mod.getFecha_cierre()));
             ps.setString(2, "Concluido");
             ps.setInt(3, mod.getIdHistorialCurso());
-            System.out.println(ps);
             ps.execute();
 
+            // 2. Set variables de sesión
             ps = con.prepareStatement(sql1);
             ps.setString(1, "Concluido");
-            System.out.println(ps);
             ps.execute();
 
             ps = con.prepareStatement(sql2);
             ps.setInt(1, mod.getIdHistorialCurso());
-            System.out.println(ps);
             ps.execute();
 
             ps = con.prepareStatement(sql3);
             ps.setInt(1, mod.getIdTipo_Curso());
-            System.out.println(ps);
             ps.execute();
 
+            // 3. Llamar al procedure
             CallableStatement cs = con.prepareCall(call);
             cs.execute();
+
+            // 4. Consultar asistentes
+            ps = con.prepareStatement(sqlAprobados);
+            ps.setInt(1, mod.getIdHistorialCurso());
+            ResultSet rs = ps.executeQuery();
+            StringBuilder aprobados = new StringBuilder("Asistentes que cumplieron los requerimientos:\n");
+            boolean hayAprobados = false;
+            while (rs.next()) {
+                hayAprobados = true;
+                String nombre = rs.getString("nombre_asistente");
+                aprobados.append(" - ").append(nombre).append("\n");
+            }
+            if (hayAprobados) {
+                JOptionPane.showMessageDialog(null, aprobados.toString());
+            }
+
+            // 2️⃣ Mostrar no aprobados
+            ps = con.prepareStatement(sqlNoAprobados);
+            ps.setInt(1, mod.getIdHistorialCurso());
+            rs = ps.executeQuery();
+            StringBuilder noAprobados = new StringBuilder("Asistentes que NO alcanzaron los requerimientos o ILUO < 90%:\n");
+            boolean hayNoAprobados = false;
+            while (rs.next()) {
+                hayNoAprobados = true;
+                String nombre = rs.getString("nombre_asistente");
+                noAprobados.append(" - ").append(nombre).append("\n");
+            }
+
+            if (hayAprobados) {
+                JOptionPane.showMessageDialog(null, aprobados.toString());
+            } else {
+                JOptionPane.showMessageDialog(null, "Ningún asistente cumplió con todos los requerimientos.");
+            }
+
             return true;
         } catch (SQLException ex) {
             Logger.getLogger(ConsultasHistorialCurso.class.getName()).log(Level.SEVERE, null, ex);
