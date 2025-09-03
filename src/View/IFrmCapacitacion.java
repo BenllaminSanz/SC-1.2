@@ -81,6 +81,7 @@ public class IFrmCapacitacion extends javax.swing.JInternalFrame {
         txt_total1 = new javax.swing.JLabel();
         txt_total2 = new javax.swing.JLabel();
         txt_total3 = new javax.swing.JLabel();
+        txt_total4 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTable_Asistentes_Curso = new javax.swing.JTable();
@@ -516,8 +517,11 @@ public class IFrmCapacitacion extends javax.swing.JInternalFrame {
                                     .addComponent(txt_total1))
                                 .addGap(53, 53, 53)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(txt_total2)
-                                    .addComponent(txt_total3))))
+                                    .addComponent(txt_total3)
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(txt_total2)
+                                        .addGap(152, 152, 152)
+                                        .addComponent(txt_total4)))))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -530,7 +534,8 @@ public class IFrmCapacitacion extends javax.swing.JInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txt_total2, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txt_total))
+                    .addComponent(txt_total)
+                    .addComponent(txt_total4, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txt_total3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1599,6 +1604,7 @@ public class IFrmCapacitacion extends javax.swing.JInternalFrame {
     public javax.swing.JLabel txt_total1;
     public javax.swing.JLabel txt_total2;
     public javax.swing.JLabel txt_total3;
+    public javax.swing.JLabel txt_total4;
     public javax.swing.JLabel txt_totalAnual;
     public javax.swing.JLabel txt_totalBaja;
     public javax.swing.JLabel txt_totalCertificados;
