@@ -349,19 +349,17 @@ public class ConsultasHistorialCurso extends Conexion {
         String call = "{CALL `sistema_capacitacion`.`concluir_curso`()}";
 
         // Consulta asistentes aprobados
-        String sqlAprobados = "SELECT a.nombre, a.apellido_paterno, a.apellido_materno "
-                + "FROM asistentes a "
-                + "JOIN asistentes_curso ac ON a.idAsistente = ac.idAsistente "
-                + "WHERE ac.idHistorial_curso = ? "
-                + "AND (ac.status_entrenamiento = 'En Proceso de Certificación' "
-                + "     OR ac.status_entrenamiento = 'Concluido')";
+        String sqlAprobados = "SELECT nombre_asistente "
+                + "FROM asistentes_curso "
+                + "WHERE idHistorial_curso = ? "
+                + "AND (status_entrenamiento = 'En Proceso de Certificación' "
+                + "     OR status_entrenamiento = 'Concluido')";
 
         // Consulta asistentes que no aprobaron
-        String sqlNoAprobados = "SELECT a.nombre, a.apellido_paterno, a.apellido_materno "
-                + "FROM asistentes a "
-                + "JOIN asistentes_curso ac ON a.idAsistente = ac.idAsistente "
-                + "WHERE ac.idHistorial_curso = ? "
-                + "AND ac.status_entrenamiento = 'En Entrenamiento'";
+        String sqlNoAprobados = "SELECT nombre_asistente "
+                + "FROM asistentes_curso "
+                + "WHERE idHistorial_curso = ? "
+                + "AND status_entrenamiento = 'En Entrenamiento'";
 
         try {
             // 1. Actualizar estado en historial_curso
@@ -403,7 +401,6 @@ public class ConsultasHistorialCurso extends Conexion {
                 JOptionPane.showMessageDialog(null, aprobados.toString());
             }
 
-            // 2️⃣ Mostrar no aprobados
             ps = con.prepareStatement(sqlNoAprobados);
             ps.setInt(1, mod.getIdHistorialCurso());
             rs = ps.executeQuery();
@@ -415,8 +412,8 @@ public class ConsultasHistorialCurso extends Conexion {
                 noAprobados.append(" - ").append(nombre).append("\n");
             }
 
-            if (hayAprobados) {
-                JOptionPane.showMessageDialog(null, aprobados.toString());
+            if (hayNoAprobados) {
+                JOptionPane.showMessageDialog(null, noAprobados.toString());
             } else {
                 JOptionPane.showMessageDialog(null, "Ningún asistente cumplió con todos los requerimientos.");
             }
