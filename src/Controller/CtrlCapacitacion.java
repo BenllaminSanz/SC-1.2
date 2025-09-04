@@ -404,6 +404,11 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
                 ContextoEditarRequerimientos contexto = new ContextoEditarRequerimientos(requisitos, modRa, frmA, curso);
                 CtrlRequerimientos ctrl = new CtrlRequerimientos(contexto);
                 ctrl.iniciar();
+            } else {
+                JOptionPane.showMessageDialog(null, 
+                        "El avance solo aplica para los cursos de Proceso de Producción \n"
+                                + "Si es el caso, verifique que se han cargado los requerimientos y habilidades en el curso");
+
             }
         }
 
