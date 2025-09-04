@@ -428,43 +428,67 @@ public class GeneratorExcel_BDs extends Conexion {
 
         File fileToSave = fileChooser.getSelectedFile();
         String rutaDoc = fileToSave.getAbsolutePath();
-        try {
-            Workbook workbook = new XSSFWorkbook();
-            Sheet sheet = workbook.createSheet("Lista de Brigadas");
-            int rowIndex = 0;
-            Row row = sheet.createRow(rowIndex++);
 
-            row.createCell(0).setCellValue("Brigada");
-            row.createCell(1).setCellValue("Nomina");
-            row.createCell(2).setCellValue("Nombre");
-            row.createCell(3).setCellValue("Area");
-            row.createCell(4).setCellValue("Puesto");
-            row.createCell(5).setCellValue("Turno");
-            row.createCell(6).setCellValue("Tipo");
+        try (Workbook workbook = new XSSFWorkbook()) {
 
             Connection con = conn.getConnection();
-            PreparedStatement ps = con.prepareStatement("SELECT * FROM view_brigadistas ORDER BY idbrigadas");
+            PreparedStatement ps = con.prepareStatement(
+                    "SELECT * FROM view_brigadistas ORDER BY nombre_brigada, idbrigadas"
+            );
             ResultSet rs = ps.executeQuery();
 
+            String brigadaActual = null;
+            Sheet sheet = null;
+            int rowIndex = 0;
+
             while (rs.next()) {
+                String brigada = rs.getString("nombre_brigada");
 
-                row = sheet.createRow(rowIndex++);
-                row.createCell(0).setCellValue(rs.getString("nombre_brigada"));
-                row.createCell(1).setCellValue(rs.getString("Nomina"));
-                row.createCell(2).setCellValue(rs.getString("Nombre"));
-                row.createCell(3).setCellValue(rs.getString("Area"));
-                row.createCell(4).setCellValue(rs.getString("Puesto"));
-                row.createCell(5).setCellValue(rs.getString("Turno"));
-                row.createCell(6).setCellValue(rs.getString("trabajador"));
+                // Si es una brigada nueva, crear hoja
+                if (brigadaActual == null || !brigada.equals(brigadaActual)) {
+                    brigadaActual = brigada;
+                    String nombreHoja = brigadaActual.replaceAll("[:\\\\/?*\\[\\]]", "_");
+                    sheet = workbook.createSheet(nombreHoja);
+                    rowIndex = 0;
+
+                    // Crear encabezados
+                    Row header = sheet.createRow(rowIndex++);
+//                    header.createCell(0).setCellValue("Brigada");
+                    header.createCell(0).setCellValue("Nomina");
+                    header.createCell(1).setCellValue("Nombre");
+                    header.createCell(2).setCellValue("Area");
+                    header.createCell(3).setCellValue("Puesto");
+                    header.createCell(4).setCellValue("Turno");
+                    header.createCell(5).setCellValue("Tipo");
+                }
+
+                // Insertar datos
+                Row row = sheet.createRow(rowIndex++);
+//                row.createCell(0).setCellValue(brigada);
+                row.createCell(0).setCellValue(rs.getString("Nomina"));
+                row.createCell(1).setCellValue(rs.getString("Nombre"));
+                row.createCell(2).setCellValue(rs.getString("Area"));
+                row.createCell(3).setCellValue(rs.getString("Puesto"));
+                row.createCell(4).setCellValue(rs.getString("Turno"));
+                row.createCell(5).setCellValue(rs.getString("trabajador"));
             }
 
-            int totalColumnas = row.getLastCellNum();
-            for (int i = 0; i < totalColumnas; i++) {
-                sheet.autoSizeColumn(i);
+            // Autoajustar columnas de cada hoja
+            for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+                Sheet s = workbook.getSheetAt(i);
+                if (s.getPhysicalNumberOfRows() > 0) {
+                    Row header = s.getRow(0);
+                    int totalColumnas = header.getLastCellNum();
+                    for (int j = 0; j < totalColumnas; j++) {
+                        s.autoSizeColumn(j);
+                    }
+                }
             }
 
-            FileOutputStream outputStream = new FileOutputStream(rutaDoc);
-            workbook.write(outputStream);
+            try (FileOutputStream outputStream = new FileOutputStream(rutaDoc)) {
+                workbook.write(outputStream);
+            }
+
             JOptionPane.showMessageDialog(null, "Respaldo Creado en " + rutaDoc);
 
             if (Desktop.isDesktopSupported()) {
@@ -476,12 +500,12 @@ public class GeneratorExcel_BDs extends Conexion {
 
             ps.close();
             return true;
-        } catch (SQLException | FileNotFoundException ex) {
+
+        } catch (SQLException | IOException ex) {
             Logger.getLogger(GeneratorExcel_LBU.class.getName()).log(Level.SEVERE, null, ex);
-            JOptionPane.showConfirmDialog(null, "Error al generar archivo: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
-        } catch (IOException ex) {
-            Logger.getLogger(GeneratorExcel_LBU.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(null, "Error al generar archivo: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
         }
+
         return false;
     }
 

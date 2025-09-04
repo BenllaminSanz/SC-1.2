@@ -1182,7 +1182,7 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
         frm.txt_total1.setText(String.format(cantidadAsistentes, consultaTotalAsistentes));
         frm.txt_total2.setText(String.format(cantidadMinutos, consultaTotalMinutos));
         frm.txt_total3.setText(String.format(cantidadHoras, consultaTotalHoras));
-        frm.txt_total4.setText(null);
+        frm.txt_total4.setText("");
     }
 
     public void ConcentradoCurso(IFrmCapacitacion frm, int idCurso, String Curso) {
@@ -1213,7 +1213,7 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
         frm.txt_total1.setText(String.format(cantidadAsistentes, consultaTotalAsistentes));
         frm.txt_total2.setText(String.format(cantidadMinutos, consultaTotalMinutos));
         frm.txt_total3.setText(String.format(cantidadHoras, consultaTotalHoras));
-        frm.txt_total4.setText(String.format(null));
+        frm.txt_total4.setText(String.format(""));
     }
 
     public void ConcentradoAsistentesCurso(IFrmCapacitacion frm, int idCurso) {

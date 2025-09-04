@@ -62,8 +62,9 @@ public class CtrlLBUGeneral implements ActionListener {
         //Funciones de Arranque
         setWindowProperties();
         Graphics_LBU.PieChartLBU(frm);
-        Graphics_LBU.BarChartLBUTrabajadores(frm);
-        Graphics_LBU.BarChartLBUCertificados(frm);
+        Graphics_LBU.StackedBarChartLBU(frm);
+//        Graphics_LBU.BarChartLBUTrabajadores(frm);
+//        Graphics_LBU.BarChartLBUCertificados(frm);
     }
 
     @Override

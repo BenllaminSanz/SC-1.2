@@ -17,6 +17,8 @@ import javax.swing.JScrollBar;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.CategoryLabelPositions;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.labels.ItemLabelAnchor;
 import org.jfree.chart.labels.ItemLabelPosition;
@@ -26,6 +28,7 @@ import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.chart.renderer.category.StackedBarRenderer;
 import org.jfree.chart.ui.TextAnchor;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
@@ -99,6 +102,87 @@ public class Graphics_LBU {
         // Actualizar el JPanel para que se muestre la gráfica
         frm.jPanel5.revalidate();
         frm.jPanel5.repaint();
+    }
+
+    public static void StackedBarChartLBU(IFrmLBU frm) {
+        Conexion conn = new Conexion();
+        Connection con = conn.getConnection();
+
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        // Consulta: trabajadores por supervisor y turno
+        String sql = "SELECT Nombre_Supervisor, Nombre_Turno, COUNT(Folio_Trabajador) AS total\n"
+                + "                FROM view_lbu\n"
+                + "                GROUP BY Nombre_Supervisor, Nombre_Turno\n"
+                + "                ORDER BY Nombre_Turno;";
+
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+        try {
+            ps = con.prepareStatement(sql);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                String supervisor = rs.getString("Nombre_Supervisor");
+                String[] palabras = supervisor.split(" ");
+                if (palabras.length > 2) {
+                    supervisor = palabras[0] + " " + palabras[1]; // solo primeras dos palabras
+                }
+
+                String turno = rs.getString("Nombre_Turno"); // serie
+                int total = rs.getInt("total");
+
+                dataset.addValue(total, turno, supervisor);
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(CtrlLBUGeneral.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(CtrlLBUGeneral.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        // Crear gráfica de barras apiladas
+        JFreeChart chart = ChartFactory.createStackedBarChart(
+                "Distribución de Trabajadores por Supervisor y Turno",
+                "Supervisor",
+                "Trabajadores",
+                dataset,
+                PlotOrientation.VERTICAL,
+                true, // leyenda
+                true, // tooltips
+                false // URLs
+        );
+
+        // Personalizar colores y etiquetas
+        CategoryPlot plot = (CategoryPlot) chart.getPlot();
+        CategoryAxis domainAxis = plot.getDomainAxis();
+
+        // Rotar etiquetas 45 grados
+        domainAxis.setCategoryLabelPositions(
+                CategoryLabelPositions.createUpRotationLabelPositions(Math.PI / 4) // 45°
+        );
+        domainAxis.setTickLabelFont(new Font("SansSerif", Font.PLAIN, 9));
+
+        StackedBarRenderer renderer = new StackedBarRenderer();
+        renderer.setDefaultItemLabelGenerator(new StandardCategoryItemLabelGenerator());
+        renderer.setDefaultItemLabelsVisible(true);
+        plot.setRenderer(renderer);
+
+        // Panel con la gráfica
+        ChartPanel chartPanel = new ChartPanel(chart);
+        chartPanel.setPreferredSize(new Dimension(600, 350));
+
+        // Insertar en el panel de tu formulario
+        frm.jPanel6.removeAll();
+        frm.jPanel6.setLayout(new BorderLayout());
+        frm.jPanel6.add(chartPanel, BorderLayout.CENTER);
+        frm.jPanel6.revalidate();
+        frm.jPanel6.repaint();
     }
 
     public static void BarChartLBUTrabajadores(IFrmLBU frm) {
@@ -181,13 +265,12 @@ public class Graphics_LBU {
         scrollPanel.add(scroller, BorderLayout.SOUTH);
 
         // Agregar el panel de gráfica al JPanel existente en la interfaz (frm.jPanel4)
-        frm.jPanel6.removeAll(); // Limpiar el panel existente
-        frm.jPanel6.setLayout(new BorderLayout());
-        frm.jPanel6.add(scrollPanel, BorderLayout.CENTER);
-
+//        frm.jPanel6.removeAll(); // Limpiar el panel existente
+//        frm.jPanel6.setLayout(new BorderLayout());
+//        frm.jPanel6.add(scrollPanel, BorderLayout.CENTER);
         // Actualizar el JPanel para que se muestre la gráfica
-        frm.jPanel6.revalidate();
-        frm.jPanel6.repaint();
+//        frm.jPanel6.revalidate();
+//        frm.jPanel6.repaint();
     }
 
     public static void BarChartLBUCertificados(IFrmLBU frm) {
@@ -216,7 +299,7 @@ public class Graphics_LBU {
             Logger.getLogger(CtrlLBUGeneral.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
-                
+
                 con.close();
             } catch (SQLException ex) {
                 Logger.getLogger(CtrlLBUGeneral.class.getName()).log(Level.SEVERE, null, ex);
@@ -265,13 +348,12 @@ public class Graphics_LBU {
         scrollPanel.add(scroller, BorderLayout.SOUTH);
 
         // Agregar el panel de gráfica al JPanel existente en la interfaz (frm.jPanel4)
-        frm.jPanel7.removeAll(); // Limpiar el panel existente
-        frm.jPanel7.setLayout(new BorderLayout());
-        frm.jPanel7.add(scrollPanel, BorderLayout.CENTER);
-
+//        frm.jPanel7.removeAll(); // Limpiar el panel existente
+//        frm.jPanel7.setLayout(new BorderLayout());
+//        frm.jPanel7.add(scrollPanel, BorderLayout.CENTER);
         // Actualizar el JPanel para que se muestre la gráfica
-        frm.jPanel7.revalidate();
-        frm.jPanel7.repaint();
+//        frm.jPanel7.revalidate();
+//        frm.jPanel7.repaint();
     }
 
     static class LabelGenerator extends StandardCategoryItemLabelGenerator {
