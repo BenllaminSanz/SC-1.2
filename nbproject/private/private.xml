@@ -28,8 +28,10 @@
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/Documents/Proyectos%20de%20Trabajo/SC-1.2-main/SC-1.2-main/src/Controller/CtrlEditarCurso.java</file>
-            <file>file:/D:/Documents/Proyectos%20de%20Trabajo/SC-1.2-main/SC-1.2-main/src/Subviews/IFrmEditarCurso.java</file>
+            <file>file:/D:/Documents/Proyectos%20de%20Trabajo/SC-1.2-main/SC-1.2-main/src/Controller/CtrlCapacitacion.java</file>
+            <file>file:/D:/Documents/Proyectos%20de%20Trabajo/SC-1.2-main/SC-1.2-main/src/Tables/CargarTabla.java</file>
+            <file>file:/D:/Documents/Proyectos%20de%20Trabajo/SC-1.2-main/SC-1.2-main/src/Tables/TableReporteEntrenamientos.java</file>
+            <file>file:/D:/Documents/Proyectos%20de%20Trabajo/SC-1.2-main/SC-1.2-main/src/Tables/DesignTabla.java</file>
         </group>
     </open-files>
 </project-private>

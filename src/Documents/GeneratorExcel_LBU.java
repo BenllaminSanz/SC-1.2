@@ -472,16 +472,26 @@ public class GeneratorExcel_LBU extends Conexion {
             headerRow.createCell(1).setCellValue("Centro de Costo");
             headerRow.createCell(2).setCellValue("Puesto");
             headerRow.createCell(3).setCellValue("Position");
-            headerRow.createCell(4).setCellValue("Propuesto");
-            headerRow.createCell(5).setCellValue("Nivel");
-            headerRow.createCell(6).setCellValue("Total");
-            headerRow.createCell(7).setCellValue("Diferencia");
-            headerRow.createCell(8).setCellValue("Plantilla");
+            headerRow.createCell(4).setCellValue("Nivel");
+            headerRow.createCell(5).setCellValue("Propuesto");
+            headerRow.createCell(6).setCellValue("Propuesto A");
+            headerRow.createCell(7).setCellValue("Actual A");
+            headerRow.createCell(8).setCellValue("Propuesto B");
+            headerRow.createCell(9).setCellValue("Actual B");
+            headerRow.createCell(10).setCellValue("Propuesto C");
+            headerRow.createCell(11).setCellValue("Actual C");
+            headerRow.createCell(12).setCellValue("Propuesto D");
+            headerRow.createCell(13).setCellValue("Actual D");
+            headerRow.createCell(14).setCellValue("Propuesto LV");
+            headerRow.createCell(15).setCellValue("Actual LV");
+            headerRow.createCell(16).setCellValue("Total Area");
+            headerRow.createCell(17).setCellValue("Diferencia Area");
+            headerRow.createCell(18).setCellValue("Plantilla Area");
 
             int totalGeneral = 0;
             int totalResta = 0;
             int totalPlantilla = 0;
-            
+
             int rowNum = 1;
             while (rs.next()) {
                 String idArea = rs.getString("idArea");
@@ -494,30 +504,44 @@ public class GeneratorExcel_LBU extends Conexion {
                 int totalArea = 0;
                 int startRow = rowNum; // Guardamos la primera fila del área
 
+                String idPuesto = null;
+
                 while (rs1.next()) {
                     Row row = sheet.createRow(rowNum++);
                     row.createCell(1).setCellValue(rs1.getString("Centro_de_Costo"));
                     row.createCell(2).setCellValue(rs1.getString("Nombre_Puesto"));
                     row.createCell(3).setCellValue(rs1.getString("Nombre_Puesto_Ingles"));
-                    row.createCell(4).setCellValue(rs1.getInt("Propuesto_Trabajadores"));
-                    row.createCell(5).setCellValue(rs1.getString("Nivel"));
+                    row.createCell(4).setCellValue(rs1.getString("Nivel"));
+                    row.createCell(5).setCellValue(rs1.getInt("Propuesto_Trabajadores"));
                     totalArea = totalArea + rs1.getInt("Propuesto_Trabajadores");
+                    idPuesto = rs1.getString("idPuesto");
+                    PreparedStatement ps2 = con.prepareStatement("SELECT * FROM view_lbu_puesto WHERE idPuesto = ?");
+                    ps2.setString(1, idPuesto);
+                    ResultSet rs2 = ps2.executeQuery();
+                    while (rs2.next()) {
+                        row.createCell(7).setCellValue(rs2.getInt("A"));
+                        row.createCell(9).setCellValue(rs2.getInt("B"));
+                        row.createCell(11).setCellValue(rs2.getInt("C"));
+                        row.createCell(13).setCellValue(rs2.getInt("D"));
+                        row.createCell(15).setCellValue(rs2.getInt("LV"));
+                    }
+
                 }
 
-                PreparedStatement ps2 = con.prepareStatement("SELECT * FROM view_lbu_puesto WHERE Area= ?");
-                ps2.setString(1, nombreArea);
-                ResultSet rs2 = ps2.executeQuery();
-                
+                PreparedStatement ps3 = con.prepareStatement("SELECT * FROM view_lbu_puesto WHERE Area= ?");
+                ps3.setString(1, nombreArea);
+                ResultSet rs3 = ps3.executeQuery();
+
                 int totalReal = 0;
                 int totalDiferencia = 0;
-                while (rs2.next()) {
-                    totalReal = totalReal + rs2.getInt("Diferencia");
-                    totalDiferencia = totalDiferencia + rs2.getInt("Plantilla");
+                while (rs3.next()) {
+                    totalReal = totalReal + rs3.getInt("Diferencia");
+                    totalDiferencia = totalDiferencia + rs3.getInt("Plantilla");
                 }
 
-                sheet.getRow(startRow).createCell(6).setCellValue(totalArea);
-                sheet.getRow(startRow).createCell(7).setCellValue(totalReal);
-                sheet.getRow(startRow).createCell(8).setCellValue(totalDiferencia);
+                sheet.getRow(startRow).createCell(16).setCellValue(totalArea);
+                sheet.getRow(startRow).createCell(17).setCellValue(totalReal);
+                sheet.getRow(startRow).createCell(18).setCellValue(totalDiferencia);
 
                 // Fusionar celdas de la columna "Área"
                 if (startRow < rowNum - 1) {
@@ -534,9 +558,9 @@ public class GeneratorExcel_LBU extends Conexion {
 
             // Crear una fila al final para mostrar el total general
             Row totalRow = sheet.createRow(rowNum);
-            totalRow.createCell(6).setCellValue(totalGeneral);
-            totalRow.createCell(7).setCellValue(totalResta);
-            totalRow.createCell(8).setCellValue(totalPlantilla);
+            totalRow.createCell(16).setCellValue(totalGeneral);
+            totalRow.createCell(17).setCellValue(totalResta);
+            totalRow.createCell(18).setCellValue(totalPlantilla);
 
             // Autoajustar columnas
             sheet.autoSizeColumn(0);
