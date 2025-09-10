@@ -11,6 +11,7 @@ import ContextController.ContextoEditarRequerimientos;
 import Documents.DesingPDF_Diplomas;
 import Documents.GeneratorExcel_BDs;
 import Documents.GeneratorExcel_Certificados;
+import Documents.GeneratorExcel_Cursos;
 import Documents.GeneratorPDF_Certificados;
 import Documents.GeneratorPDF_Cursos;
 import Functions.DateTools;
@@ -90,6 +91,7 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
     String cantidadAsistentes = "No. de Asistentes: %s";
     String cantidadMinutos = "Minutos Curso: %s";
     String cantidadHoras = "Horas Curso: %s";
+    String cantidadSemanas = "Semanas del Curso: %s";
 
     String certificacionesTotal = "Certificados: %s";
     String porcentajeFlexibilidad = "Porcentaje de Flexibilidad: %s";
@@ -184,6 +186,7 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
         this.frm.jButton2.addActionListener(this);
         this.frm.jButton3.addActionListener(this);
         this.frm.jButton4.addActionListener(this);
+        this.frm.jButton5.addActionListener(this);
     }
 
     public void iniciar() {
@@ -401,6 +404,11 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
                 ContextoEditarRequerimientos contexto = new ContextoEditarRequerimientos(requisitos, modRa, frmA, curso);
                 CtrlRequerimientos ctrl = new CtrlRequerimientos(contexto);
                 ctrl.iniciar();
+            } else {
+                JOptionPane.showMessageDialog(null, 
+                        "El avance solo aplica para los cursos de Proceso de Producción \n"
+                                + "Si es el caso, verifique que se han cargado los requerimientos y habilidades en el curso");
+
             }
         }
 
@@ -1026,6 +1034,28 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
                 JOptionPane.showMessageDialog(null, "Error de base de datos: " + ex.getMessage());
             }
         }
+
+        if (e.getSource() == frm.jButton5) {
+            int filaSeleccionada = frm.JTable_HistorialCurso.getSelectedRow();
+            if (filaSeleccionada == -1) {
+                JOptionPane.showMessageDialog(null, "Por favor, selecciona un curso en la tabla.");
+                return;
+            }
+            String historialCurso = frm.JTable_HistorialCurso.getValueAt(
+                    frm.JTable_HistorialCurso.getSelectedRow(), 0).toString();
+            int idHistorialCurso = Integer.parseInt(historialCurso);
+
+            frm.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) frm.jTree_Cursos.getLastSelectedPathComponent();
+            String Node = selectedNode.getUserObject().toString();
+            String consultaSemanas = QueryFunctions.CapturaCondicionalSimple("curso", "duracion_curso", "nombre_curso", Node);
+            int semanas = Integer.parseInt(consultaSemanas);
+            if (GeneratorExcel_Cursos.AnvanceILUO(idHistorialCurso, semanas)) {
+                frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            } else {
+                frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            }
+        }
     }
 
     @Override
@@ -1157,6 +1187,7 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
         frm.txt_total1.setText(String.format(cantidadAsistentes, consultaTotalAsistentes));
         frm.txt_total2.setText(String.format(cantidadMinutos, consultaTotalMinutos));
         frm.txt_total3.setText(String.format(cantidadHoras, consultaTotalHoras));
+        frm.txt_total4.setText("");
     }
 
     public void ConcentradoCurso(IFrmCapacitacion frm, int idCurso, String Curso) {
@@ -1165,12 +1196,14 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
         String consultaTotalMinutos = QueryFunctions.CapturaSimple("view_historialcursos WHERE idCurso = " + idCurso, "FORMAT(SUM(horas_asistentes),0)");
         String formulaHombrehoras = "CONCAT(FLOOR(SUM(horas_asistentes) / 60),':', LPAD(SUM(horas_asistentes) % 60, 2, '0'))";
         String consultaTotalHoras = QueryFunctions.CapturaSimple("view_historialcursos WHERE idCurso = " + idCurso, formulaHombrehoras);
+        String consultaSemanas = QueryFunctions.CapturaCondicionalSimple("curso", "duracion_curso", "idCurso", String.valueOf(idCurso));
 
         frm.txt_curso_titulo.setText(Curso);
         frm.txt_total.setText(String.format(cantidadCursos, consultaTotalCursos));
         frm.txt_total1.setText(String.format(cantidadAsistentes, consultaTotalAsistentes));
         frm.txt_total2.setText(String.format(cantidadMinutos, consultaTotalMinutos));
         frm.txt_total3.setText(String.format(cantidadHoras, consultaTotalHoras));
+        frm.txt_total4.setText(String.format(cantidadSemanas, consultaSemanas));
     }
 
     public void ConcentradoTipoCurso(IFrmCapacitacion frm, int idTipoCurso, String TipoCurso) {
@@ -1185,6 +1218,7 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
         frm.txt_total1.setText(String.format(cantidadAsistentes, consultaTotalAsistentes));
         frm.txt_total2.setText(String.format(cantidadMinutos, consultaTotalMinutos));
         frm.txt_total3.setText(String.format(cantidadHoras, consultaTotalHoras));
+        frm.txt_total4.setText(String.format(""));
     }
 
     public void ConcentradoAsistentesCurso(IFrmCapacitacion frm, int idCurso) {

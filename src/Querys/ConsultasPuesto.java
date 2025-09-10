@@ -1,13 +1,13 @@
 package Querys;
 
 import Model.Puesto;
-import Functions.QueryFunctions;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -17,126 +17,113 @@ public class ConsultasPuesto extends Conexion {
 
     //Funcion de Registro para Area
     public boolean registrar(Puesto tbr) {
+        String sqlPuesto = "INSERT INTO puesto (Nombre_Puesto, Nombre_Puesto_Ingles, Descripcion, Nivel, Centro_de_Costo, Propuesto_Trabajadores, area_idArea) VALUES (?,?,?,?,?,?,?)";
+        String sqlTurno = "INSERT INTO turno_puesto (turno_idTurno, puesto_idPuesto, propuesto) VALUES (?,?,?)";
 
-        String sql = "INSERT INTO `sistema_capacitacion`.`puesto`\n"
-                + "(`Nombre_Puesto`,\n"
-                + "`Nombre_Puesto_Ingles`,\n"
-                + "`Descripcion`,\n"
-                + "`Nivel`,\n"
-                + "`Centro_de_Costo`,\n"
-                + "`Propuesto_Trabajadores`,\n"
-                + "`area_idArea`)\n"
-                + "VALUES\n"
-                + "(?,?,?,?,?,?,?)";
+        try (Connection con = getConnection()) {
+            con.setAutoCommit(false); // Iniciar transacción
 
-        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql);) {
-            ps.setString(1, tbr.getNombre_Puesto());
-            ps.setString(2, tbr.getNombre_Puesto_Ingles());
-            ps.setString(3, tbr.getDescripcion());
-            ps.setString(4, tbr.getNivel());
-            ps.setInt(5, tbr.getCentro_de_Costo());
-            ps.setInt(6, tbr.getPropuesto_Trabajadores());
-            ps.setInt(7, tbr.getArea_idArea());
-            ps.execute();
+            try (PreparedStatement ps = con.prepareStatement(sqlPuesto, Statement.RETURN_GENERATED_KEYS)) {
+                ps.setString(1, tbr.getNombre_Puesto());
+                ps.setString(2, tbr.getNombre_Puesto_Ingles());
+                ps.setString(3, tbr.getDescripcion());
+                ps.setString(4, tbr.getNivel());
+                ps.setInt(5, tbr.getCentro_de_Costo());
+                ps.setInt(6, tbr.getPropuesto_Trabajadores());
+                ps.setInt(7, tbr.getArea_idArea());
+                ps.executeUpdate();
 
-            return true;
-        } catch (SQLException ex) {
-            Logger.getLogger(ConsultasPuesto.class.getName()).log(Level.SEVERE, null, ex);
-        }
+                ResultSet rs = ps.getGeneratedKeys();
+                int idPuesto = 0;
+                if (rs.next()) {
+                    idPuesto = rs.getInt(1);
+                }
 
-        String sql1 = "INSERT INTO sistema_capacitacion.turno_puesto (turno_idTurno, puesto_idPuesto, propuesto) VALUES (?,?,?)";
+                try (PreparedStatement ps2 = con.prepareStatement(sqlTurno)) {
+                    String[] sufijosTurno = {"A", "B", "C", "D", "LV", "LS"};
+                    for (int i = 0; i < sufijosTurno.length; i++) {
+                        String metodoNombre = "getTurno" + sufijosTurno[i];
+                        Method metodo = tbr.getClass().getMethod(metodoNombre);
+                        int valorPropuesto = (Integer) metodo.invoke(tbr);
 
-        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql1)) {
-
-            int idPuesto = Integer.parseInt(QueryFunctions.CapturaCondicional("puesto", "idPuesto", "Nombre_Puesto", tbr.getNombre_Puesto()));
-
-            String[] sufijosTurno = {"A", "B", "C", "D", "LV", "LS"};
-
-            for (int i = 0; i < sufijosTurno.length; i++) {
-                String metodoNombre = "getTurno" + sufijosTurno[i];
-                Method metodo = tbr.getClass().getMethod(metodoNombre);
-                int valorPropuesto = (Integer) metodo.invoke(tbr);
-
-                ps.setInt(1, i + 1); // suponiendo idTurno es 1 para A, 2 para B, etc.
-                ps.setInt(2, idPuesto);
-                ps.setInt(3, valorPropuesto);
-                ps.addBatch();
+                        ps2.setInt(1, i + 1);
+                        ps2.setInt(2, idPuesto);
+                        ps2.setInt(3, valorPropuesto);
+                        ps2.addBatch();
+                    }
+                    ps2.executeBatch();
+                }
             }
-            ps.executeBatch();
+
+            con.commit(); // confirmar transacción
             return true;
 
-        } catch (SQLException | ReflectiveOperationException ex) {
+        } catch (Exception ex) {
             Logger.getLogger(ConsultasPuesto.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
         }
-        return false;
     }
 
     //Funcion de Moficar para Trabajadores
     public boolean modificar(Puesto tbr, int folio) {
+        String sqlPuesto = "UPDATE puesto SET "
+                + "Nombre_Puesto = ?, "
+                + "Nombre_Puesto_Ingles = ?, "
+                + "Descripcion = ?, "
+                + "Nivel = ?, "
+                + "Centro_de_Costo = ?, "
+                + "Propuesto_Trabajadores = ?, "
+                + "area_idArea = ? "
+                + "WHERE idPuesto = ?";
 
-        // Actualización del puesto
-        String sql = "UPDATE `sistema_capacitacion`.`puesto` SET "
-                + "`Nombre_Puesto` = ?, "
-                + "`Nombre_Puesto_Ingles` = ?, "
-                + "`Descripcion` = ?, "
-                + "`Nivel` = ?, "
-                + "`Centro_de_Costo` = ?, "
-                + "`Propuesto_Trabajadores` = ?, "
-                + "`area_idArea` = ? "
-                + "WHERE `idPuesto` = ?";
+        String sqlTurno = "INSERT INTO turno_puesto (turno_idTurno, puesto_idPuesto, propuesto) "
+                + "VALUES (?, ?, ?) "
+                + "ON DUPLICATE KEY UPDATE propuesto = VALUES(propuesto)";
 
-        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, tbr.getNombre_Puesto());
-            ps.setString(2, tbr.getNombre_Puesto_Ingles());
-            ps.setString(3, tbr.getDescripcion());
-            ps.setString(4, tbr.getNivel());
-            ps.setInt(5, tbr.getCentro_de_Costo());
-            ps.setInt(6, tbr.getPropuesto_Trabajadores());
-            ps.setInt(7, tbr.getArea_idArea());
-            ps.setInt(8, folio);
+        try (Connection con = getConnection()) {
+            con.setAutoCommit(false); // 🔒 iniciar transacción
 
-            int filas = ps.executeUpdate();
-            if (filas == 0) {
-                return false; // No se modificó nada
+            // --- Actualizar datos del puesto ---
+            try (PreparedStatement ps = con.prepareStatement(sqlPuesto)) {
+                ps.setString(1, tbr.getNombre_Puesto());
+                ps.setString(2, tbr.getNombre_Puesto_Ingles());
+                ps.setString(3, tbr.getDescripcion());
+                ps.setString(4, tbr.getNivel());
+                ps.setInt(5, tbr.getCentro_de_Costo());
+                ps.setInt(6, tbr.getPropuesto_Trabajadores());
+                ps.setInt(7, tbr.getArea_idArea());
+                ps.setInt(8, folio);
+
+                int filas = ps.executeUpdate();
+                if (filas == 0) {
+                    con.rollback();
+                    return false; // no se modificó nada
+                }
             }
 
-        } catch (SQLException ex) {
-            Logger.getLogger(ConsultasPuesto.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
-        }
-
-        // Actualización de turnos del puesto
-        String sql1 = "UPDATE sistema_capacitacion.turno_puesto SET propuesto = ? WHERE turno_idTurno = ? AND puesto_idPuesto = ?";
-
-        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql1)) {
-
-            int idPuesto = folio; // Usamos directamente el folio
-
-            String[] sufijosTurno = {"A", "B", "C", "D", "LV", "LS"};
-
-            for (int i = 0; i < sufijosTurno.length; i++) {
-                try {
+            // --- Insertar o actualizar turnos ---
+            try (PreparedStatement ps = con.prepareStatement(sqlTurno)) {
+                String[] sufijosTurno = {"A", "B", "C", "D", "LV", "LS"};
+                for (int i = 0; i < sufijosTurno.length; i++) {
                     String metodoNombre = "getTurno" + sufijosTurno[i];
                     Method metodo = tbr.getClass().getMethod(metodoNombre);
                     int valorPropuesto = (Integer) metodo.invoke(tbr);
 
-                    ps.setInt(1, valorPropuesto);
-                    ps.setInt(2, i + 1); // turno_idTurno
-                    ps.setInt(3, idPuesto);
+                    ps.setInt(1, i + 1);   // turno_idTurno
+                    ps.setInt(2, folio);   // puesto_idPuesto
+                    ps.setInt(3, valorPropuesto);
                     ps.addBatch();
-                } catch (NoSuchMethodException e) {
-                    System.err.println("Método no encontrado: getTurno" + sufijosTurno[i]);
                 }
+                ps.executeBatch();
             }
 
-            ps.executeBatch();
+            con.commit(); // ✅ confirmar todo
             return true;
 
-        } catch (SQLException | ReflectiveOperationException ex) {
+        } catch (Exception ex) {
             Logger.getLogger(ConsultasPuesto.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
         }
-
-        return false;
     }
 
     //Funcion de Eliminar para Trabajadores

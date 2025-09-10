@@ -28,9 +28,11 @@ public class ConfiguracionColumnasExcelTrabajadores extends JFrame {
         cargarPropiedades();
 
         // Crear componentes
-        JPanel panel = new JPanel(new GridLayout(11, 2, 10, 10));
+        JPanel panel = new JPanel(new GridLayout(12, 2, 10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
+        panel.add(new JLabel("Nota: Los índices de columnas "));
+        panel.add(new JLabel("usan números (A=0, B=1, C=2, ...)."));
         panel.add(new JLabel("Índice Folio:"));
         txtFolio = new JTextField(propiedades.getProperty("indice.folio"));
         panel.add(txtFolio);
@@ -79,7 +81,8 @@ public class ConfiguracionColumnasExcelTrabajadores extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 guardarPropiedades();
-                JOptionPane.showMessageDialog(ConfiguracionColumnasExcelTrabajadores.this, "Configuración guardada correctamente.");
+                JOptionPane.showMessageDialog(ConfiguracionColumnasExcelTrabajadores.this,
+                        "Configuración guardada correctamente.");
                 dispose(); // Cerrar la ventana después de guardar
             }
         });
@@ -111,7 +114,9 @@ public class ConfiguracionColumnasExcelTrabajadores extends JFrame {
 
                 propiedadesPorDefecto.store(fos, "Archivo de configuración creado automáticamente");
             } catch (IOException ex) {
-                JOptionPane.showMessageDialog(this, "No se pudo crear el archivo de configuración.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this,
+                        "No se pudo crear el archivo de configuración.", "Error",
+                        JOptionPane.ERROR_MESSAGE);
                 ex.printStackTrace();
                 return;
             }
@@ -120,7 +125,9 @@ public class ConfiguracionColumnasExcelTrabajadores extends JFrame {
         try (FileInputStream fis = new FileInputStream(archivoConfig)) {
             propiedades.load(fis);
         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(this, "No se pudo cargar el archivo de configuración.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    "No se pudo cargar el archivo de configuración.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }
     }
@@ -138,9 +145,11 @@ public class ConfiguracionColumnasExcelTrabajadores extends JFrame {
         propiedades.setProperty("indice.telefono", txtTelefono.getText());
 
         try (FileOutputStream fos = new FileOutputStream("files/configIndiceT.properties")) {
-            propiedades.store(fos, "Configuración de índices de columnas");
+            propiedades.store(fos, "Configuración de Indices");
         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(this, "No se pudo guardar el archivo de configuración.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    "No se pudo guardar el archivo de configuración.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

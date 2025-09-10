@@ -59,7 +59,7 @@ public class CtrlEditarCurso implements ActionListener, ItemListener {
     }
 
     public void iniciar() {
-        frm.setSize(352, frm.getHeight());
+        frm.setSize(360, frm.getHeight());
         frm.cb_tipoCurso.addItem("Seleccione el tipo de Curso...");
         QueryFunctions.LlenarComboBox("certificado", "nombre_Certificado", frm.cb_certificado);
         ButtonFunctions.TxtBtnCurso(texto, folio, frm, mod, modC, modDC);
@@ -211,14 +211,14 @@ public class CtrlEditarCurso implements ActionListener, ItemListener {
                 frm.cb_certificado.setVisible(true);
                 frm.btn_certificado.setVisible(true);
                 if (!texto.equals("Guardar")) {
-                    frm.setSize(704, 396);
+                    frm.setSize(700, 420);
                 }
                 ViewTools.Centrar(frmB, frm);
             } else {
                 frm.jLabel3.setVisible(false);
                 frm.cb_certificado.setVisible(false);
                 frm.btn_certificado.setVisible(false);
-                frm.setSize(352, frm.getHeight());
+                frm.setSize(360, frm.getHeight());
                 ViewTools.Centrar(frmB, frm);
             }
         }

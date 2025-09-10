@@ -122,7 +122,6 @@ public class CtrlTrabajador implements ActionListener, KeyListener, MouseListene
         this.frmTrabajador.ItemModificar_Baja.addActionListener(this);
         this.frmTrabajador.txt_buscar_Tbr.addKeyListener(this);
         this.frmTrabajador.txt_buscar_bajas.addKeyListener(this);
-        this.frmTrabajador.ItemAgregarS.addActionListener(this);
         this.frmTrabajador.ItemModificarS.addActionListener(this);
         this.frmTrabajador.ItemEliminarS.addActionListener(this);
         this.frmTrabajador.btn_guardar_sup.addActionListener(this);
@@ -153,6 +152,8 @@ public class CtrlTrabajador implements ActionListener, KeyListener, MouseListene
         this.frmTrabajador.jTable_brigadas.getSelectionModel().addListSelectionListener(this);
         this.frmTrabajador.btn_RefreshTabla3.addActionListener(this);
         this.frmTrabajador.item_EliminarBrigadista.addActionListener(this);
+        this.frmTrabajador.item_AgregarBrigadista.addActionListener(this);
+        this.frmTrabajador.btn_agregarBrigadista.addActionListener(this);
         this.frmTrabajador.item_nivelesSalarios.addActionListener(this);
         this.frmTrabajador.btn_ListT.addActionListener(this);
         this.frmTrabajador.btn_ListT1.addActionListener(this);
@@ -250,8 +251,9 @@ public class CtrlTrabajador implements ActionListener, KeyListener, MouseListene
                     frmTrabajador.jTable_Trabajadores.getSelectedRow(), 0).toString();
             modTrabajador.setFolio_Trabajador(folio);
 
-            int option = JOptionPane.showConfirmDialog(null, "¿Seguro de dar de baja este Trabajador?");
-            if (option == JOptionPane.OK_OPTION && conTrabajador.eliminar(modTrabajador)) {
+            int opcion = JOptionPane.showConfirmDialog(null, "¿Está seguro que desea dar de baja al trabajador?",
+                    "Confirmar acción", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            if (opcion == JOptionPane.OK_OPTION && conTrabajador.eliminar(modTrabajador)) {
                 JOptionPane.showMessageDialog(null, "Baja de trabajador realizada");
                 actualizarVistaTrabajador();
                 DesignTabla.designBajas(frmTrabajador);
@@ -463,7 +465,7 @@ public class CtrlTrabajador implements ActionListener, KeyListener, MouseListene
             }
         }
 
-        List<Object> validSourcesAgregarSupervisor = Arrays.asList(frmTrabajador.btn_limpiar, frmTrabajador.ItemAgregarS);
+        List<Object> validSourcesAgregarSupervisor = Arrays.asList(frmTrabajador.btn_limpiar);
         if (validSourcesAgregarSupervisor.contains(e.getSource())) {
             limpiarSupervisor();
         }
@@ -570,7 +572,7 @@ public class CtrlTrabajador implements ActionListener, KeyListener, MouseListene
         List<Object> validSourcesAgregarBrigada = Arrays.asList(frmTrabajador.item_AgregarBrigada, frmTrabajador.btn_agregarBrigada);
         if (validSourcesAgregarBrigada.contains(e.getSource())) {
             JLabel text = new JLabel("Nombre de la Brigada:");
-            JTextField textField = new JTextField(10);
+            JTextField textField = new JTextField(30);
             JPanel panel = new JPanel();
             panel.add(text);
             panel.add(textField);
@@ -670,7 +672,8 @@ public class CtrlTrabajador implements ActionListener, KeyListener, MouseListene
             }
         }
 
-        if (e.getSource() == frmTrabajador.btn_agregarBrigadista) {
+        List<Object> validSourcesAgregarBrigadistas = Arrays.asList(frmTrabajador.btn_agregarBrigadista, frmTrabajador.item_AgregarBrigadista);
+        if (validSourcesAgregarBrigadistas.contains(e.getSource())) {
             JOptionPane.showMessageDialog(null, "Para agregar o modificar un Brigadista,\n"
                     + "busque su número de Nomina en su respectiva tabla. \n"
                     + "Dele click a la opción de modificar y busque el apartado de Brigadas.");
