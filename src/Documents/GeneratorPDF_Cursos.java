@@ -1366,5 +1366,4 @@ public class GeneratorPDF_Cursos extends Conexion {
         }
         return false;
     }
-
 }

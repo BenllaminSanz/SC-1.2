@@ -184,6 +184,7 @@ public class IFrmCapacitacion extends javax.swing.JInternalFrame {
         jMenu5 = new javax.swing.JMenu();
         jMenuItem8 = new javax.swing.JMenuItem();
         jMenuItem9 = new javax.swing.JMenuItem();
+        jMenuItem14 = new javax.swing.JMenuItem();
 
         AgregarRegistro.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/IconPlus.png"))); // NOI18N
         AgregarRegistro.setText("Agregar registro al Curso");
@@ -387,7 +388,7 @@ public class IFrmCapacitacion extends javax.swing.JInternalFrame {
         );
         jPanel23Layout.setVerticalGroup(
             jPanel23Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 234, Short.MAX_VALUE)
+            .addGap(0, 235, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout jPanel22Layout = new javax.swing.GroupLayout(jPanel22);
@@ -398,7 +399,7 @@ public class IFrmCapacitacion extends javax.swing.JInternalFrame {
         );
         jPanel22Layout.setVerticalGroup(
             jPanel22Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
+            .addGap(0, 101, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout jPanel19Layout = new javax.swing.GroupLayout(jPanel19);
@@ -825,7 +826,7 @@ public class IFrmCapacitacion extends javax.swing.JInternalFrame {
         );
         grafica2Layout.setVerticalGroup(
             grafica2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 193, Short.MAX_VALUE)
+            .addGap(0, 194, Short.MAX_VALUE)
         );
 
         grafica_certificados.setMaximumSize(new java.awt.Dimension(400, 32767));
@@ -838,7 +839,7 @@ public class IFrmCapacitacion extends javax.swing.JInternalFrame {
         );
         grafica_certificadosLayout.setVerticalGroup(
             grafica_certificadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 184, Short.MAX_VALUE)
+            .addGap(0, 185, Short.MAX_VALUE)
         );
 
         txt_totalCertificados.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
@@ -1089,7 +1090,7 @@ public class IFrmCapacitacion extends javax.swing.JInternalFrame {
         );
         jPanel13Layout.setVerticalGroup(
             jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 454, Short.MAX_VALUE)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 456, Short.MAX_VALUE)
         );
 
         jPanel15.setBorder(javax.swing.BorderFactory.createTitledBorder("Certificados del Trabajador:"));
@@ -1201,7 +1202,7 @@ public class IFrmCapacitacion extends javax.swing.JInternalFrame {
         jPanel9Layout.setVerticalGroup(
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel9Layout.createSequentialGroup()
-                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 468, Short.MAX_VALUE)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 469, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btn_agregarCertificado))
         );
@@ -1384,6 +1385,15 @@ public class IFrmCapacitacion extends javax.swing.JInternalFrame {
         jMenuItem9.setText("Certificados (xlsx)");
         jMenu5.add(jMenuItem9);
 
+        jMenuItem14.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/IconDataBasex16.png"))); // NOI18N
+        jMenuItem14.setText("Certificados de Bajas (xlsx)");
+        jMenuItem14.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem14ActionPerformed(evt);
+            }
+        });
+        jMenu5.add(jMenuItem14);
+
         jMenuBar1.add(jMenu5);
 
         setJMenuBar(jMenuBar1);
@@ -1439,6 +1449,10 @@ public class IFrmCapacitacion extends javax.swing.JInternalFrame {
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void jMenuItem14ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem14ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jMenuItem14ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -1530,6 +1544,7 @@ public class IFrmCapacitacion extends javax.swing.JInternalFrame {
     public javax.swing.JMenuItem jMenuItem11;
     public javax.swing.JMenuItem jMenuItem12;
     public javax.swing.JMenuItem jMenuItem13;
+    public javax.swing.JMenuItem jMenuItem14;
     public javax.swing.JMenuItem jMenuItem2;
     public javax.swing.JMenuItem jMenuItem3;
     public javax.swing.JMenuItem jMenuItem4;

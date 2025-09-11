@@ -182,6 +182,7 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
         this.frm.jMenuItem11.addActionListener(this);
         this.frm.jMenuItem12.addActionListener(this);
         this.frm.jMenuItem13.addActionListener(this);
+        this.frm.jMenuItem14.addActionListener(this);
         this.frm.jButton1.addActionListener(this);
         this.frm.jButton2.addActionListener(this);
         this.frm.jButton3.addActionListener(this);
@@ -704,6 +705,20 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
             } catch (Exception ex) {
                 Logger.getLogger(CtrlEditarTrabajador.class.getName()).log(Level.SEVERE, null, ex);
                 frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            }
+        }
+        
+        if (e.getSource() == frm.jMenuItem14) {
+            try {
+                // Acción a realizar al hacer clic en "Aceptar"
+                frm.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                if (GeneratorExcel_BDs.BD_CERTIFICADOS_BAJAS()) {
+                    frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                } else {
+                    frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(CtrlCapacitacion.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
 

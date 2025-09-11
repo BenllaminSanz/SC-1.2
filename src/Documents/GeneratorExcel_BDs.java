@@ -246,6 +246,102 @@ public class GeneratorExcel_BDs extends Conexion {
             return false;
         }
     }
+    
+    public static boolean BD_CERTIFICADOS_BAJAS() throws IOException {
+        Date fecha = new Date();
+        SimpleDateFormat formatFecha = new SimpleDateFormat("dd-MM-yyyy");
+        String FechaS = formatFecha.format(fecha);
+
+        Properties properties = new Properties();
+        properties.load(new FileInputStream("files/niveles.properties"));
+
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Guardar Respaldo de Certificados de Bajas");
+        fileChooser.setSelectedFile(new File("Respaldo Historial de Certificados de Bajas " + FechaS + ".xlsx"));
+
+        if (fileChooser.showSaveDialog(null) != JFileChooser.APPROVE_OPTION) {
+            JOptionPane.showMessageDialog(null, "Operación cancelada por el usuario.");
+            return false;
+        }
+
+        String rutaDoc = fileChooser.getSelectedFile().getAbsolutePath();
+
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Connection con = conn.getConnection();
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM area");
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Sheet sheet = workbook.createSheet(rs.getString("nombre_Area"));
+                int rowIndex = 0;
+
+                Row header = sheet.createRow(rowIndex++);
+                String[] columnas = {
+                    "Nómina", "Nombre", "Certificado", "Estado", "Tipo", "Inicio",
+                    "Cierre", "Certificación", "Turno", "Salario", "Nivel"
+                };
+
+                for (int i = 0; i < columnas.length; i++) {
+                    Cell cell = header.createCell(i);
+                    cell.setCellValue(columnas[i]);
+                }
+
+                PreparedStatement ps1 = con.prepareStatement("SELECT * FROM turno");
+                ResultSet rs1 = ps1.executeQuery();
+
+                while (rs1.next()) {
+                    PreparedStatement ps2 = con.prepareStatement(
+                            "SELECT * FROM view_asistentes_certificados_bajas WHERE nombre_area = ? AND nombre_turno = ?");
+                    ps2.setString(1, rs.getString("nombre_Area"));
+                    ps2.setString(2, rs1.getString("nombre_Turno"));
+                    ResultSet rs2 = ps2.executeQuery();
+
+                    while (rs2.next()) {
+                        Row row = sheet.createRow(rowIndex++);
+                        int col = 0;
+
+                        row.createCell(col++).setCellValue(rs2.getInt("Folio_Trabajador"));
+                        row.createCell(col++).setCellValue(rs2.getString("nombre_trabajador"));
+                        row.createCell(col++).setCellValue(rs2.getString("nombre_certificado"));
+                        row.createCell(col++).setCellValue(rs2.getString("estado_certificacion"));
+                        row.createCell(col++).setCellValue(rs2.getString("tipo_certificacion"));
+                        row.createCell(col++).setCellValue(DateTools.MySQLtoString(rs2.getDate("fecha_inicio")));
+                        row.createCell(col++).setCellValue(DateTools.MySQLtoString(rs2.getDate("fecha_termino")));
+                        row.createCell(col++).setCellValue(DateTools.MySQLtoString(rs2.getDate("fecha_certificacion")));
+                        row.createCell(col++).setCellValue(rs2.getString("nombre_turno"));
+
+                        double salario = rs2.getDouble("SalarioDiario_Trabajador");
+                        row.createCell(col++).setCellValue(salario);
+
+                        String nivel = Niveles_Salarios.determinarNivel(salario, properties);
+                        row.createCell(col).setCellValue(nivel);
+                    }
+                }
+
+                // Ajustar el ancho de columnas
+                for (int i = 0; i < columnas.length; i++) {
+                    sheet.autoSizeColumn(i);
+                }
+            }
+
+            try (FileOutputStream outputStream = new FileOutputStream(rutaDoc)) {
+                workbook.write(outputStream);
+            }
+
+            JOptionPane.showMessageDialog(null, "Respaldo creado en " + rutaDoc);
+            if (Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().open(new File(rutaDoc));
+            }
+
+            ps.close();
+            return true;
+
+        } catch (SQLException | IOException ex) {
+            Logger.getLogger(GeneratorExcel_LBU.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(null, "Error al generar archivo: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+    }
 
     public static boolean BD_TRABAJADORES(Map<String, String> camposDisponibles, List<String> camposSeleccionados) {
         Date fecha = new Date();
