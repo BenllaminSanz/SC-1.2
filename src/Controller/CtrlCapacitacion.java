@@ -387,7 +387,7 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
                     }
                 }
             }
-//            DesignTabla.designHistorialCurso(frm, Integer.parseInt(idCurso));
+            DesignTabla.designHistorialCurso(frm, Integer.parseInt(idCurso));
         }
 
         if (e.getSource() == frm.item_RequerimientosAsistente) {

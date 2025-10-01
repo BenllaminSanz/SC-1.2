@@ -257,7 +257,7 @@
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel7">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Cento de costo:"/>
+            <Property name="text" type="java.lang.String" value="Centro de costo:"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="txt_centrocosto">

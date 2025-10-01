@@ -74,7 +74,7 @@ public class IFrmEditarPuesto extends javax.swing.JInternalFrame {
             }
         });
 
-        jLabel7.setText("Cento de costo:");
+        jLabel7.setText("Centro de costo:");
 
         jLabel8.setText("Descripción general del Puesto:");
 

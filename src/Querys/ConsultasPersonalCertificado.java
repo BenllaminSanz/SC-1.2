@@ -135,8 +135,6 @@ public class ConsultasPersonalCertificado extends Conexion {
 
             // 2. Llamar al procedimiento almacenado
             cs = con.prepareCall("{CALL actualizar_certificados(?)}");
-            // El parámetro que espera es el id del asistente, que en tu caso parece ser mod.getIdTrabajador_Certificado()
-            // pero mod.getIdTrabajador_Certificado() es String, tu procedimiento espera INT. Si es un int, adapta aquí.
             cs.setInt(1, Integer.parseInt(mod.getIdTrabajador_Certificado()));
             cs.execute();
 

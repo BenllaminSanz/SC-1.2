@@ -381,8 +381,10 @@ public class ConsultasHistorialCurso extends Conexion {
             ps = con.prepareStatement(sql3);
             ps.setInt(1, mod.getIdTipo_Curso());
             ps.execute();
-            
-            PreparedStatement psql = con.prepareStatement("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));");
+
+            PreparedStatement psql = con.prepareStatement(
+                    "SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));"
+            );
             psql.execute();
 
             // 3. Llamar al procedure
@@ -417,7 +419,7 @@ public class ConsultasHistorialCurso extends Conexion {
 
             if (hayNoAprobados) {
                 JOptionPane.showMessageDialog(null, noAprobados.toString());
-            } else if(hayNoAprobados && !hayAprobados){
+            } else if (hayNoAprobados && !hayAprobados) {
                 JOptionPane.showMessageDialog(null, "Ningún asistente cumplió con todos los requerimientos.");
             }
 

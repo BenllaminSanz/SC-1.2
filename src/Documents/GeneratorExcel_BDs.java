@@ -268,6 +268,8 @@ public class GeneratorExcel_BDs extends Conexion {
 
         try (Workbook workbook = new XSSFWorkbook()) {
             Connection con = conn.getConnection();
+            PreparedStatement psql = con.prepareStatement("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));");
+            psql.execute();
             PreparedStatement ps = con.prepareStatement("SELECT * FROM area");
             ResultSet rs = ps.executeQuery();
 
@@ -278,7 +280,8 @@ public class GeneratorExcel_BDs extends Conexion {
                 Row header = sheet.createRow(rowIndex++);
                 String[] columnas = {
                     "Nómina", "Nombre", "Certificado", "Estado", "Tipo", "Inicio",
-                    "Cierre", "Certificación", "Turno", "Salario", "Nivel"
+                    "Cierre", "Certificación", "Fecha de Baja"
+                        ,"Turno", "Salario", "Nivel"
                 };
 
                 for (int i = 0; i < columnas.length; i++) {
@@ -308,6 +311,7 @@ public class GeneratorExcel_BDs extends Conexion {
                         row.createCell(col++).setCellValue(DateTools.MySQLtoString(rs2.getDate("fecha_inicio")));
                         row.createCell(col++).setCellValue(DateTools.MySQLtoString(rs2.getDate("fecha_termino")));
                         row.createCell(col++).setCellValue(DateTools.MySQLtoString(rs2.getDate("fecha_certificacion")));
+                        row.createCell(col++).setCellValue(DateTools.MySQLtoString(rs2.getDate("fecha_baja")));
                         row.createCell(col++).setCellValue(rs2.getString("nombre_turno"));
 
                         double salario = rs2.getDouble("SalarioDiario_Trabajador");
