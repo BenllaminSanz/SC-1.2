@@ -24,7 +24,21 @@ import javax.swing.JOptionPane;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.charts.AxisCrosses;
+import org.apache.poi.ss.usermodel.charts.AxisPosition;
+import org.apache.poi.ss.usermodel.charts.ChartAxis;
+import org.apache.poi.ss.usermodel.charts.ChartDataSource;
+import org.apache.poi.ss.usermodel.charts.ChartLegend;
+import org.apache.poi.ss.usermodel.charts.DataSources;
+import org.apache.poi.ss.usermodel.charts.LegendPosition;
+import org.apache.poi.ss.usermodel.charts.LineChartData;
+import org.apache.poi.ss.usermodel.charts.LineChartSeries;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFChart;
+import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
+import org.apache.poi.xssf.usermodel.XSSFDrawing;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.usermodel.charts.XSSFValueAxis;
 
 public class GeneratorExcel_Cursos extends Conexion {
 
@@ -58,7 +72,7 @@ public class GeneratorExcel_Cursos extends Conexion {
         Map<String, Map<String, Object>> datosAsistente = new LinkedHashMap<>();
 
         try {
-            // 1. Selección de carpeta destino (Mismo que el original)
+            // Selección de carpeta destino
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             if (fileChooser.showSaveDialog(null) != JFileChooser.APPROVE_OPTION) {
@@ -69,24 +83,20 @@ public class GeneratorExcel_Cursos extends Conexion {
             String historial = String.valueOf(idHistorial);
             String nombreCurso = QueryFunctions.CapturaCondicionalSimple(
                     "view_historialcurso", "nombre_curso", "idHistorial", historial);
-            
             String idCurso = QueryFunctions.CapturaCondicionalSimple(
                     "view_historialcurso", "idcurso", "idHistorial", historial);
 
-            // 🆕 1.1. Obtener la fecha de inicio del curso
+            // Obtener fecha de inicio del curso
             String fechaInicioStr = QueryFunctions.CapturaCondicionalSimple(
                     "view_historialcurso", "fecha_inicio", "idHistorial", historial);
-
             if (fechaInicioStr == null || fechaInicioStr.isEmpty()) {
                 JOptionPane.showMessageDialog(null, "No se encontró la fecha de inicio para el historial " + historial, "Error", JOptionPane.ERROR_MESSAGE);
                 return false;
             }
-
-            // Convertir la fecha de inicio a java.util.Date para el cálculo
             java.sql.Date fechaInicioCursoSQL = java.sql.Date.valueOf(fechaInicioStr);
             long fechaInicioCursoMillis = fechaInicioCursoSQL.getTime();
 
-            // 2. Conexión y consulta de Evaluaciones ILUO (Query 1) - Mismo query
+            // Consulta de evaluaciones
             String queryEvaluaciones = "SELECT e.id_asistente, t.Nombre_Trabajador, h.nombre AS habilidad, "
                     + "e.nivel_alcanzado, e.fecha_evaluacion, e.observaciones "
                     + "FROM evaluacion_habilidad_asistente e "
@@ -96,11 +106,9 @@ public class GeneratorExcel_Cursos extends Conexion {
                     + "ORDER BY e.fecha_evaluacion";
 
             try (Connection con = conn.getConnection(); PreparedStatement ps = con.prepareStatement(queryEvaluaciones)) {
-
                 ps.setInt(1, idHistorial);
 
                 try (ResultSet rs = ps.executeQuery()) {
-
                     while (rs.next()) {
                         String idAsistente = rs.getString("id_asistente");
                         String nombreAsistente = rs.getString("Nombre_Trabajador");
@@ -109,7 +117,6 @@ public class GeneratorExcel_Cursos extends Conexion {
                         String observacion = rs.getString("observaciones");
                         java.sql.Date fecha = rs.getDate("fecha_evaluacion");
 
-                        // Inicializar la estructura del asistente si no existe
                         datosAsistente.putIfAbsent(idAsistente, new LinkedHashMap<>());
                         Map<String, Object> asistenteData = datosAsistente.get(idAsistente);
 
@@ -124,20 +131,12 @@ public class GeneratorExcel_Cursos extends Conexion {
                         habilidadesMap.putIfAbsent(habilidad, new HashMap<>());
                         Map<Integer, EvaluacionSemana> semanas = habilidadesMap.get(habilidad);
 
-                        // 🔴 CORRECCIÓN CRÍTICA: Cálculo de la semana real
+                        // Calcular número de semana
                         long diferenciaMillis = fecha.getTime() - fechaInicioCursoMillis;
                         long diferenciaDias = TimeUnit.DAYS.convert(diferenciaMillis, TimeUnit.MILLISECONDS);
-                        // El cálculo es: (diferencia en días / 7) + 1. 
-                        // El +1 asegura que la semana 1 va de día 0 a día 6.
                         int semana = (int) (diferenciaDias / 7) + 1;
-
-                        // Asegurar que la semana no exceda el total de semanas del curso y sea al menos 1
                         semana = Math.max(1, Math.min(semana, totalSemanas));
 
-                        // ⚠️ Cuidado con la lógica de sobrescritura:
-                        // Si hay más de una evaluación por semana para la misma habilidad, 
-                        // solo se guardará la última leída (debido a que usas .put(semana, eval)).
-                        // Como tu consulta ya ordena por fecha, esto guardará la última evaluación de la semana.
                         EvaluacionSemana eval = new EvaluacionSemana();
                         eval.nivel = nivel;
                         eval.fecha = fecha;
@@ -147,11 +146,8 @@ public class GeneratorExcel_Cursos extends Conexion {
                 }
             }
 
-            // 3. Generar un archivo por asistente (Resto del código es funcional con el nuevo Map)
+            // Generar archivo por asistente
             for (String idAsistente : datosAsistente.keySet()) {
-                // ... (El resto del código de la generación del Excel es el mismo, 
-                // ya que itera sobre la estructura de datos que ya se corrigió)
-
                 @SuppressWarnings("unchecked")
                 Map<String, Object> asistenteData = datosAsistente.get(idAsistente);
                 String nombreAsistente = (String) asistenteData.get("nombre");
@@ -162,27 +158,28 @@ public class GeneratorExcel_Cursos extends Conexion {
 
                 Workbook workbook = new XSSFWorkbook();
                 Sheet sheet = workbook.createSheet("Avance " + nombreCurso);
-
                 int filaIndex = 0;
 
-                // Creación de Encabezados
+                // Encabezados
                 Row header = sheet.createRow(filaIndex++);
-                header.createCell(0).setCellValue("Trabaajdor:");
+                header.createCell(0).setCellValue("Trabajador:");
                 header.createCell(1).setCellValue("% Avance Final");
 
+                int col = 2;
                 for (int s = 1; s <= totalSemanas; s++) {
-                    header.createCell(1 + (s - 1) * 2 + 1).setCellValue("Sem " + s);
-                    header.createCell(1 + (s - 1) * 2 + 2).setCellValue("Observación");
+                    header.createCell(col++).setCellValue("Sem " + s);
                 }
-                header.createCell((totalSemanas * 2) + 2).setCellValue("Última Semana");
+                header.createCell(col++).setCellValue("Última Semana");
+                for (int s = 1; s <= totalSemanas; s++) {
+                    header.createCell(col++).setCellValue("Observación " + s);
+                }
 
-                // Fila de Avance General del Asistente
+                // Fila de avance general
                 Row filaAsistente = sheet.createRow(filaIndex++);
                 filaAsistente.createCell(0).setCellValue(folioAsistente + " " + nombreAsistente);
 
-                // Calcular avance final (Cálculo original)
                 double sumaValoresFinal = 0;
-                int nivelMaximo = habilidades.size() * 100; // Asumo 4 es el valor máximo para 'O'
+                int nivelMaximo = habilidades.size() * 100;
 
                 for (String hab : habilidades.keySet()) {
                     Map<Integer, EvaluacionSemana> niveles = habilidades.get(hab);
@@ -197,49 +194,51 @@ public class GeneratorExcel_Cursos extends Conexion {
                 double porcentajeFinal = (sumaValoresFinal / (double) nivelMaximo) * 100.0;
                 filaAsistente.createCell(1).setCellValue(redondear(porcentajeFinal));
 
-                // Filas de Habilidades
+                // Filas de habilidades
                 for (String hab : habilidades.keySet()) {
                     Row filaHab = sheet.createRow(filaIndex++);
                     filaHab.createCell(0).setCellValue(hab);
 
                     Map<Integer, EvaluacionSemana> niveles = habilidades.get(hab);
                     String ultimaLetra = "";
+                    int colHab = 2;
 
+                    // Semanas
                     for (int s = 1; s <= totalSemanas; s++) {
                         EvaluacionSemana e = niveles.get(s);
-                        int colNivel = 2 + (s - 1) * 2;
-                        int colObs = colNivel + 1;
-
                         if (e != null && e.nivel != null) {
-                            Integer valor = nivelILUO.getOrDefault(e.nivel, 0);
-
-                            // Escribe el VALOR NUMÉRICO en la celda de la semana.
-                            filaHab.createCell(colNivel).setCellValue(valor);
-
-                            // Almacena el valor numérico para la columna "Última Semana"
-                            ultimaLetra = valor.toString();
-
-                            filaHab.createCell(colObs).setCellValue(e.observacion);
+                            int valor = nivelILUO.getOrDefault(e.nivel, 0);
+                            filaHab.createCell(colHab++).setCellValue(valor);
+                            ultimaLetra = String.valueOf(valor);
                         } else {
-                            // Intenta obtener la última evaluación anterior (para rellenar si es necesario)
-                            // Tu código original solo deja celdas vacías si no hay evaluación en esa semana
-                            filaHab.createCell(colNivel).setCellValue("");
-                            filaHab.createCell(colObs).setCellValue("-");
+                            filaHab.createCell(colHab++).setCellValue("");
                         }
                     }
-                    filaHab.createCell(2 + totalSemanas * 2).setCellValue(ultimaLetra);
+
+                    // Última semana
+                    filaHab.createCell(colHab++).setCellValue(ultimaLetra);
+
+                    // Observaciones
+                    for (int s = 1; s <= totalSemanas; s++) {
+                        EvaluacionSemana e = niveles.get(s);
+                        if (e != null && e.observacion != null && !e.observacion.isEmpty()) {
+                            filaHab.createCell(colHab++).setCellValue(e.observacion);
+                        } else {
+                            filaHab.createCell(colHab++).setCellValue("-");
+                        }
+                    }
                 }
 
-                // Fila % Avance por Semana 
+                // Fila % Avance por semana
                 Row filaAvance = sheet.createRow(filaIndex++);
                 filaAvance.createCell(0).setCellValue("% Avance");
+
+                int colAvance = 2;
                 for (int s = 1; s <= totalSemanas; s++) {
                     double sumaValoresSemana = 0;
                     for (String hab : habilidades.keySet()) {
                         Map<Integer, EvaluacionSemana> niveles = habilidades.get(hab);
                         EvaluacionSemana eval = null;
-
-                        // Busca la última evaluación registrada *hasta* esa semana (s)
                         for (int i = s; i >= 1 && eval == null; i--) {
                             eval = niveles.get(i);
                         }
@@ -247,13 +246,36 @@ public class GeneratorExcel_Cursos extends Conexion {
                             sumaValoresSemana += nivelILUO.getOrDefault(eval.nivel, 0);
                         }
                     }
-                    int colNivel = 2 + (s - 1) * 2;
-                    filaAvance.createCell(colNivel)
-                            .setCellValue(redondear((sumaValoresSemana / (double) nivelMaximo) * 100.0));
+                    filaAvance.createCell(colAvance++).setCellValue(redondear((sumaValoresSemana / (double) nivelMaximo) * 100.0));
                 }
 
-                // ... (El resto del código para Requerimientos y guardado es el mismo)
-                filaIndex += 2;
+                // Crear gráfico solo para semanas
+                int filaIndexAvance = filaAvance.getRowNum();
+                XSSFDrawing drawing = (XSSFDrawing) sheet.createDrawingPatriarch();
+                XSSFClientAnchor anchor = drawing.createAnchor(0, 0, 0, 0, 0, filaIndexAvance + 2, totalSemanas + 1, filaIndexAvance + 20);
+
+                XSSFChart chart = drawing.createChart(anchor);
+                chart.setTitleText("Avance de Crecimiento por Semana");
+                ChartLegend legend = chart.getOrCreateLegend();
+                legend.setPosition(LegendPosition.BOTTOM);
+
+                LineChartData data = chart.getChartDataFactory().createLineChartData();
+                ChartAxis bottomAxis = chart.getChartAxisFactory().createCategoryAxis(AxisPosition.BOTTOM);
+                XSSFValueAxis leftAxis = chart.getChartAxisFactory().createValueAxis(AxisPosition.LEFT);
+                leftAxis.setCrosses(AxisCrosses.AUTO_ZERO);
+
+// Datos de categorías y valores
+                ChartDataSource<String> semanas = DataSources.fromStringCellRange(sheet, new CellRangeAddress(0, 0, 1, totalSemanas));
+                ChartDataSource<Number> porcentajes = DataSources.fromNumericCellRange(sheet, new CellRangeAddress(filaIndexAvance, filaIndexAvance, 1, totalSemanas));
+
+// Serie de línea
+                LineChartSeries series = data.addSeries(semanas, porcentajes);
+                series.setTitle("% Avance");
+//                series.setMarkerStyle(MarkerStyle.CIRCLE); // marcadores en cada punto
+//                series.setShowDataLabels(true);             // mostrar valores en cada punto
+
+// Dibujar gráfico
+                chart.plot(data, bottomAxis, leftAxis);
 
                 Row headerReq = sheet.createRow(filaIndex++);
                 headerReq.createCell(0).setCellValue("Requerimiento");
@@ -261,34 +283,25 @@ public class GeneratorExcel_Cursos extends Conexion {
                 headerReq.createCell(2).setCellValue("Fecha Entrega");
                 headerReq.createCell(3).setCellValue("Archivo");
 
-                // Consulta de Requerimientos Cumplidos (Query 2)
+                // Consulta de Requerimientos Cumplidos (Query 2) 
                 String queryRequerimientos = "SELECT r.nombre_Requerimiento AS requerimiento, rc.fecha_entrega, rc.ruta_Archivo,\n"
                         + "CASE WHEN rc.fecha_entrega IS NOT NULL THEN 'Cumplido' ELSE 'No cumplido' END AS estado \n"
-                        + "FROM asistentes_curso ac \n"
-                        + "JOIN historial_curso hc ON hc.idHistorial_Curso = ac.idHistorial_Curso \n"
-                        + "JOIN requerimientos r ON r.curso_idcurso = hc.idCurso \n"
-                        + "LEFT JOIN requerimientos_cumplidos rc \n"
-                        + "ON rc.idAsistentes_Curso = ac.idAsistentes_Curso \n"
-                        + "AND rc.idHistorial_curso = ac.idHistorial_Curso \n"
-                        + "AND rc.idRequerimientos = r.idRequerimientos \n"
-                        + "WHERE ac.idHistorial_Curso = ? AND ac.idAsistentes_Curso = ? \n"
+                        + "FROM asistentes_curso ac \n" + "JOIN historial_curso hc ON hc.idHistorial_Curso = ac.idHistorial_Curso \n"
+                        + "JOIN requerimientos r ON r.curso_idcurso = hc.idCurso \n" + "LEFT JOIN requerimientos_cumplidos rc \n"
+                        + "ON rc.idAsistentes_Curso = ac.idAsistentes_Curso \n" + "AND rc.idHistorial_curso = ac.idHistorial_Curso \n"
+                        + "AND rc.idRequerimientos = r.idRequerimientos \n" + "WHERE ac.idHistorial_Curso = ? AND ac.idAsistentes_Curso = ? \n"
                         + "ORDER BY r.nombre_Requerimiento;";
-
                 try (Connection con2 = conn.getConnection(); PreparedStatement ps2 = con2.prepareStatement(queryRequerimientos)) {
-
                     ps2.setInt(1, idHistorial);
                     ps2.setString(2, idAsistente);
-
                     try (ResultSet rs2 = ps2.executeQuery()) {
                         while (rs2.next()) {
                             Row filaReq = sheet.createRow(filaIndex++);
                             filaReq.createCell(0).setCellValue(rs2.getString("requerimiento"));
-
                             if (rs2.getDate("fecha_entrega") != null) {
                                 filaReq.createCell(1).setCellValue("Sí");
                                 filaReq.createCell(2).setCellValue(rs2.getDate("fecha_entrega").toString());
-                                filaReq.createCell(3).setCellValue(
-                                        rs2.getString("ruta_Archivo") != null ? rs2.getString("ruta_Archivo") : "");
+                                filaReq.createCell(3).setCellValue(rs2.getString("ruta_Archivo") != null ? rs2.getString("ruta_Archivo") : "");
                             } else {
                                 filaReq.createCell(1).setCellValue("No");
                                 filaReq.createCell(2).setCellValue("");
@@ -302,12 +315,7 @@ public class GeneratorExcel_Cursos extends Conexion {
                 for (int i = 0; i <= (totalSemanas * 2) + 2; i++) {
                     sheet.autoSizeColumn(i);
                 }
-                sheet.autoSizeColumn(0);
-                sheet.autoSizeColumn(1);
-                sheet.autoSizeColumn(2);
-
-                final int ANCHO_MAX_RUTA = 3000;
-                sheet.setColumnWidth(3, ANCHO_MAX_RUTA);
+                sheet.setColumnWidth(3, 3000);
 
                 // Guardar archivo individual
                 String nombreArchivo = "Avance_" + nombreAsistente.replace(" ", "_")
@@ -321,9 +329,7 @@ public class GeneratorExcel_Cursos extends Conexion {
                 workbook.close();
             }
 
-            JOptionPane.showMessageDialog(null,
-                    "Reportes generados en la carpeta: " + carpeta.getAbsolutePath());
-
+            JOptionPane.showMessageDialog(null, "Reportes generados en la carpeta: " + carpeta.getAbsolutePath());
             return true;
         } catch (SQLException | IOException ex) {
             Logger.getLogger(GeneratorExcel_Cursos.class.getName()).log(Level.SEVERE, null, ex);
