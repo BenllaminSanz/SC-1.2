@@ -4,6 +4,7 @@ import Controller.CtrlLBUGeneral;
 import Querys.Conexion;
 import View.IFrmLBU;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.sql.Connection;
@@ -113,9 +114,9 @@ public class Graphics_LBU {
 
         // Consulta: trabajadores por supervisor y turno
         String sql = "SELECT Nombre_Supervisor, Nombre_Turno, COUNT(Folio_Trabajador) AS total\n"
-                + "                FROM view_lbu\n"
-                + "                GROUP BY Nombre_Supervisor, Nombre_Turno\n"
-                + "                ORDER BY Nombre_Turno;";
+                + "FROM view_lbu\n"
+                + "GROUP BY Nombre_Supervisor, Nombre_Turno\n"
+                + "ORDER BY Nombre_Turno;";
 
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
@@ -132,10 +133,8 @@ public class Graphics_LBU {
 
                 String turno = rs.getString("Nombre_Turno"); // serie
                 int total = rs.getInt("total");
-
                 dataset.addValue(total, turno, supervisor);
             }
-
         } catch (SQLException ex) {
             Logger.getLogger(CtrlLBUGeneral.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
@@ -168,7 +167,24 @@ public class Graphics_LBU {
         );
         domainAxis.setTickLabelFont(new Font("SansSerif", Font.PLAIN, 9));
 
+        // ... código anterior (después de crear el gráfico 'chart' y obtener el 'plot')
         StackedBarRenderer renderer = new StackedBarRenderer();
+        renderer.setDefaultItemLabelGenerator(new StandardCategoryItemLabelGenerator());
+        renderer.setDefaultItemLabelsVisible(true);
+
+        Color azulFuerte = new Color(31, 73, 125); // Opcional: Color.BLUE es un buen azul fuerte
+        Color azul = new Color(79, 129, 189); // Un azul más claro o medio
+        Color rojoFuerte = new Color(127, 48, 55); // Opcional: Color.RED es un buen rojo fuerte
+        Color rojo = new Color(192, 80, 77); // Un rojo más claro o medio
+        Color verdeFuerte = new Color(101, 142, 70); // Opcional: Color.GREEN es un buen verde fuerte
+
+        // El orden de los turnos se asume como: A (0), B (1), C (2), D (3), LV (4)
+        renderer.setSeriesPaint(0, azulFuerte);   // Turno A: Azul Fuerte
+        renderer.setSeriesPaint(1, azul);         // Turno B: Azul
+        renderer.setSeriesPaint(2, rojoFuerte);   // Turno C: Rojo Fuerte
+        renderer.setSeriesPaint(3, rojo);         // Turno D: Rojo
+        renderer.setSeriesPaint(4, verdeFuerte);  // Turno LV: Verde Fuerte
+
         renderer.setDefaultItemLabelGenerator(new StandardCategoryItemLabelGenerator());
         renderer.setDefaultItemLabelsVisible(true);
         plot.setRenderer(renderer);

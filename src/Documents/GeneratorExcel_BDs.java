@@ -246,7 +246,7 @@ public class GeneratorExcel_BDs extends Conexion {
             return false;
         }
     }
-    
+
     public static boolean BD_CERTIFICADOS_BAJAS() throws IOException {
         Date fecha = new Date();
         SimpleDateFormat formatFecha = new SimpleDateFormat("dd-MM-yyyy");
@@ -280,8 +280,8 @@ public class GeneratorExcel_BDs extends Conexion {
                 Row header = sheet.createRow(rowIndex++);
                 String[] columnas = {
                     "Nómina", "Nombre", "Certificado", "Estado", "Tipo", "Inicio",
-                    "Cierre", "Certificación", "Fecha de Baja"
-                        ,"Turno", "Salario", "Nivel"
+                    "Cierre", "Certificación", "Fecha de Baja",
+                    "Turno", "Salario", "Nivel"
                 };
 
                 for (int i = 0; i < columnas.length; i++) {
@@ -377,6 +377,95 @@ public class GeneratorExcel_BDs extends Conexion {
 
             Connection con = conn.getConnection();
             PreparedStatement ps = con.prepareStatement("SELECT * FROM view_trabajador");
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                row = sheet.createRow(rowIndex++);
+                colIndex = 0;
+                for (String campo : camposSeleccionados) {
+                    switch (campo) {
+                        case "Nivel":
+                            String nivel = calcularNivel(rs.getDouble("SalarioDiario_Trabajador"));
+                            row.createCell(colIndex++).setCellValue(nivel);
+                            break;
+                        case "Sexo":
+                            String curp = rs.getString("CURP_Trabajador");
+                            String sexo = obtenerSexoDesdeCURP(curp);
+                            row.createCell(colIndex++).setCellValue(sexo);
+                            break;
+                        default:
+                            if (campo.startsWith("fecha")) {
+                                row.createCell(colIndex++).setCellValue(DateTools.MySQLtoString(rs.getDate(campo)));
+                            } else if (campo.equals("Folio_Trabajador")) {
+                                row.createCell(colIndex++).setCellValue(rs.getInt(campo));
+                            } else {
+                                row.createCell(colIndex++).setCellValue(rs.getString(campo));
+                            }
+                    }
+                }
+            }
+
+            for (int i = 0; i < camposSeleccionados.size(); i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            FileOutputStream outputStream = new FileOutputStream(rutaDoc);
+            workbook.write(outputStream);
+            JOptionPane.showMessageDialog(null, "Respaldo Creado en " + rutaDoc);
+
+            if (Desktop.isDesktopSupported()) {
+                Desktop desktop = Desktop.getDesktop();
+                if (desktop.isSupported(Desktop.Action.OPEN)) {
+                    desktop.open(new File(rutaDoc));
+                }
+            }
+
+            ps.close();
+            return true;
+        } catch (SQLException | FileNotFoundException ex) {
+            Logger.getLogger(GeneratorExcel_LBU.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showConfirmDialog(null, "Error al generar archivo: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (IOException ex) {
+            Logger.getLogger(GeneratorExcel_LBU.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+
+    public static boolean BD_BAJAS(String fechaInicio, String fechaFin, Map<String, String> camposDisponibles, List<String> camposSeleccionados) throws IOException {
+        Date fecha = new Date();
+        SimpleDateFormat formatFecha = new SimpleDateFormat("dd-MM-yyyy");
+        String FechaS = formatFecha.format(fecha);
+
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Guardar Respaldo de Bajas");
+        fileChooser.setSelectedFile(new File("Respaldo Lista de Bajas " + FechaS + ".xlsx"));
+
+        int userSelection = fileChooser.showSaveDialog(null);
+        if (userSelection != JFileChooser.APPROVE_OPTION) {
+            JOptionPane.showMessageDialog(null, "Operación cancelada por el usuario.");
+            return false;
+        }
+
+        File fileToSave = fileChooser.getSelectedFile();
+        String rutaDoc = fileToSave.getAbsolutePath();
+        try {
+            Workbook workbook = new XSSFWorkbook();
+            Sheet sheet = workbook.createSheet("Lista de Bajas");
+            int rowIndex = 0;
+
+            Row row = sheet.createRow(rowIndex++);
+            int colIndex = 0;
+            for (String campo : camposSeleccionados) {
+                row.createCell(colIndex++).setCellValue(camposDisponibles.get(campo));
+            }
+
+            Connection con = conn.getConnection();
+            PreparedStatement psql = con.prepareStatement("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));");
+            psql.execute();
+
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM view_bajas WHERE Fecha_Baja >= ? AND Fecha_Baja <= ?");
+            ps.setString(1, fechaInicio);
+            ps.setString(2, fechaFin);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {

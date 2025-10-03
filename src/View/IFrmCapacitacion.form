@@ -1190,12 +1190,12 @@
                                       </Group>
                                       <Group type="102" alignment="0" attributes="0">
                                           <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                                              <Component id="btn_listaAsistentes" alignment="0" max="32767" attributes="0"/>
-                                              <Component id="jButton4" alignment="0" max="32767" attributes="0"/>
+                                              <Component id="btn_AgrTrabajador" alignment="0" max="32767" attributes="0"/>
+                                              <Component id="btn_listaAsistentes" alignment="0" pref="159" max="32767" attributes="0"/>
                                           </Group>
-                                          <EmptySpace pref="135" max="32767" attributes="0"/>
+                                          <EmptySpace max="32767" attributes="0"/>
                                           <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                              <Component id="btn_AgrTrabajador" max="32767" attributes="0"/>
+                                              <Component id="jButton4" max="32767" attributes="0"/>
                                               <Component id="jButton5" max="32767" attributes="0"/>
                                           </Group>
                                       </Group>
@@ -1226,13 +1226,13 @@
                                   <Component id="jScrollPane3" pref="372" max="32767" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="3" attributes="0">
-                                      <Component id="btn_listaAsistentes" alignment="3" min="-2" pref="22" max="-2" attributes="0"/>
                                       <Component id="btn_AgrTrabajador" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jButton4" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="3" attributes="0">
-                                      <Component id="jButton4" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="jButton5" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="btn_listaAsistentes" alignment="3" min="-2" pref="22" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
                           </Group>

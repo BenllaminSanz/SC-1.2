@@ -959,17 +959,18 @@ public class GeneratorPDF_Certificados extends Conexion {
                 tabla.addCell(rs.getString("En Segundo Puesto"));
                 doc.add(tabla);
             }
-            doc.add(new Phrase("Resúmen de todas las Áreas:"));
 
+            doc.add(new Phrase("Resúmen de todas las Áreas:"));
             PdfPTable tablaSt = DesingPDF_LBU.encabezadoSupervisorTotalFlexi();
             doc.add(tablaSt);
 
             PreparedStatement ps2 = con.prepareStatement("SELECT * FROM sistema_capacitacion.view_certificados_total");
             ResultSet rs2 = ps2.executeQuery();
+
             if (rs2.next()) {
                 PdfPTable tablaTotal = new PdfPTable(new float[]{0.5F, 0.5F, 0.5F, 0.5F, 0.5F});
                 tablaTotal.setWidthPercentage(67);
-                tablaTotal.setHorizontalAlignment(Element.ALIGN_RIGHT);
+//                tablaTotal.setHorizontalAlignment(Element.ALIGN_RIGHT);
 
                 tablaTotal.addCell(rs2.getString("plantilla"));
                 tablaTotal.addCell(rs2.getString("certificados"));
@@ -977,6 +978,28 @@ public class GeneratorPDF_Certificados extends Conexion {
                 tablaTotal.addCell(rs2.getString("En Primer Puesto"));
                 tablaTotal.addCell(rs2.getString("En Segundo Puesto"));
                 doc.add(tablaTotal);
+            }
+
+            doc.add(new Phrase("Resúmen Anual de Certificados:"));
+            PdfPTable tablaAc = DesingPDF_LBU.encabezadoSupervisorTotalAnual();
+            doc.add(tablaAc);
+
+            PreparedStatement ps3 = con.prepareStatement("SELECT * \n"
+                    + "FROM sistema_capacitacion.view_estado_certificados_anual \n"
+                    + "where year_certificacion=YEAR(CURDATE());");
+            ResultSet rs3 = ps3.executeQuery();
+
+            if (rs3.next()) {
+                PdfPTable tablaTotalAnual = new PdfPTable(new float[]{0.5F, 0.5F, 0.5F, 0.5F, 0.5F});
+                tablaTotalAnual.setWidthPercentage(67);
+//                tablaTotalAnual.setHorizontalAlignment(Element.ALIGN_RIGHT);
+
+                tablaTotalAnual.addCell(rs3.getString("total"));
+                tablaTotalAnual.addCell(rs3.getString("Primero"));
+                tablaTotalAnual.addCell(rs3.getString("Segundo"));
+                tablaTotalAnual.addCell(rs3.getString("baja"));
+                tablaTotalAnual.addCell(rs3.getString("Actual"));
+                doc.add(tablaTotalAnual);
             }
             doc.close();
             JOptionPane.showMessageDialog(null, "Archivo Creado en " + rutaDoc);
@@ -1041,7 +1064,7 @@ public class GeneratorPDF_Certificados extends Conexion {
                 ps = con.prepareStatement("SELECT * FROM sistema_capacitacion.view_certificados_area\n"
                         + "WHERE nombre_Area = ? GROUP BY `Puesto`");
                 ps.setString(1, areaSeleccionada);
-                
+
                 PreparedStatement psV = con.prepareStatement("SET @nombre_Area:=?");
                 psV.setString(1, areaSeleccionada);
                 psV.executeUpdate();
@@ -1051,15 +1074,15 @@ public class GeneratorPDF_Certificados extends Conexion {
                         + "WHERE nombre_Area = ? AND nombre_turno = ? GROUP BY `Puesto`");
                 ps.setString(1, areaSeleccionada);
                 ps.setString(2, turnoSeleccionado);
-                
+
                 PreparedStatement psA = con.prepareStatement("SET @nombre_Area:=?");
                 psA.setString(1, areaSeleccionada);
                 psA.executeUpdate();
-                
+
                 PreparedStatement psT = con.prepareStatement("SET @nombre_Turno:=?");
                 psT.setString(1, turnoSeleccionado);
                 psT.executeUpdate();
-                
+
                 ps2 = con.prepareStatement("SELECT * FROM sistema_capacitacion.view_certificados_area_turno_total");
             }
 

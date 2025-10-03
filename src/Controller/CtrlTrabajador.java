@@ -49,6 +49,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -158,6 +159,8 @@ public class CtrlTrabajador implements ActionListener, KeyListener, MouseListene
         this.frmTrabajador.btn_ListT.addActionListener(this);
         this.frmTrabajador.btn_ListT1.addActionListener(this);
         this.frmTrabajador.btn_ListT2.addActionListener(this);
+        this.frmTrabajador.jMenuItem2.addActionListener(this);
+        
     }
 
     //Funcion de inicio
@@ -368,6 +371,134 @@ public class CtrlTrabajador implements ActionListener, KeyListener, MouseListene
                 String fechaInicio = DateTools.StringtoMySQL(((JTextField) dateChooserIn.getDateEditor().getUiComponent()).getText());
                 String fechaFin = DateTools.StringtoMySQL(((JTextField) dateChooserFn.getDateEditor().getUiComponent()).getText());
                 GeneratorPDF_LBU.Bajas_Trabajadores(fechaInicio, fechaFin);
+            }
+        }
+        
+        //Accion para abrir la ventana que genera la lista de bajas
+        if (e.getSource() == frmTrabajador.jMenuItem2) {
+            // Crear el DateChooser
+            JDateChooser dateChooserIn = new JDateChooser();// Crear el DateChooser
+            dateChooserIn.setDateFormatString("dd/MM/yyyy");//Formato de fecha
+            JDateChooser dateChooserFn = new JDateChooser();
+            dateChooserFn.setDateFormatString("dd/MM/yyyy");//Formato de fecha
+
+            JPanel panel = new JPanel(new GridLayout(0, 1));
+            panel.add(new JLabel("Seleccione el periodo de consulta de las Bajas:"));
+            panel.add(new JLabel("Inicio:"));
+            panel.add(dateChooserIn);
+            panel.add(new JLabel("Final:"));
+            panel.add(dateChooserFn);
+
+            // Mostrar el JOptionPane con el panel y botones personalizados
+            int option = JOptionPane.showOptionDialog(frmTrabajador, panel,
+                    "Consultar Bajas", JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.QUESTION_MESSAGE, null, null, null);
+            
+            Map<String, String> camposDisponibles = new LinkedHashMap<>();
+            camposDisponibles.put("Folio_Trabajador", "Nomina");
+            camposDisponibles.put("Nombre_Trabajador", "Nombre");
+            camposDisponibles.put("Fecha_Baja", "Baja");
+            camposDisponibles.put("Comentario", "Comentario");
+            camposDisponibles.put("CURP_Trabajador", "CURP");
+            camposDisponibles.put("RFC_Trabajador", "RFC");
+            camposDisponibles.put("IMSS_Trabajador", "IMSS");
+            camposDisponibles.put("Fecha_Antiguedad", "Antiguedad");
+            camposDisponibles.put("nombre_Area", "Area");
+            camposDisponibles.put("nombre_Puesto", "Puesto");
+            camposDisponibles.put("nombre_Turno", "Turno");
+            camposDisponibles.put("Supervisor", "Supervisor");
+            camposDisponibles.put("SalarioDiario_Trabajador", "Salario");
+            camposDisponibles.put("Email_Trabajador", "Email");
+            camposDisponibles.put("Teléfono_Trabajador", "Teléfono");
+            camposDisponibles.put("Fecha_Cumpleaños", "Fecha de Nacimiento");
+
+            DefaultListModel<JCheckBox> listModel = new DefaultListModel<>();
+            for (String key : camposDisponibles.keySet()) {
+                JCheckBox checkBox = new JCheckBox(camposDisponibles.get(key), true);
+                listModel.addElement(checkBox);
+            }
+
+            JList<JCheckBox> list = new JList<>(listModel);
+            list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            list.setCellRenderer(new DefaultListCellRenderer() {
+                @Override
+                public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                    JCheckBox checkBox = (JCheckBox) value;
+                    checkBox.setBackground(isSelected ? list.getSelectionBackground() : list.getBackground());
+                    return checkBox;
+                }
+            });
+
+            // Listener para alternar el estado del checkbox con cada clic
+            list.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    int index = list.locationToIndex(e.getPoint());
+                    if (index != -1) {
+                        JCheckBox checkBox = listModel.getElementAt(index);
+                        checkBox.setSelected(!checkBox.isSelected());
+                        list.repaint();
+                    }
+                }
+            });
+
+            JScrollPane scrollPane = new JScrollPane(list);
+            JButton btnUp = new JButton("Subir");
+            JButton btnDown = new JButton("Bajar");
+
+            btnUp.addActionListener(ev -> {
+                int index = list.getSelectedIndex();
+                if (index > 0) {
+                    JCheckBox item = listModel.remove(index);
+                    listModel.add(index - 1, item);
+                    list.setSelectedIndex(index - 1);
+                }
+            });
+
+            btnDown.addActionListener(ev -> {
+                int index = list.getSelectedIndex();
+                if (index < listModel.getSize() - 1 && index != -1) {
+                    JCheckBox item = listModel.remove(index);
+                    listModel.add(index + 1, item);
+                    list.setSelectedIndex(index + 1);
+                }
+            });
+
+            JPanel panel2 = new JPanel(new BorderLayout());
+            panel2.add(scrollPane, BorderLayout.CENTER);
+
+            JPanel buttonPanel = new JPanel(new GridLayout(1, 2));
+            buttonPanel.add(btnUp);
+            buttonPanel.add(btnDown);
+            panel2.add(buttonPanel, BorderLayout.SOUTH);
+
+            int result = JOptionPane.showConfirmDialog(null, panel2, "Selecciona y ordena los campos a exportar",
+                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+            List<String> camposSeleccionados = new ArrayList<>();
+            for (int i = 0; i < listModel.getSize(); i++) {
+                JCheckBox checkBox = listModel.getElementAt(i);
+                if (checkBox.isSelected()) {
+                    camposSeleccionados.add(getKeyByValue(camposDisponibles, checkBox.getText()));
+                }
+            }
+
+            if (result != JOptionPane.OK_OPTION || camposSeleccionados.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Operación cancelada por el usuario.");
+                
+            } else {
+                String fechaInicio = DateTools.StringtoMySQL(((JTextField) dateChooserIn.getDateEditor().getUiComponent()).getText());
+                String fechaFin = DateTools.StringtoMySQL(((JTextField) dateChooserFn.getDateEditor().getUiComponent()).getText());
+                frmTrabajador.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                try {
+                    if (GeneratorExcel_BDs.BD_BAJAS(fechaInicio, fechaFin,camposDisponibles, camposSeleccionados)) {
+                        frmTrabajador.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                    } else {
+                        frmTrabajador.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                    }
+                } catch (IOException ex) {
+                    Logger.getLogger(CtrlTrabajador.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
 

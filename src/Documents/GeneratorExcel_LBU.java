@@ -546,28 +546,28 @@ public class GeneratorExcel_LBU extends Conexion {
                             case 1:
                                 row.createCell(8).setCellValue(rs4.getInt("Propuesto"));
                                 diferenciaCell = row.createCell(9);
-                                diferenciaCell.setCellFormula("I" + (rowNum + 1) + "-K" + (rowNum + 1));
+                                diferenciaCell.setCellFormula("I" + (rowNum) + "-K" + (rowNum));
 
                                 break;
                             case 2:
                                 row.createCell(11).setCellValue(rs4.getInt("Propuesto"));
                                 diferenciaCell = row.createCell(12);
-                                diferenciaCell.setCellFormula("I" + (rowNum + 1) + "-K" + (rowNum + 1));
+                                diferenciaCell.setCellFormula("L" + (rowNum) + "-N" + (rowNum));
                                 break;
                             case 3:
                                 row.createCell(14).setCellValue(rs4.getInt("Propuesto"));
                                 diferenciaCell = row.createCell(15);
-                                diferenciaCell.setCellFormula("I" + (rowNum + 1) + "-K" + (rowNum + 1));
+                                diferenciaCell.setCellFormula("O" + (rowNum) + "-Q" + (rowNum));
                                 break;
                             case 4:
                                 row.createCell(17).setCellValue(rs4.getInt("Propuesto"));
                                 diferenciaCell = row.createCell(18);
-                                diferenciaCell.setCellFormula("I" + (rowNum + 1) + "-K" + (rowNum + 1));
+                                diferenciaCell.setCellFormula("R" + (rowNum) + "-T" + (rowNum));
                                 break;
                             case 5:
                                 row.createCell(20).setCellValue(rs4.getInt("Propuesto"));
                                 diferenciaCell = row.createCell(21);
-                                diferenciaCell.setCellFormula("I" + (rowNum + 1) + "-K" + (rowNum + 1));
+                                diferenciaCell.setCellFormula("U" + (rowNum) + "-W" + (rowNum));
                                 break;
                             default:
                                 row.createCell(20).setCellValue("0");
@@ -604,10 +604,9 @@ public class GeneratorExcel_LBU extends Conexion {
             totalRow.createCell(25).setCellValue(totalPlantilla);
 
             // Autoajustar columnas
-            sheet.autoSizeColumn(0);
-            sheet.autoSizeColumn(1);
-            sheet.autoSizeColumn(2);
-            sheet.autoSizeColumn(3);
+            for(int i=0; i<=25;i++){
+                sheet.autoSizeColumn(i);
+            }
 
             FileOutputStream outputStream = new FileOutputStream(rutaDoc);
             workbook.write(outputStream);

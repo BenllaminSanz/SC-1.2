@@ -98,7 +98,7 @@ public class DesingPDF_LBU {
     public static PdfPTable encabezadoSupervisorTotalFlexi() {
         PdfPTable encabezadoSupervisor = new PdfPTable(new float[]{0.5F, 0.5F, 0.5F, 0.5F, 0.5F});
         encabezadoSupervisor.setWidthPercentage(67);
-        encabezadoSupervisor.setHorizontalAlignment(Element.ALIGN_RIGHT);
+//        encabezadoSupervisor.setHorizontalAlignment(Element.ALIGN_RIGHT);
         BaseColor color = new BaseColor(175, 196, 174);
         Font font1 = new Font();
         font1.setStyle(Font.BOLD);
@@ -109,6 +109,24 @@ public class DesingPDF_LBU {
         encabezadoSupervisor.addCell(createHeaderCell("Flexibilidad", font1, color, 1));
         encabezadoSupervisor.addCell(createHeaderCell("Pers. Primer Puesto", font1, color, 1));
         encabezadoSupervisor.addCell(createHeaderCell("Pers. Segundo Puesto o más", font1, color, 1));
+
+        return encabezadoSupervisor;
+    }
+    
+    public static PdfPTable encabezadoSupervisorTotalAnual() {
+        PdfPTable encabezadoSupervisor = new PdfPTable(new float[]{0.5F, 0.5F, 0.5F, 0.5F, 0.5F});
+        encabezadoSupervisor.setWidthPercentage(67);
+//        encabezadoSupervisor.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        BaseColor color = new BaseColor(175, 196, 174);
+        Font font1 = new Font();
+        font1.setStyle(Font.BOLD);
+        font1.setSize(10);
+
+        encabezadoSupervisor.addCell(createHeaderCell("Total Certificados", font1, color, 1));
+        encabezadoSupervisor.addCell(createHeaderCell("Primer Puesto", font1, color, 1));
+        encabezadoSupervisor.addCell(createHeaderCell("Segundo o más", font1, color, 1));
+        encabezadoSupervisor.addCell(createHeaderCell("Bajas", font1, color, 1));
+        encabezadoSupervisor.addCell(createHeaderCell("Total Activo", font1, color, 1));
 
         return encabezadoSupervisor;
     }

@@ -996,8 +996,8 @@ public class CargarTabla {
         }
         return lbu;
     }
-    
-        public static List<HabilidadesCurso> cargarTablaHabilidadesCurso(String idCurso) {
+
+    public static List<HabilidadesCurso> cargarTablaHabilidadesCurso(String idCurso) {
         List<HabilidadesCurso> lbu = new ArrayList<>();
         Connection con = conn.getConnection();
 
@@ -2687,36 +2687,6 @@ public class CargarTabla {
         List<PersonalCertificado> personal = new ArrayList<>();
         Connection con = conn.getConnection();
 
-        String sql0 = "SELECT * FROM sistema_capacitacion.asistentes_certificados ac\n"
-                + "JOIN certificado c ON ac.certificado_idcertificado=c.idcertificado\n"
-                + "LEFT JOIN view_trabajador vt ON ac.asistentes_curso_idAsistente=vt.Folio_Trabajador\n"
-                + "WHERE YEAR(fecha_certificacion) = ? AND MONTH(fecha_certificacion) = ?\n"
-                + "ORDER BY fecha_certificacion";
-        String sql1 = "SELECT * FROM sistema_capacitacion.asistentes_certificados ac\n"
-                + "JOIN certificado c ON ac.certificado_idcertificado=c.idcertificado\n"
-                + "LEFT JOIN view_trabajador vt ON ac.asistentes_curso_idAsistente=vt.Folio_Trabajador\n"
-                + "WHERE YEAR(fecha_certificacion) = ? AND MONTH(fecha_certificacion) = ?\n"
-                + "AND nombre_area = ?"
-                + "ORDER BY fecha_certificacion;";
-        String sql2 = "SELECT * FROM sistema_capacitacion.asistentes_certificados ac\n"
-                + "JOIN certificado c ON ac.certificado_idcertificado=c.idcertificado\n"
-                + "LEFT JOIN view_trabajador vt ON ac.asistentes_curso_idAsistente=vt.Folio_Trabajador\n"
-                + "WHERE YEAR(fecha_certificacion) = ? AND MONTH(fecha_certificacion) = ?\n"
-                + "AND nombre_area = ? AND nombre_turno = ?"
-                + "ORDER BY fecha_certificacion;";
-        String sql3 = "SELECT * FROM sistema_capacitacion.asistentes_certificados ac\n"
-                + "JOIN certificado c ON ac.certificado_idcertificado=c.idcertificado\n"
-                + "LEFT JOIN view_trabajador vt ON ac.asistentes_curso_idAsistente=vt.Folio_Trabajador\n"
-                + "WHERE YEAR(fecha_certificacion) = ? AND MONTH(fecha_certificacion) = ?\n"
-                + "AND nombre_area = ? AND nombre_puesto = ?"
-                + "ORDER BY fecha_certificacion;";
-        String sql4 = "SELECT * FROM sistema_capacitacion.asistentes_certificados ac\n"
-                + "JOIN certificado c ON ac.certificado_idcertificado=c.idcertificado\n"
-                + "LEFT JOIN view_trabajador vt ON ac.asistentes_curso_idAsistente=vt.Folio_Trabajador\n"
-                + "WHERE YEAR(fecha_certificacion) = ? AND MONTH(fecha_certificacion) = ?\n"
-                + "AND nombre_area = ? AND nombre_puesto = ? AND nombre_turno = ?"
-                + "ORDER BY fecha_certificacion;";
-
         String mode = "SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));";
 
         try {
@@ -2724,49 +2694,14 @@ public class CargarTabla {
             ps.executeUpdate();
             ps.close();
 
-            switch (par) {
-                case 0:
-                    ps = con.prepareStatement(sql0);
-                    ps.setInt(1, año);
-                    ps.setInt(2, mes);
-                    break;
-                case 1:
-                    ps = con.prepareStatement(sql1);
-                    ps.setInt(1, año);
-                    ps.setInt(2, mes);
-                    ps.setString(3, Area);
-                    break;
-                case 2:
-                    ps = con.prepareStatement(sql2);
-                    ps.setInt(1, año);
-                    ps.setInt(2, mes);
-                    ps.setString(3, Area);
-                    ps.setString(4, Turno);
-                    break;
-                case 3:
-                    ps = con.prepareStatement(sql3);
-                    ps.setInt(1, año);
-                    ps.setInt(2, mes);
-                    ps.setString(3, Area);
-                    ps.setString(4, Puesto);
-                    break;
-                case 4:
-                    ps = con.prepareStatement(sql4);
-                    ps.setInt(1, año);
-                    ps.setInt(2, mes);
-                    ps.setString(3, Area);
-                    ps.setString(4, Puesto);
-                    ps.setString(5, Turno);
-                    break;
-            }
+            ps = prepararConsultaCertificados(con, año, mes, Area, Puesto, Turno, par);
             rs = ps.executeQuery();
-            System.out.println(ps);
 
             while (rs.next()) {
                 PersonalCertificado tbr = new PersonalCertificado();
-                tbr.setIdTrabajador_Certificado(rs.getString("asistentes_curso_idAsistente"));
+                tbr.setIdTrabajador_Certificado(rs.getString("Folio_Trabajador"));
                 tbr.setNombre_Trabajador(rs.getString("Nombre_Trabajador"));
-                tbr.setNombre_Certificado(rs.getString("Nombre_Certificado"));
+                tbr.setNombre_Certificado(rs.getString("nombre_certificado"));
                 tbr.setTipo_certificado(rs.getString("estado_certificacion"));
                 tbr.setFecha_certificacion(rs.getString("fecha_certificacion"));
                 personal.add(tbr);
@@ -2781,6 +2716,78 @@ public class CargarTabla {
             }
         }
         return personal;
+    }
+
+    public static PreparedStatement prepararConsultaCertificados(Connection con, int año, int mes, String area, String puesto, String turno, int seleccion) throws SQLException {
+        StringBuilder sql = new StringBuilder(
+                "SELECT ac.Folio_Trabajador, vt.Nombre_Trabajador, ac.nombre_certificado, ac.estado_certificacion, ac.fecha_certificacion, 'Trabajador' AS Origen "
+                + "FROM view_asistentes_certificados ac "
+                + "JOIN view_trabajador vt ON ac.Folio_Trabajador = vt.Folio_Trabajador "
+                + "WHERE YEAR(fecha_certificacion) = ? AND MONTH(fecha_certificacion) = ? "
+        );
+
+        // Filtros dinámicos primer SELECT
+        if (seleccion >= 1) {
+            sql.append(" AND vt.nombre_area = ? ");
+        }
+        if (seleccion == 2 || seleccion == 4) {
+            sql.append(" AND vt.nombre_turno = ? ");
+        }
+        if (seleccion == 3 || seleccion == 4) {
+            sql.append(" AND vt.nombre_puesto = ? ");
+        }
+
+        sql.append(
+                "UNION ALL "
+                + "SELECT ac.Folio_Trabajador, vb.Nombre_Trabajador, ac.nombre_certificado, ac.estado_certificacion, ac.fecha_certificacion, 'Baja' AS Origen "
+                + "FROM view_asistentes_certificados_bajas ac "
+                + "JOIN view_bajas vb ON ac.Folio_Trabajador = vb.Folio_Trabajador "
+                + "WHERE YEAR(fecha_certificacion) = ? AND MONTH(fecha_certificacion) = ? "
+        );
+
+        // Filtros dinámicos segundo SELECT
+        if (seleccion >= 1) {
+            sql.append(" AND vb.nombre_area = ? ");
+        }
+        if (seleccion == 2 || seleccion == 4) {
+            sql.append(" AND vb.nombre_turno = ? ");
+        }
+        if (seleccion == 3 || seleccion == 4) {
+            sql.append(" AND vb.nombre_puesto = ? ");
+        }
+
+        sql.append(" ORDER BY fecha_certificacion");
+
+        PreparedStatement ps = con.prepareStatement(sql.toString());
+
+        int index = 1;
+        // Parámetros primer SELECT
+        ps.setInt(index++, año);
+        ps.setInt(index++, mes);
+        if (seleccion >= 1) {
+            ps.setString(index++, area);
+        }
+        if (seleccion == 2 || seleccion == 4) {
+            ps.setString(index++, turno);
+        }
+        if (seleccion == 3 || seleccion == 4) {
+            ps.setString(index++, puesto);
+        }
+
+        // Parámetros segundo SELECT
+        ps.setInt(index++, año);
+        ps.setInt(index++, mes);
+        if (seleccion >= 1) {
+            ps.setString(index++, area);
+        }
+        if (seleccion == 2 || seleccion == 4) {
+            ps.setString(index++, turno);
+        }
+        if (seleccion == 3 || seleccion == 4) {
+            ps.setString(index++, puesto);
+        }
+
+        return ps;
     }
 
     public static List<PersonalCertificado> cargarTablaPersonalCertificadoProceso(int año, int mes, String proceso) {

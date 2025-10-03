@@ -254,6 +254,7 @@ public class GeneratorPDF_LBU extends Conexion {
         }
         return false;
     }
+    
 
     public static boolean LBUGeneral() {
         Document doc = new Document();

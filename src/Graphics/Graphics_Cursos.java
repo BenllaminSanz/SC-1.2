@@ -1,4 +1,3 @@
-//
 package Graphics;
 
 import Querys.Conexion;
@@ -48,7 +47,7 @@ public class Graphics_Cursos {
                 + "    nombre_tipo,COUNT(idHistorial) AS cursos,\n"
                 + "    SUM(asistentes_esperados) as esperado,\n"
                 + "    SUM(num_asistentes) AS asistentes,\n"
-                + "    SUM(num_asistentes)/SUM(asistentes_esperados) AS porcentaje\n"
+                + "TRUNCATE(SUM(num_asistentes)/SUM(asistentes_esperados), 2) AS porcentaje \n"
                 + "FROM sistema_capacitacion.view_historialcursos\n"
                 + "WHERE estado_curso = 'Concluido'\n"
                 + "AND YEAR(fecha_inicio) = YEAR(CURDATE())"
@@ -99,7 +98,7 @@ public class Graphics_Cursos {
         renderer2.setDrawOutlines(true);
         renderer2.setUseFillPaint(true);
         renderer2.setDefaultFillPaint(Color.WHITE);
-        renderer2.setDefaultItemLabelGenerator(new StandardCategoryItemLabelGenerator("{2}", new DecimalFormat("##%")));
+        renderer2.setDefaultItemLabelGenerator(new StandardCategoryItemLabelGenerator("{2}", new DecimalFormat("0.00%")));
         renderer2.setDefaultItemLabelsVisible(true);
 
         plot1.setDataset(1, dataset2);

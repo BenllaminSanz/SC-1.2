@@ -143,6 +143,7 @@ public class IFrmTrabajador extends javax.swing.JInternalFrame {
         Item_Lista_Nuevos_Tbr = new javax.swing.JMenuItem();
         Menu_Bajas = new javax.swing.JMenu();
         Item_Lista_Bajas_Tbr = new javax.swing.JMenuItem();
+        jMenuItem2 = new javax.swing.JMenuItem();
         Menu_Salarios = new javax.swing.JMenu();
         item_nivelesSalarios = new javax.swing.JMenuItem();
 
@@ -909,8 +910,17 @@ public class IFrmTrabajador extends javax.swing.JInternalFrame {
         Menu_Bajas.setText("Bajas");
 
         Item_Lista_Bajas_Tbr.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/IconList.png"))); // NOI18N
-        Item_Lista_Bajas_Tbr.setText("Listar Bajas");
+        Item_Lista_Bajas_Tbr.setText("Reporte Bajas");
+        Item_Lista_Bajas_Tbr.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Item_Lista_Bajas_TbrActionPerformed(evt);
+            }
+        });
         Menu_Bajas.add(Item_Lista_Bajas_Tbr);
+
+        jMenuItem2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/IconExcel.png"))); // NOI18N
+        jMenuItem2.setText("Listar Bajas");
+        Menu_Bajas.add(jMenuItem2);
 
         Bar_Trabajador.add(Menu_Bajas);
 
@@ -946,6 +956,10 @@ public class IFrmTrabajador extends javax.swing.JInternalFrame {
     private void formInternalFrameClosing(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameClosing
         x = null;
     }//GEN-LAST:event_formInternalFrameClosing
+
+    private void Item_Lista_Bajas_TbrActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Item_Lista_Bajas_TbrActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_Item_Lista_Bajas_TbrActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -1030,6 +1044,7 @@ public class IFrmTrabajador extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel4;
     public javax.swing.JLabel jLabel5;
     private javax.swing.JMenuItem jMenuItem1;
+    public javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;

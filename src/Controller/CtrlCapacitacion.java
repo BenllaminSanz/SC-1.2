@@ -406,9 +406,9 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
                 CtrlRequerimientos ctrl = new CtrlRequerimientos(contexto);
                 ctrl.iniciar();
             } else {
-                JOptionPane.showMessageDialog(null, 
+                JOptionPane.showMessageDialog(null,
                         "El avance solo aplica para los cursos de Proceso de Producción \n"
-                                + "Si es el caso, verifique que se han cargado los requerimientos y habilidades en el curso");
+                        + "Si es el caso, verifique que se han cargado los requerimientos y habilidades en el curso");
 
             }
         }
@@ -707,7 +707,7 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
                 frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
             }
         }
-        
+
         if (e.getSource() == frm.jMenuItem14) {
             try {
                 // Acción a realizar al hacer clic en "Aceptar"
@@ -977,13 +977,8 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
             }
 
             File carpetaBase = chooser.getSelectedFile();
-            String nombreCarpetaCurso = nombreCurso.trim().replaceAll("[\\\\/:*?\"<>|]", "_") + "_" + idHCurso;
-            File carpetaCurso = new File(carpetaBase, nombreCarpetaCurso);
-
-            if (!carpetaCurso.exists() && !carpetaCurso.mkdirs()) {
-                JOptionPane.showMessageDialog(null, "No se pudo crear la carpeta del curso.");
-                return;
-            }
+            
+            frm.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
             try (Connection con = conn.getConnection(); PreparedStatement psAsistentes = con.prepareStatement(
                     "SELECT idAsistentes_Curso, nombre_asistente FROM asistentes_curso WHERE idHistorial_Curso = ?"); PreparedStatement psDocs = con.prepareStatement(
@@ -1001,11 +996,17 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
 
                 while (rsDocs.next()) {
                     String rutaArchivo = rsDocs.getString("ruta_documento");
-                    File archivo = new File(rutaArchivo);
-                    if (archivo.exists()) {
-                        archivosCurso.add(archivo);
+
+                    if (rutaArchivo != null) {
+                        File archivo = new File(rutaArchivo);
+
+                        if (archivo.exists()) {
+                            archivosCurso.add(archivo);
+                        } else {
+                            todosExisten = false; // al menos uno no existe
+                        }
                     } else {
-                        todosExisten = false; // al menos uno no existe
+                        System.err.println("Advertencia: Se encontró una ruta de documento NULL en la base de datos.");
                     }
                 }
 
@@ -1020,10 +1021,10 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
 
                 while (rsAsistentes.next()) {
                     String idAsistente = rsAsistentes.getString("idAsistentes_Curso").trim();
-                    String nombreAsistente = rsAsistentes.getString("nombre_asistente").trim()
-                            .replaceAll("[\\\\/:*?\"<>|]", "_");
+//                    String nombreAsistente = rsAsistentes.getString("nombre_asistente").trim()
+//                            .replaceAll("[\\\\/:*?\"<>|]", "_");
 
-                    File carpetaAsistente = new File(carpetaCurso, idAsistente + "_" + nombreAsistente);
+                    File carpetaAsistente = new File(carpetaBase, idAsistente + "_" + nombreCurso.trim().replaceAll("[\\\\/:*?\"<>|]", "_"));
                     carpetaAsistente.mkdirs();
 
                     for (File archivoOriginal : archivosCurso) {
@@ -1041,8 +1042,9 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
                         }
                     }
                 }
-
-                JOptionPane.showMessageDialog(null, "Carpetas y archivos generados en:\n" + carpetaCurso.getAbsolutePath());
+                
+                frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                JOptionPane.showMessageDialog(null, "Carpetas y archivos generados en:\n" + carpetaBase.getAbsolutePath());
 
             } catch (SQLException ex) {
                 Logger.getLogger(CtrlCapacitacion.class.getName()).log(Level.SEVERE, null, ex);
@@ -1065,7 +1067,7 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
             String Node = selectedNode.getUserObject().toString();
             String consultaSemanas = QueryFunctions.CapturaCondicionalSimple("curso", "duracion_curso", "nombre_curso", Node);
             int semanas = Integer.parseInt(consultaSemanas);
-            if (GeneratorExcel_Cursos.AnvanceILUO(idHistorialCurso, semanas)) {
+            if (GeneratorExcel_Cursos.AvanceILUO(idHistorialCurso, semanas)) {
                 frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
             } else {
                 frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -1086,11 +1088,6 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
                     int induccion = Integer.parseInt(QueryFunctions.CapturaCondicionalSimple(
                             "historial_curso", "idCurso",
                             "idHistorial_Curso", String.valueOf(Curso)));
-                    if (induccion == 1) {
-//                        frm.btn_generarCardex.setVisible(true);
-                    } else {
-//                        frm.btn_generarCardex.setVisible(false);
-                    }
                 }
             }
         }

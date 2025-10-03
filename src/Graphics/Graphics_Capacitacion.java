@@ -1389,7 +1389,6 @@ public class Graphics_Capacitacion {
                     + "group by year(fecha_certificacion), month(fecha_certificacion) \n"
                     + "order by year(fecha_certificacion), month(fecha_certificacion) asc;";
 
-            System.out.println(year);
             if (year > 0) {
                 ps = con.prepareStatement(sql);
                 ps.setInt(1, year);
