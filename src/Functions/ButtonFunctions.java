@@ -166,7 +166,9 @@ public class ButtonFunctions {
                     frm.txt_totalturno_D.setText(String.valueOf(mod.getTurnoD()));
                     frm.txt_totalturno_LV.setText(String.valueOf(mod.getTurnoLV()));
                     frm.txt_totalturno_LS.setText(String.valueOf(mod.getTurnoLS()));
-                    
+                    frm.jCheckBox1.setSelected(mod.getTecnoOE()== 1);
+                    frm.jCheckBox2.setSelected(mod.getTecnoRS()== 1);
+                    frm.jCheckBox3.setSelected(mod.getTecnoPOLY()== 1);
                     frm.repaint();
                     break;
                 }
@@ -282,8 +284,8 @@ public class ButtonFunctions {
                 break;
         }
     }
-    
-        public static void TxtBtnHabilidad(String texto, String folio, IFrmEditarHabilidad frm, HabilidadesCurso mod, ConsultasHabilidadesCurso modC) {
+
+    public static void TxtBtnHabilidad(String texto, String folio, IFrmEditarHabilidad frm, HabilidadesCurso mod, ConsultasHabilidadesCurso modC) {
         switch (texto) {
             case "Guardar":
                 frm.setTitle("Agregar habilidad al Curso");

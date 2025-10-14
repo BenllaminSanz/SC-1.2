@@ -52,6 +52,7 @@ public class CtrlLBUGeneral implements ActionListener {
         this.frm.jMenuItem3.addActionListener(this);
         this.frm.jMenuItem4.addActionListener(this);
         this.frm.jMenuItem5.addActionListener(this);
+        this.frm.jMenuItem6.addActionListener(this);
     }
 
     //Funcion de inicio
@@ -213,7 +214,7 @@ public class CtrlLBUGeneral implements ActionListener {
                 frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
             }
         }
-        
+
         if (e.getSource() == frm.jMenuItem5) {
             frm.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             try {
@@ -277,11 +278,22 @@ public class CtrlLBUGeneral implements ActionListener {
 
             }
         }
-        
+
         if (e.getSource() == frm.jMenuItem4) {
             frm.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             try {
                 GeneratorExcel_LBU.LBUResumenAreas();
+                frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            } catch (Exception ex) {
+                Logger.getLogger(CtrlEditarTrabajador.class.getName()).log(Level.SEVERE, null, ex);
+                frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            }
+        }
+
+        if (e.getSource() == frm.jMenuItem6) {
+            frm.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            try {
+                GeneratorExcel_LBU.LBUResumenAreasTecnologias();
                 frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
             } catch (Exception ex) {
                 Logger.getLogger(CtrlEditarTrabajador.class.getName()).log(Level.SEVERE, null, ex);

@@ -12,17 +12,27 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.DataFormat;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class GeneratorExcel_LBU extends Conexion {
@@ -604,7 +614,7 @@ public class GeneratorExcel_LBU extends Conexion {
             totalRow.createCell(25).setCellValue(totalPlantilla);
 
             // Autoajustar columnas
-            for(int i=0; i<=25;i++){
+            for (int i = 0; i <= 25; i++) {
                 sheet.autoSizeColumn(i);
             }
 
@@ -626,5 +636,351 @@ public class GeneratorExcel_LBU extends Conexion {
             Logger.getLogger(GeneratorExcel_LBU.class.getName()).log(Level.SEVERE, null, ex);
         }
         return false;
+    }
+
+    public static boolean LBUResumenAreasTecnologias() {
+        Date fecha = new Date();
+        SimpleDateFormat formatFecha = new SimpleDateFormat("dd-MM-yyyy");
+        String FechaS = formatFecha.format(fecha);
+
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Guardar Resumen Tecnologias");
+        fileChooser.setSelectedFile(new File("Resumen de Tecnologias " + FechaS + ".xlsx"));
+
+        int userSelection = fileChooser.showSaveDialog(null);
+        if (userSelection != JFileChooser.APPROVE_OPTION) {
+            JOptionPane.showMessageDialog(null, "Operación cancelada por el usuario.");
+            return false;
+        }
+        String rutaDoc = fileChooser.getSelectedFile().getAbsolutePath();
+
+        try (Connection con = conn.getConnection(); Workbook workbook = new XSSFWorkbook()) {
+
+            // ============================================================
+            // ESTILOS
+            // ============================================================
+            CellStyle centeredStyle = workbook.createCellStyle();
+            centeredStyle.setAlignment(HorizontalAlignment.CENTER);
+            centeredStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+
+            DataFormat format = workbook.createDataFormat();
+            centeredStyle.setDataFormat(format.getFormat("0")); // formato numérico sin decimales
+
+            // --- Estilo para porcentajes centrados ---
+            CellStyle percentStyle = workbook.createCellStyle();
+            percentStyle.setAlignment(HorizontalAlignment.CENTER);
+            percentStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+
+            DataFormat format2 = workbook.createDataFormat();
+            percentStyle.setDataFormat(format2.getFormat("0.00%"));
+
+            // ============================================================
+            // HOJA 1: Resumen Completo
+            // ============================================================
+            Sheet sheet = workbook.createSheet("Resumen Completo");
+            int rowNum = 0;
+
+            Row header = sheet.createRow(rowNum++);
+            header.createCell(0).setCellValue("Área");
+            header.createCell(1).setCellValue("Puesto");
+            header.createCell(2).setCellValue("Position");
+            header.createCell(3).setCellValue("Nivel");
+            header.createCell(4).setCellValue("Propuesto");
+            header.createCell(5).setCellValue("Diferencia");
+            header.createCell(6).setCellValue("Actual");
+            header.createCell(7).setCellValue("OE");
+            header.createCell(8).setCellValue("RS");
+            header.createCell(9).setCellValue("POLYCOTTON");
+
+            Map<String, Map<String, Integer>> tabla1 = new LinkedHashMap<>();
+            Map<Integer, Set<Integer>> tecnologiasPorPuesto = new HashMap<>();
+
+            PreparedStatement psAreas = con.prepareStatement("SELECT * FROM area ORDER BY idArea");
+            ResultSet rsAreas = psAreas.executeQuery();
+
+            List<String> ordenAreas = new ArrayList<>();
+
+            while (rsAreas.next()) {
+                String idArea = rsAreas.getString("idArea");
+                String nombreArea = rsAreas.getString("Nombre_Area");
+                ordenAreas.add(nombreArea);
+
+                PreparedStatement psPuestos = con.prepareStatement(
+                        "SELECT * FROM puesto WHERE area_idArea = ? ORDER BY idPuesto");
+                psPuestos.setString(1, idArea);
+                ResultSet rsPuestos = psPuestos.executeQuery();
+
+                while (rsPuestos.next()) {
+                    int idPuesto = rsPuestos.getInt("idPuesto");
+                    Row row = sheet.createRow(rowNum++);
+                    row.createCell(0).setCellValue(nombreArea);
+                    row.createCell(1).setCellValue(rsPuestos.getString("Nombre_Puesto"));
+                    row.createCell(2).setCellValue(rsPuestos.getString("Nombre_Puesto_Ingles"));
+                    row.createCell(3).setCellValue(rsPuestos.getString("Nivel"));
+
+                    int propuesto = rsPuestos.getInt("Propuesto_Trabajadores");
+                    Cell cellPropuesto = row.createCell(4);
+                    cellPropuesto.setCellValue(propuesto);
+                    cellPropuesto.setCellStyle(centeredStyle);
+
+                    PreparedStatement psView = con.prepareStatement(
+                            "SELECT Diferencia, Plantilla FROM view_lbu_puesto WHERE idPuesto = ?");
+                    psView.setInt(1, idPuesto);
+                    ResultSet rsView = psView.executeQuery();
+                    int diferencia = 0;
+                    int actual = 0;
+                    if (rsView.next()) {
+                        diferencia = rsView.getInt("Diferencia");
+                        actual = rsView.getInt("Plantilla");
+                    }
+
+                    Cell cellDif = row.createCell(5);
+                    cellDif.setCellValue(diferencia);
+                    cellDif.setCellStyle(centeredStyle);
+
+                    Cell cellAct = row.createCell(6);
+                    cellAct.setCellValue(actual);
+                    cellAct.setCellStyle(centeredStyle);
+
+                    PreparedStatement psTecno = con.prepareStatement(
+                            "SELECT idTecnologia FROM puesto_tecnologia WHERE idPuesto = ?");
+                    psTecno.setInt(1, idPuesto);
+                    ResultSet rsTecno = psTecno.executeQuery();
+                    Set<Integer> tecSet = new HashSet<>();
+                    while (rsTecno.next()) {
+                        tecSet.add(rsTecno.getInt("idTecnologia"));
+                    }
+                    tecnologiasPorPuesto.put(idPuesto, tecSet);
+
+                    Cell cellOE = row.createCell(7);
+                    cellOE.setCellValue(tecSet.contains(1) ? 1 : 0);
+                    cellOE.setCellStyle(centeredStyle);
+
+                    Cell cellRS = row.createCell(8);
+                    cellRS.setCellValue(tecSet.contains(2) ? 1 : 0);
+                    cellRS.setCellStyle(centeredStyle);
+
+                    Cell cellPOLY = row.createCell(9);
+                    cellPOLY.setCellValue(tecSet.contains(3) ? 1 : 0);
+                    cellPOLY.setCellStyle(centeredStyle);
+
+                    String comboTec;
+                    if (tecSet.contains(1) && !tecSet.contains(2) && !tecSet.contains(3)) {
+                        comboTec = "OE";
+                    } else if (!tecSet.contains(1) && tecSet.contains(2) && !tecSet.contains(3)) {
+                        comboTec = "RS";
+                    } else if (!tecSet.contains(1) && !tecSet.contains(2) && tecSet.contains(3)) {
+                        comboTec = "POLY";
+                    } else if (tecSet.contains(1) && tecSet.contains(2) && !tecSet.contains(3)) {
+                        comboTec = "OE-RS";
+                    } else if (tecSet.contains(1) && !tecSet.contains(2) && tecSet.contains(3)) {
+                        comboTec = "OE-POLY";
+                    } else if (!tecSet.contains(1) && tecSet.contains(2) && tecSet.contains(3)) {
+                        comboTec = "RS-POLY";
+                    } else if (tecSet.contains(1) && tecSet.contains(2) && tecSet.contains(3)) {
+                        comboTec = "OE-RS-POLY";
+                    } else {
+                        comboTec = "Capacitación";
+                    }
+
+                    Map<String, Integer> inner = tabla1.getOrDefault(comboTec, new LinkedHashMap<>());
+                    inner.put(nombreArea, inner.getOrDefault(nombreArea, 0) + actual);
+                    tabla1.put(comboTec, inner);
+                }
+            }
+
+            rowNum += 2;
+
+            Row header2 = sheet.createRow(rowNum++);
+            header2.createCell(0).setCellValue("Combinación/Área");
+
+            for (int i = 0; i < ordenAreas.size(); i++) {
+                header2.createCell(i + 1).setCellValue(ordenAreas.get(i));
+            }
+            header2.createCell(ordenAreas.size() + 1).setCellValue("TOTAL");
+
+            List<String> combosOrden = Arrays.asList(
+                    "OE", "RS", "POLY", "OE-RS", "OE-POLY", "RS-POLY", "OE-RS-POLY", "Capacitación"
+            );
+
+            for (String combo : combosOrden) {
+                Map<String, Integer> inner = tabla1.getOrDefault(combo, new LinkedHashMap<>());
+                Row row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(combo);
+                int totalFila = 0;
+                for (int i = 0; i < ordenAreas.size(); i++) {
+                    int val = inner.getOrDefault(ordenAreas.get(i), 0);
+                    Cell cell = row.createCell(i + 1);
+                    cell.setCellValue(val);
+                    cell.setCellStyle(centeredStyle);
+                    totalFila += val;
+                }
+                Cell totalCell = row.createCell(ordenAreas.size() + 1);
+                totalCell.setCellValue(totalFila);
+                totalCell.setCellStyle(centeredStyle);
+            }
+
+            Row totalGen = sheet.createRow(rowNum++);
+            totalGen.createCell(0).setCellValue("TOTAL GENERAL");
+            int sumaTotal = 0;
+            for (int i = 0; i < ordenAreas.size(); i++) {
+                int colSum = 0;
+                for (String combo : combosOrden) {
+                    colSum += tabla1.getOrDefault(combo, new LinkedHashMap<>())
+                            .getOrDefault(ordenAreas.get(i), 0);
+                }
+                Cell cell = totalGen.createCell(i + 1);
+                cell.setCellValue(colSum);
+                cell.setCellStyle(centeredStyle);
+                sumaTotal += colSum;
+            }
+            Cell totalCell = totalGen.createCell(ordenAreas.size() + 1);
+            totalCell.setCellValue(sumaTotal);
+            totalCell.setCellStyle(centeredStyle);
+
+            for (int i = 0; i <= 30; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            // ============================================================
+            // HOJA 2: Resumen Agrupado
+            // ============================================================
+            Sheet resumen2 = workbook.createSheet("Summit LBU Summary");
+            int rowNum2 = 0;
+
+            Row h2 = resumen2.createRow(rowNum2++);
+            h2.createCell(0).setCellValue("Grupo / Área");
+            for (int i = 0; i < ordenAreas.size(); i++) {
+                h2.createCell(i + 1).setCellValue(ordenAreas.get(i));
+            }
+            h2.createCell(ordenAreas.size() + 1).setCellValue("TOTAL");
+            h2.createCell(ordenAreas.size() + 2).setCellValue("TOTAL GRUPO");
+
+            List<String> grupo1 = Arrays.asList("OE", "RS", "POLY");
+            int totalGrupo1 = 0;
+            for (String combo : grupo1) {
+                Map<String, Integer> inner = tabla1.getOrDefault(combo, new LinkedHashMap<>());
+                Row row = resumen2.createRow(rowNum2++);
+                row.createCell(0).setCellValue(combo);
+                int subtotal = 0;
+                for (int i = 0; i < ordenAreas.size(); i++) {
+                    int val = inner.getOrDefault(ordenAreas.get(i), 0);
+                    Cell cell = row.createCell(i + 1);
+                    cell.setCellValue(val);
+                    cell.setCellStyle(centeredStyle);
+                    subtotal += val;
+                }
+                Cell cellTotal = row.createCell(ordenAreas.size() + 1);
+                cellTotal.setCellValue(subtotal);
+                cellTotal.setCellStyle(centeredStyle);
+                totalGrupo1 += subtotal;
+            }
+
+            Map<String, Integer> otros = tabla1.getOrDefault("Capacitación", new LinkedHashMap<>());
+            Row rowOtros = resumen2.createRow(rowNum2++);
+            rowOtros.createCell(0).setCellValue("Capacitación");
+            int subtotal = 0;
+            for (int i = 0; i < ordenAreas.size(); i++) {
+                int val = otros.getOrDefault(ordenAreas.get(i), 0);
+                Cell cell = rowOtros.createCell(i + 1);
+                cell.setCellValue(val);
+                cell.setCellStyle(centeredStyle);
+                subtotal += val;
+            }
+
+            Row row4 = resumen2.createRow(rowNum2++);
+            Cell grupoCell = row4.createCell(ordenAreas.size() + 2);
+            grupoCell.setCellValue(totalGrupo1);
+            grupoCell.setCellStyle(centeredStyle);
+
+            double porcentajeOEPOLY = ((tabla1.getOrDefault("OE", Map.of()).values().stream().mapToInt(Integer::intValue).sum()
+                    + tabla1.getOrDefault("POLY", Map.of()).values().stream().mapToInt(Integer::intValue).sum())
+                    / (double) totalGrupo1) * 100;
+
+            double porcentajeRS = (tabla1.getOrDefault("RS", Map.of()).values().stream().mapToInt(Integer::intValue).sum()
+                    / (double) totalGrupo1) * 100;
+
+            Cell subtotalCell = rowOtros.createCell(ordenAreas.size() + 1);
+            subtotalCell.setCellValue(subtotal);
+            subtotalCell.setCellStyle(centeredStyle);
+
+            Cell cellOE = resumen2.createRow(rowNum2++).createCell(ordenAreas.size() + 1);
+            cellOE.setCellValue("OE-POLY:");
+            Cell valOE = resumen2.getRow(rowNum2 - 1).createCell(ordenAreas.size() + 2);
+            valOE.setCellValue(porcentajeOEPOLY / 100.0);
+            valOE.setCellStyle(percentStyle);
+
+            Cell cellRS = resumen2.createRow(rowNum2++).createCell(ordenAreas.size() + 1);
+            cellRS.setCellValue("RS:");
+            Cell valRS = resumen2.getRow(rowNum2 - 1).createCell(ordenAreas.size() + 2);
+            valRS.setCellValue(porcentajeRS / 100.0);
+            valRS.setCellStyle(percentStyle);
+
+            List<String> grupo2 = Arrays.asList("OE-RS", "OE-RS-POLY");
+            int totalGrupo2 = 0;
+            for (String combo : grupo2) {
+                Map<String, Integer> inner = tabla1.getOrDefault(combo, new LinkedHashMap<>());
+                Row row = resumen2.createRow(rowNum2++);
+                row.createCell(0).setCellValue(combo);
+                int subtotal2 = 0;
+                for (int i = 0; i < ordenAreas.size(); i++) {
+                    int val = inner.getOrDefault(ordenAreas.get(i), 0);
+                    Cell cell = row.createCell(i + 1);
+                    cell.setCellValue(val);
+                    cell.setCellStyle(centeredStyle);
+                    subtotal2 += val;
+                }
+                Cell cellTotal2 = row.createCell(ordenAreas.size() + 1);
+                cellTotal2.setCellValue(subtotal2);
+                cellTotal2.setCellStyle(centeredStyle);
+                totalGrupo2 += subtotal2;
+            }
+
+            Map<String, Integer> otros2 = tabla1.getOrDefault("Capacitación", new LinkedHashMap<>());
+            Row rowOtros2 = resumen2.createRow(rowNum2++);
+            rowOtros2.createCell(0).setCellValue("Capacitación");
+            int subtotal2 = 0;
+            for (int i = 0; i < ordenAreas.size(); i++) {
+                int val = otros2.getOrDefault(ordenAreas.get(i), 0);
+                Cell cell = rowOtros2.createCell(i + 1);
+                cell.setCellValue(val);
+                cell.setCellStyle(centeredStyle);
+                subtotal2 += val;
+            }
+
+            Cell cellTotal2 = rowOtros2.createCell(ordenAreas.size() + 1);
+            cellTotal2.setCellValue(subtotal2);
+            cellTotal2.setCellStyle(centeredStyle);
+            totalGrupo2 += subtotal2;
+
+            Row totalFinal = resumen2.createRow(rowNum2++);
+            totalFinal.createCell(ordenAreas.size() + 1).setCellValue("TOTAL GENERAL");
+            Cell totalGeneralCell = totalFinal.createCell(ordenAreas.size() + 2);
+            totalGeneralCell.setCellValue(totalGrupo1 + totalGrupo2 );
+            totalGeneralCell.setCellStyle(centeredStyle);
+
+            for (int i = 0; i <= 30; i++) {
+                resumen2.autoSizeColumn(i);
+            }
+
+            // ============================================================
+            // GUARDAR ARCHIVO
+            // ============================================================
+            try (FileOutputStream out = new FileOutputStream(rutaDoc)) {
+                workbook.write(out);
+            }
+
+            JOptionPane.showMessageDialog(null, "Archivo creado en: " + rutaDoc);
+            if (Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().open(new File(rutaDoc));
+            }
+
+            return true;
+
+        } catch (SQLException | IOException ex) {
+            Logger.getLogger(GeneratorExcel_LBU.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(null, "Error al generar el archivo: " + ex.getMessage());
+            return false;
+        }
     }
 }

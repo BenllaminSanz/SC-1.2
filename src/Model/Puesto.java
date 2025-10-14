@@ -37,7 +37,7 @@ public class Puesto {
     public void setTurnoLS(int TurnoLS) {
         this.TurnoLS = TurnoLS;
     }
-    
+
     private int Plantilla_Trabajadores;
     private int area_idArea;
     private String area_NombreArea;
@@ -79,7 +79,7 @@ public class Puesto {
     public void setDescripcion(String Descripcion) {
         this.Descripcion = Descripcion;
     }
-    
+
     public String getNivel() {
         return Nivel;
     }
@@ -135,7 +135,7 @@ public class Puesto {
     public void setArea_NombreArea(String area_NombreArea) {
         this.area_NombreArea = area_NombreArea;
     }
-    
+
     public int getTurnoA() {
         return TurnoA;
     }
@@ -175,4 +175,34 @@ public class Puesto {
     public void setTurnoLV(int TurnoLV) {
         this.TurnoLV = TurnoLV;
     }
+
+    //Tecnologias a las que reporta
+    private int OE;
+    private int RS;
+    private int POLY;
+
+    public int getTecnoOE() {
+        return OE;
+    }
+
+    public void setTecnoOE(int TecnoOE) {
+        this.OE = TecnoOE;
+    }
+
+    public int getTecnoRS() {
+        return RS;
+    }
+
+    public void setTecnoRS(int TecnoRS) {
+        this.RS = TecnoRS;
+    }
+
+    public int getTecnoPOLY() {
+        return POLY;
+    }
+
+    public void setTecnoPOLY(int TecnoPOLY) {
+        this.POLY = TecnoPOLY;
+    }
+
 }

@@ -70,6 +70,7 @@ public class IFrmLBU extends javax.swing.JInternalFrame {
         itemRptSup_Excel = new javax.swing.JMenuItem();
         itemRptArea_Excel = new javax.swing.JMenuItem();
         jMenuItem4 = new javax.swing.JMenuItem();
+        jMenuItem6 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         jMenu3 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
@@ -510,6 +511,15 @@ public class IFrmLBU extends javax.swing.JInternalFrame {
         jMenuItem4.setText("Reporte de Áreas");
         itemReporte.add(jMenuItem4);
 
+        jMenuItem6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/IconList.png"))); // NOI18N
+        jMenuItem6.setText("Reporte de Tecnologías");
+        jMenuItem6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem6ActionPerformed(evt);
+            }
+        });
+        itemReporte.add(jMenuItem6);
+
         Bar_LBU.add(itemReporte);
 
         jMenu2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/IconList.png"))); // NOI18N
@@ -593,6 +603,10 @@ public class IFrmLBU extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
+    private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem6ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jMenuItem6ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuBar Bar_LBU;
     private javax.swing.JPanel Panel_Resumen_LBU;
@@ -633,6 +647,7 @@ public class IFrmLBU extends javax.swing.JInternalFrame {
     public javax.swing.JMenuItem jMenuItem3;
     public javax.swing.JMenuItem jMenuItem4;
     public javax.swing.JMenuItem jMenuItem5;
+    public javax.swing.JMenuItem jMenuItem6;
     public javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;

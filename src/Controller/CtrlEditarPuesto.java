@@ -83,6 +83,9 @@ public class CtrlEditarPuesto implements ActionListener {
             String area = frm.cb_AreaPuesto.getSelectedItem().toString();
             mod.setArea_idArea(Integer.parseInt(QueryFunctions.CapturaCondicionalSimple(
                     "area", "idArea", "Nombre_Area", area)));
+            mod.setTecnoOE(frm.jCheckBox1.isSelected() ? 1 : 0);
+            mod.setTecnoRS(frm.jCheckBox2.isSelected() ? 1 : 0);
+            mod.setTecnoPOLY(frm.jCheckBox3.isSelected() ? 1 : 0);
 
             if (modC.registrar(mod)) {
                 JOptionPane.showMessageDialog(null, "Puesto agregado");
@@ -111,7 +114,9 @@ public class CtrlEditarPuesto implements ActionListener {
                 String area = frm.cb_AreaPuesto.getSelectedItem().toString();
                 mod.setArea_idArea(Integer.parseInt(QueryFunctions.CapturaCondicionalSimple(
                         "area", "idArea", "Nombre_Area", area)));
-
+                mod.setTecnoOE(frm.jCheckBox1.isSelected() ? 1 : 0);
+                mod.setTecnoRS(frm.jCheckBox2.isSelected() ? 1 : 0);
+                mod.setTecnoPOLY(frm.jCheckBox3.isSelected() ? 1 : 0);
                 //Llamada a la funcion de modificar enviando los datos guardados en la instacia
                 if (modC.modificar(mod, folio)) {
                     JOptionPane.showMessageDialog(null, "Puesto modificado");

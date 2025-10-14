@@ -19,6 +19,7 @@ public class ConsultasPuesto extends Conexion {
     public boolean registrar(Puesto tbr) {
         String sqlPuesto = "INSERT INTO puesto (Nombre_Puesto, Nombre_Puesto_Ingles, Descripcion, Nivel, Centro_de_Costo, Propuesto_Trabajadores, area_idArea) VALUES (?,?,?,?,?,?,?)";
         String sqlTurno = "INSERT INTO turno_puesto (turno_idTurno, puesto_idPuesto, propuesto) VALUES (?,?,?)";
+        String sqlTecno = "INSERT INTO puesto_tecnologia (idpuesto, idtecnologia) VALUES (?,?)";
 
         try (Connection con = getConnection()) {
             con.setAutoCommit(false); // Iniciar transacción
@@ -53,6 +54,24 @@ public class ConsultasPuesto extends Conexion {
                     }
                     ps2.executeBatch();
                 }
+
+                try (PreparedStatement ps3 = con.prepareStatement(sqlTecno)) {
+                    // 1 = OE, 2 = RS, 3 = POLYCOTTON
+                    String[] sufijosTecno = {"OE", "RS", "POLY"};
+                    for (int i = 0; i < sufijosTecno.length; i++) {
+                        String metodoNombre = "getTecno" + sufijosTecno[i];
+                        Method metodo = tbr.getClass().getMethod(metodoNombre);
+                        int valorPropuesto = (Integer) metodo.invoke(tbr);
+
+                        // Solo insertar si el valor es 1 (checkbox seleccionado)
+                        if (valorPropuesto == 1) {
+                            ps3.setInt(1, idPuesto);   // idpuesto
+                            ps3.setInt(2, i + 1);      // idtecnologia (1=OE, 2=RS, 3=POLY)
+                            ps3.addBatch();
+                        }
+                    }
+                    ps3.executeBatch();
+                }
             }
 
             con.commit(); // confirmar transacción
@@ -80,8 +99,14 @@ public class ConsultasPuesto extends Conexion {
                 + "VALUES (?, ?, ?) "
                 + "ON DUPLICATE KEY UPDATE propuesto = VALUES(propuesto)";
 
+        String sqlTecno = "INSERT INTO puesto_tecnologia (idPuesto, idTecnologia) "
+                + "VALUES (?, ?) "
+                + "ON DUPLICATE KEY UPDATE idTecnologia = VALUES(idTecnologia)";
+
+        String sqlDeleteTecno = "DELETE FROM puesto_tecnologia WHERE idPuesto = ?";
+
         try (Connection con = getConnection()) {
-            con.setAutoCommit(false); // 🔒 iniciar transacción
+            con.setAutoCommit(false);
 
             // --- Actualizar datos del puesto ---
             try (PreparedStatement ps = con.prepareStatement(sqlPuesto)) {
@@ -117,7 +142,29 @@ public class ConsultasPuesto extends Conexion {
                 ps.executeBatch();
             }
 
-            con.commit(); // ✅ confirmar todo
+            try (PreparedStatement psDel = con.prepareStatement(sqlDeleteTecno)) {
+                psDel.setInt(1, folio);
+                psDel.execute();
+            }
+
+            try (PreparedStatement ps3 = con.prepareStatement(sqlTecno)) {
+                String[] sufijosTecno = {"OE", "RS", "POLY"};
+                for (int i = 0; i < sufijosTecno.length; i++) {
+                    String metodoNombre = "getTecno" + sufijosTecno[i];
+                    Method metodo = tbr.getClass().getMethod(metodoNombre);
+                    int valorTecno = (Integer) metodo.invoke(tbr);
+                    System.out.println(valorTecno);
+                    // Si el valor es 1 (seleccionado), lo guardamos
+                    if (valorTecno == 1) {
+                        ps3.setInt(1, folio);   // puesto_idPuesto
+                        ps3.setInt(2, i + 1);   // tecnologia_idTecnologia
+                        ps3.addBatch();
+                    }
+                }
+                ps3.executeBatch();
+            }
+
+            con.commit();
             return true;
 
         } catch (Exception ex) {
@@ -193,24 +240,56 @@ public class ConsultasPuesto extends Conexion {
 
                     String sufijo = sufijosTurno.get(turnoId);
                     if (sufijo == null) {
-                        System.err.println("Turno no reconocido: " + turnoId);
+                        Logger.getLogger("Turno no reconocido: " + turnoId);
                         continue; // o manejar el error como desees
                     }
 
                     String metodoNombre = "setTurno" + sufijo;
-                    System.out.println("Invocando método: " + metodoNombre + " con valor: " + propuesto);
 
-                    try {
-                        Method metodo = tbr.getClass().getMethod(metodoNombre, int.class);
-                        metodo.invoke(tbr, propuesto);
-                    } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
-                        Logger.getLogger(ConsultasPuesto.class.getName()).log(Level.SEVERE, "Error al invocar método dinámico", ex);
-                    }
+                    Method metodo = tbr.getClass().getMethod(metodoNombre, int.class);
+                    metodo.invoke(tbr, propuesto);
                 }
+            } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException ex) {
+                Logger.getLogger(ConsultasPuesto.class.getName()).log(Level.SEVERE, null, ex);
             }
         } catch (SQLException ex) {
             Logger.getLogger(ConsultasPuesto.class.getName()).log(Level.SEVERE, "Error en la consulta de turnos", ex);
             return false;
+        }
+
+        // --- Consultar tecnologías asociadas ---
+        Map<Integer, String> sufijosTecno = new HashMap<>();
+        sufijosTecno.put(1, "OE");
+        sufijosTecno.put(2, "RS");
+        sufijosTecno.put(3, "POLY");
+
+        String sqlTecno = "SELECT idtecnologia FROM puesto_tecnologia WHERE idpuesto = ?";
+
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sqlTecno)) {
+            ps.setInt(1, tbr.getIdPuesto());
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    int idTecno = rs.getInt("idtecnologia");
+                    String sufijo = sufijosTecno.get(idTecno);
+
+                    if (sufijo == null) {
+                        Logger.getLogger("Tecnología no reconocida: " + idTecno);
+                        continue;
+                    }
+
+                    // Llamar al setter correspondiente: setTecnoOE, setTecnoRS o setTecnoPOLY
+                    String metodoNombre = "setTecno" + sufijo;
+                    try {
+                        Method metodo = tbr.getClass().getMethod(metodoNombre, int.class);
+                        metodo.invoke(tbr, 1); // 1 porque está activo en la tabla
+                    } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException ex) {
+                        Logger.getLogger(ConsultasPuesto.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(ConsultasPuesto.class.getName()).log(Level.SEVERE, "Error en la consulta de tecnologías", ex);
         }
 
         return true;
