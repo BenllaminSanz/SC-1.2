@@ -73,6 +73,23 @@ public class DesingPDF_LBU {
         encabezadoSupervisor.addCell(createHeaderCell("Pers. Segundo Puesto o más", font1, color, 1));
         return encabezadoSupervisor;
     }
+    
+        public static PdfPTable encabezadoAreaFlexi() {
+        PdfPTable encabezadoSupervisor = new PdfPTable(new float[]{2F, 0.5F, 0.5F, 0.5F, 0.5F, 0.5F});
+        encabezadoSupervisor.setWidthPercentage(100);
+        BaseColor color = new BaseColor(175, 196, 174);
+        Font font1 = new Font();
+        font1.setStyle(Font.BOLD);
+        font1.setSize(10);
+
+        encabezadoSupervisor.addCell(createHeaderCell("Puesto", font1, color, 1));
+        encabezadoSupervisor.addCell(createHeaderCell("Plantilla", font1, color, 1));
+        encabezadoSupervisor.addCell(createHeaderCell("Certificaciones", font1, color, 1));
+        encabezadoSupervisor.addCell(createHeaderCell("Flexibilidad", font1, color, 1));
+        encabezadoSupervisor.addCell(createHeaderCell("Pers. Primer Puesto", font1, color, 1));
+        encabezadoSupervisor.addCell(createHeaderCell("Pers. Segundo Puesto o más", font1, color, 1));
+        return encabezadoSupervisor;
+    }
 
     public static PdfPTable encabezadoSupervisorTotal() {
         PdfPTable encabezadoSupervisor = new PdfPTable(new float[]{0.5F, 0.5F, 0.5F, 0.5F, 0.5F, 0.5F, 0.5F, 0.5F});

@@ -30,23 +30,25 @@ public class CargarExcelTrabajador extends Conexion{
     }
 
     public static void cargar() {
-        String sql = "INSERT INTO `sistema_capacitacion`.`curso` (`nombre_curso`) VALUES(?)";
+        String sql = "UPDATE `sistema_capacitacion`.`asistentes_certificados` SET `Apellidos` = ? , `Nombres` = ? WHERE asistentes_curso_idAsistente = ?";
         try(Connection con = conn.getConnection();){
             
-            FileInputStream file = new FileInputStream(new File("Y:\\Capacitacion\\Benjamin\\certification.xlsx"));
+            FileInputStream file = new FileInputStream(new File("D:\\Escritorio\\Respaldo Lista de Trabajadores 03-10-2025.xlsx"));
 
             XSSFWorkbook wb = new XSSFWorkbook(file);
-            XSSFSheet hoja = wb.getSheetAt(1);
+            XSSFSheet hoja = wb.getSheetAt(0);
 
             int numFilas = hoja.getLastRowNum();
 
             // a inicia en 0 por que no hay encabezados
             // Nota: si se agregan encabezados el valor de a seria 1
-            for (int a = 0; a <= numFilas; a++) {
+            for (int a = 1; a <= numFilas; a++) {
                 Row fila = hoja.getRow(a);
 
                 ps = con.prepareStatement(sql);
-                ps.setString(1, fila.getCell(0).getStringCellValue());
+                ps.setString(1, fila.getCell(3).getStringCellValue());
+                ps.setString(2, fila.getCell(4).getStringCellValue());
+                ps.setDouble(3, fila.getCell(0).getNumericCellValue());
                 ps.execute();
             }
         } catch (IOException | SQLException ex) {

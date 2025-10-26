@@ -876,7 +876,6 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
         }
 
         if (e.getSource() == frm.jMenuItem11) {
-            // Acción a realizar al hacer clic en "Aceptar"
             frm.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             if (GeneratorPDF_Certificados.CertificadosResumenSupervisor()) {
                 frm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));

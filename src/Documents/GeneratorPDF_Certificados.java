@@ -1099,7 +1099,7 @@ public class GeneratorPDF_Certificados extends Conexion {
             doc.add(new Paragraph("Fecha: " + FechaS));
             doc.add(new Paragraph("\n"));
 
-            PdfPTable tablaE = DesingPDF_LBU.encabezadoSupervisorFlexi();
+            PdfPTable tablaE = DesingPDF_LBU.encabezadoAreaFlexi();
             doc.add(tablaE);
             while (rs.next()) {
                 float[] relativeWidths = new float[]{2F, 0.5F, 0.5F, 0.5F, 0.5F, 0.5F};
@@ -1122,7 +1122,7 @@ public class GeneratorPDF_Certificados extends Conexion {
             if (rs2.next()) {
                 PdfPTable tablaTotal = new PdfPTable(new float[]{0.5F, 0.5F, 0.5F, 0.5F, 0.5F});
                 tablaTotal.setWidthPercentage(67);
-                tablaTotal.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                tablaTotal.setHorizontalAlignment(Element.ALIGN_CENTER);
 
                 tablaTotal.addCell(rs2.getString("plantilla"));
                 tablaTotal.addCell(rs2.getString("certificados"));

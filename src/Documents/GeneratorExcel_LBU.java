@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -846,6 +847,9 @@ public class GeneratorExcel_LBU extends Conexion {
             // HOJA 2: Resumen Agrupado
             // ============================================================
             Sheet resumen2 = workbook.createSheet("Summit LBU Summary");
+            workbook.setSheetOrder("Summit LBU Summary", 0);
+            workbook.setActiveSheet(0);
+
             int rowNum2 = 0;
 
             Row h2 = resumen2.createRow(rowNum2++);
@@ -893,11 +897,11 @@ public class GeneratorExcel_LBU extends Conexion {
             grupoCell.setCellValue(totalGrupo1);
             grupoCell.setCellStyle(centeredStyle);
 
-            double porcentajeOEPOLY = ((tabla1.getOrDefault("OE", Map.of()).values().stream().mapToInt(Integer::intValue).sum()
-                    + tabla1.getOrDefault("POLY", Map.of()).values().stream().mapToInt(Integer::intValue).sum())
+            double porcentajeOEPOLY = ((tabla1.getOrDefault("OE", Collections.emptyMap()).values().stream().mapToInt(Integer::intValue).sum()
+                    + tabla1.getOrDefault("POLY", Collections.emptyMap()).values().stream().mapToInt(Integer::intValue).sum())
                     / (double) totalGrupo1) * 100;
 
-            double porcentajeRS = (tabla1.getOrDefault("RS", Map.of()).values().stream().mapToInt(Integer::intValue).sum()
+            double porcentajeRS = (tabla1.getOrDefault("RS", Collections.emptyMap()).values().stream().mapToInt(Integer::intValue).sum()
                     / (double) totalGrupo1) * 100;
 
             Cell subtotalCell = rowOtros.createCell(ordenAreas.size() + 1);
@@ -953,10 +957,15 @@ public class GeneratorExcel_LBU extends Conexion {
             cellTotal2.setCellStyle(centeredStyle);
             totalGrupo2 += subtotal2;
 
+            Row row5 = resumen2.createRow(rowNum2++);
+            Cell grupoCell2 = row5.createCell(ordenAreas.size() + 2);
+            grupoCell2.setCellValue(totalGrupo2);
+            grupoCell2.setCellStyle(centeredStyle);
+
             Row totalFinal = resumen2.createRow(rowNum2++);
             totalFinal.createCell(ordenAreas.size() + 1).setCellValue("TOTAL GENERAL");
             Cell totalGeneralCell = totalFinal.createCell(ordenAreas.size() + 2);
-            totalGeneralCell.setCellValue(totalGrupo1 + totalGrupo2 );
+            totalGeneralCell.setCellValue(totalGrupo1 + totalGrupo2);
             totalGeneralCell.setCellStyle(centeredStyle);
 
             for (int i = 0; i <= 30; i++) {
