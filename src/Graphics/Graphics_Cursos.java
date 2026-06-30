@@ -34,7 +34,7 @@ import org.jfree.data.category.DefaultCategoryDataset;
 
 public class Graphics_Cursos {
 
-    public static void BarCharCursosGeneral(IFrmCapacitacion frm) {
+    public static void BarCharCursosGeneral(IFrmCapacitacion frm, int year) {
         Conexion conn = new Conexion();
         Connection con = conn.getConnection();
         ResultSet rs = null;
@@ -50,7 +50,7 @@ public class Graphics_Cursos {
                 + "TRUNCATE(SUM(num_asistentes)/SUM(asistentes_esperados), 2) AS porcentaje \n"
                 + "FROM sistema_capacitacion.view_historialcursos\n"
                 + "WHERE estado_curso = 'Concluido'\n"
-                + "AND YEAR(fecha_inicio) = YEAR(CURDATE())"
+                + "AND YEAR(fecha_inicio) = ?\n"
                 + "GROUP BY id_tipocurso\n"
                 + "ORDER BY id_tipocurso;";
 
@@ -59,6 +59,7 @@ public class Graphics_Cursos {
             ps.executeUpdate();
 
             ps = con.prepareStatement(sql);
+            ps.setInt(1, year);
             rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -66,11 +67,11 @@ public class Graphics_Cursos {
                 dataset2.addValue(rs.getDouble("porcentaje"), "% Asistencia", rs.getString("nombre_tipo"));
             }
         } catch (SQLException ex) {
-            Logger.getLogger(Graphics_Capacitacion.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Graphics_Cursos.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         JFreeChart chart1 = ChartFactory.createBarChart(
-                "Total de Cursos y % Asistencia",
+                "Total de Cursos y % Asistencia " + year,
                 "Cursos",
                 "Cantidad",
                 dataset1,
@@ -116,7 +117,7 @@ public class Graphics_Cursos {
         categoryAxis = combinedPlot.getDomainAxis();
         categoryAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_45);
 
-        JFreeChart combinedChart = new JFreeChart("Total de Cursos y % de Asistencia", JFreeChart.DEFAULT_TITLE_FONT, combinedPlot, true);
+        JFreeChart combinedChart = new JFreeChart("Total de Cursos y % de Asistencia " + year, JFreeChart.DEFAULT_TITLE_FONT, combinedPlot, true);
         ChartPanel chartPanel = new ChartPanel(combinedChart);
         JPanel chartContainer = new JPanel(new BorderLayout());
         chartContainer.add(chartPanel, BorderLayout.CENTER);
@@ -131,7 +132,7 @@ public class Graphics_Cursos {
         frm.jPanel24.repaint();
     }
 
-    public static void BarCharCursosTiempo(IFrmCapacitacion frm) {
+    public static void BarCharCursosTiempo(IFrmCapacitacion frm, int year) {
         Conexion conn = new Conexion();
         Connection con = conn.getConnection();
         ResultSet rs = null;
@@ -145,7 +146,7 @@ public class Graphics_Cursos {
                 + "SUM(horas_asistentes)/60 AS horas_capacitacion\n"
                 + "FROM sistema_capacitacion.view_historialcursos\n"
                 + "WHERE estado_curso = 'Concluido'\n"
-                + "AND YEAR(fecha_inicio) = YEAR(CURDATE())"
+                + "AND YEAR(fecha_inicio) = ?\n"
                 + "GROUP BY id_tipocurso\n"
                 + "ORDER BY id_tipocurso;";
 
@@ -154,6 +155,7 @@ public class Graphics_Cursos {
             ps.executeUpdate();
 
             ps = con.prepareStatement(sql);
+            ps.setInt(1, year);
             rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -162,11 +164,11 @@ public class Graphics_Cursos {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(Graphics_Capacitacion.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Graphics_Cursos.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         JFreeChart chart1 = ChartFactory.createBarChart(
-                null,
+                "Horas de Cursos " + year,
                 "Cursos",
                 null,
                 dataset1,
@@ -200,7 +202,7 @@ public class Graphics_Cursos {
         frm.jPanel23.repaint();
     }
 
-    public static void BarCharCursosTiempoTotal(IFrmCapacitacion frm) {
+    public static void BarCharCursosTiempoTotal(IFrmCapacitacion frm, int year) {
         Conexion conn = new Conexion();
         Connection con = conn.getConnection();
         ResultSet rs = null;
@@ -213,13 +215,14 @@ public class Graphics_Cursos {
                 + "SUM(horas_asistentes)/60 AS horas_capacitacion\n"
                 + "FROM sistema_capacitacion.view_historialcursos\n"
                 + "WHERE estado_curso = 'Concluido'\n"
-                + "AND YEAR(fecha_inicio) = YEAR(CURDATE());";
+                + "AND YEAR(fecha_inicio) = ?;";
 
         try {
             PreparedStatement ps = con.prepareStatement(mode);
             ps.executeUpdate();
 
             ps = con.prepareStatement(sql1);
+            ps.setInt(1, year);
             rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -228,11 +231,11 @@ public class Graphics_Cursos {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(Graphics_Capacitacion.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Graphics_Cursos.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         JFreeChart chart1 = ChartFactory.createBarChart(
-                "Total de Tiempo en Horas de los Cursos",
+                "Total de Tiempo en Horas de los Cursos " + year,
                 "Cursos",
                 "Cantidad",
                 dataset2,

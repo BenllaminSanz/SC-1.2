@@ -58,6 +58,9 @@ public class IFrmCapacitacion extends javax.swing.JInternalFrame {
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
+        jLabelAnioCursos = new javax.swing.JLabel();
+        jYearChooser2 = new com.toedter.calendar.JYearChooser();
+        consulta_cursos = new javax.swing.JButton();
         jPanel20 = new javax.swing.JPanel();
         jScrollPane10 = new javax.swing.JScrollPane();
         Tabla_ListadoCursos1 = new javax.swing.JTable();
@@ -402,6 +405,10 @@ public class IFrmCapacitacion extends javax.swing.JInternalFrame {
             .addGap(0, 101, Short.MAX_VALUE)
         );
 
+        jLabelAnioCursos.setText("Consulta:");
+
+        consulta_cursos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/IconRefresh.png"))); // NOI18N
+
         javax.swing.GroupLayout jPanel19Layout = new javax.swing.GroupLayout(jPanel19);
         jPanel19.setLayout(jPanel19Layout);
         jPanel19Layout.setHorizontalGroup(
@@ -417,7 +424,10 @@ public class IFrmCapacitacion extends javax.swing.JInternalFrame {
                         .addGroup(jPanel19Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 224, Short.MAX_VALUE)
                             .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabelAnioCursos)
+                            .addComponent(jYearChooser2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(consulta_cursos, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jPanel24, javax.swing.GroupLayout.PREFERRED_SIZE, 417, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -437,6 +447,12 @@ public class IFrmCapacitacion extends javax.swing.JInternalFrame {
                         .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabelAnioCursos)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jYearChooser2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(consulta_cursos, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(jPanel19Layout.createSequentialGroup()
                         .addGroup(jPanel19Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1500,6 +1516,7 @@ public class IFrmCapacitacion extends javax.swing.JInternalFrame {
     public javax.swing.JComboBox<String> cb_turno;
     public javax.swing.JComboBox<String> cb_turno1;
     public javax.swing.JButton consulta_mensual;
+    public javax.swing.JButton consulta_cursos;
     public javax.swing.JPanel grafica;
     public javax.swing.JPanel grafica2;
     public javax.swing.JPanel grafica_certificados;
@@ -1602,6 +1619,8 @@ public class IFrmCapacitacion extends javax.swing.JInternalFrame {
     public javax.swing.JTable jTable_entrenamientos;
     public javax.swing.JTree jTree_Cursos;
     public com.toedter.calendar.JYearChooser jYearChooser1;
+    public com.toedter.calendar.JYearChooser jYearChooser2;
+    private javax.swing.JLabel jLabelAnioCursos;
     public javax.swing.JTable jtable_certificados;
     public javax.swing.JLabel txt_Entrenamiento;
     public javax.swing.JLabel txt_TotalPrimero;

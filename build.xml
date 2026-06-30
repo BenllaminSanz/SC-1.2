@@ -15,6 +15,28 @@
             <fileset dir="${basedir}/files"/>
         </copy>
     </target>
+
+    <target name="compile-integration" depends="compile">
+        <mkdir dir="${build.test.classes.dir}"/>
+        <javac srcdir="test/integration"
+               destdir="${build.test.classes.dir}"
+               encoding="UTF-8"
+               source="1.8"
+               target="1.8"
+               includeantruntime="false">
+            <classpath path="${run.classpath}"/>
+        </javac>
+    </target>
+
+    <target name="test-pool" depends="compile-integration"
+            description="Ejecuta el pool de pruebas de integración legacy">
+        <java classname="integration.RunTestPool" fork="true" failonerror="true">
+            <classpath>
+                <path path="${run.classpath}"/>
+                <pathelement path="${build.test.classes.dir}"/>
+            </classpath>
+        </java>
+    </target>
     <!--
 
     There exist several targets which are by default empty and which can be 

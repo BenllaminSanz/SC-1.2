@@ -14,15 +14,17 @@ public class ConsultasLogin extends Conexion {
         PreparedStatement ps = null;
         ResultSet rs = null;
         Connection con = getConnection();
+        if (con == null) {
+            System.err.println("ConsultasLogin: no hay conexión a la base de datos");
+            return false;
+        }
 
         String sql = "select tipo_nivel, status from usuario where username= ? and password = ?";
 
         try {
             ps = con.prepareStatement(sql);
             ps.setString(1, usr.getUsername());
-            System.out.println(usr.getUsername());
             ps.setString(2, usr.getPassword());
-            System.out.println(usr.getPassword());
             rs = ps.executeQuery();
 
             if (rs.next()) {

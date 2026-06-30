@@ -168,6 +168,7 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
         this.frm.jTabbedPane1.addChangeListener(this);
         this.frm.bt_consulta2.addActionListener(this);
         this.frm.consulta_mensual.addActionListener(this);
+        this.frm.consulta_cursos.addActionListener(this);
         this.frm.item_ModificarCursoPersonal.addActionListener(this);
         this.frm.jMenuItem1.addActionListener(this);
         this.frm.jMenuItem2.addActionListener(this);
@@ -190,8 +191,30 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
         this.frm.jButton5.addActionListener(this);
     }
 
+    private void sincronizarAnio(int anio) {
+        year = anio;
+        frm.jYearChooser1.setYear(anio);
+        frm.jYearChooser2.setYear(anio);
+    }
+
+    private int obtenerAnioSeleccionado() {
+        sincronizarAnio(frm.jYearChooser1.getYear());
+        return year;
+    }
+
+    private int obtenerAnioSeleccionadoCursos() {
+        sincronizarAnio(frm.jYearChooser2.getYear());
+        return year;
+    }
+
+    private void actualizarGraficasCursos() {
+        Graphics_Cursos.BarCharCursosGeneral(frm, year);
+        Graphics_Cursos.BarCharCursosTiempoTotal(frm, year);
+        Graphics_Cursos.BarCharCursosTiempo(frm, year);
+    }
+
     public void iniciar() {
-//        frm.jYearChooser1.setYear(year);
+        sincronizarAnio(year);
         CargarTabla.GenerarArbolCursos(frm);
         CargarComboBoxCapacitacion(frm);
         DesignTabla.designAllCursosActivos(frm);
@@ -216,9 +239,7 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
         SwingWorker<Void, Void> workerGraphics = new SwingWorker<Void, Void>() {
             @Override
             protected Void doInBackground() throws Exception {
-                Graphics_Cursos.BarCharCursosGeneral(frm);
-                Graphics_Cursos.BarCharCursosTiempoTotal(frm);
-                Graphics_Cursos.BarCharCursosTiempo(frm);
+                actualizarGraficasCursos();
                 Graphics_Capacitacion.PieCharCertificados(frm);
                 Graphics_Capacitacion.BarCharCertificados(frm);
                 Graphics_Capacitacion.ChartCertificados(frm, year);
@@ -639,6 +660,7 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
         }
 
         if (e.getSource() == frm.btn_Consultar1) {
+            obtenerAnioSeleccionado();
             String area = frm.cb_area1.getSelectedItem().toString();
             String puesto = frm.cb_puesto1.getSelectedItem().toString();
             String turno = frm.cb_turno1.getSelectedItem().toString();
@@ -654,10 +676,12 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
                 Graphics_Capacitacion.BarCharCertificados(frm);
                 Graphics_Capacitacion.PieCharCertificados(frm);
                 Graphics_Capacitacion.ChartCertificados(frm, year);
+                ConcentradoCertificadosGeneral(frm, year);
             }
         }
 
         if (e.getSource() == frm.bt_consulta2) {
+            obtenerAnioSeleccionado();
             String proceso = String.valueOf(frm.cb_procesos.getSelectedIndex());
 
             if (!proceso.equals("0")) {
@@ -680,10 +704,17 @@ public class CtrlCapacitacion implements ActionListener, MouseListener, ListSele
         }
 
         if (e.getSource() == frm.consulta_mensual) {
-            year = Calendar.getInstance().get(Calendar.YEAR);
+            obtenerAnioSeleccionado();
             Graphics_Capacitacion.BarCharCertificados(frm);
             Graphics_Capacitacion.PieCharCertificados(frm);
             Graphics_Capacitacion.ChartCertificados(frm, year);
+            ConcentradoCertificadosGeneral(frm, year);
+            actualizarGraficasCursos();
+        }
+
+        if (e.getSource() == frm.consulta_cursos) {
+            obtenerAnioSeleccionadoCursos();
+            actualizarGraficasCursos();
         }
 
         if (e.getSource() == frm.jMenuItem1) {

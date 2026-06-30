@@ -568,18 +568,21 @@ public class ConsultasTrabajador extends Conexion {
         PreparedStatement ps = null;
         ResultSet rs = null;
         Connection con = getConnection();
+        if (con == null) {
+            Logger.getLogger(ConsultasTrabajador.class.getName()).log(Level.SEVERE,
+                    "consultarStatus: conexión nula");
+            return null;
+        }
         String sql = "SELECT * FROM view_trabajador WHERE Folio_Trabajador = ?";
         String status;
 
         try {
             ps = con.prepareStatement(sql);
             ps.setString(1, folio);
-            System.out.println(ps);
             rs = ps.executeQuery();
 
             if (rs.next()) {
                 status = rs.getString("Status_Trabajador");
-                System.out.println("x" + status);
                 return status;
             }
         } catch (SQLException ex) {

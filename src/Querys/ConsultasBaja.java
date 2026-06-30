@@ -13,17 +13,21 @@ public class ConsultasBaja extends Conexion {
 
     //Funcion de Eliminar para Trabajadores
     public boolean buscar(Bajas tbr) {
-        String sqlMode = "SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))";
-        String sql = "SELECT * FROM view_bajas WHERE Folio_Trabajador = ?";
+        String sql = "SELECT b.*, a.Nombre_Area, p.Nombre_Puesto, tn.Nombre_Turno,\n"
+                + "       COALESCE(b.supervisor, s.Nombre_Supervisor) AS Supervisor,\n"
+                + "       b.CURP_Trabajador AS Curp_Trabajador\n"
+                + "FROM baja b\n"
+                + "LEFT JOIN area a ON b.puesto_area_idArea = a.idArea\n"
+                + "LEFT JOIN puesto p ON b.puesto_idPuesto = p.idPuesto AND b.puesto_area_idArea = p.area_idArea\n"
+                + "LEFT JOIN turno tn ON b.turno_idTurno = tn.idTurno\n"
+                + "LEFT JOIN supervisor_turno st ON st.turno_idTurno = b.turno_idTurno\n"
+                + "  AND st.supervisor_area_idArea = b.puesto_area_idArea\n"
+                + "LEFT JOIN supervisor s ON s.idSupervisor = st.supervisor_idSupervisor\n"
+                + "WHERE b.Folio_Trabajador = ?";
 
-        try (Connection con = getConnection(); 
-                PreparedStatement psMode = con.prepareStatement(sqlMode); 
+        try (Connection con = getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
 
-            // Ejecutar el cambio de modo SQL
-            psMode.executeUpdate();
-
-            // Configurar y ejecutar la consulta principal
             ps.setString(1, tbr.getFolio_Trabajador());
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {

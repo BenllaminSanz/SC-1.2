@@ -151,6 +151,7 @@ public class CtrlTrabajador implements ActionListener, KeyListener, MouseListene
         this.frmTrabajador.item_ModificarBrigada.addActionListener(this);
         this.frmTrabajador.item_EliminarBrigada.addActionListener(this);
         this.frmTrabajador.jTable_brigadas.getSelectionModel().addListSelectionListener(this);
+        this.frmTrabajador.jTable_Supervisores.getSelectionModel().addListSelectionListener(this);
         this.frmTrabajador.btn_RefreshTabla3.addActionListener(this);
         this.frmTrabajador.item_EliminarBrigadista.addActionListener(this);
         this.frmTrabajador.item_AgregarBrigadista.addActionListener(this);
@@ -515,41 +516,7 @@ public class CtrlTrabajador implements ActionListener, KeyListener, MouseListene
 
         //
         if (e.getSource() == frmTrabajador.ItemModificarS) {
-            limpiarRBSupervisor();
-            String nombreS = frmTrabajador.jTable_Supervisores.getValueAt(
-                    frmTrabajador.jTable_Supervisores.getSelectedRow(), 1).toString();
-            modSupervisor.setNombre_supervisor(nombreS);
-            List<Supervisor> supervisoresEncontrados = conSupervisor.buscarSupervisor(modSupervisor);
-            if (conSupervisor.buscar(modSupervisor)) {
-                frmTrabajador.txt_nomina_sup.setText(String.valueOf(modSupervisor.getId_supervisor()));
-                frmTrabajador.txt_NombreSupervisor.setText(modSupervisor.getNombre_supervisor());
-                frmTrabajador.txt_Propuesto.setText(String.valueOf(modSupervisor.getPropuesto_trabajadores()));
-                for (Supervisor supervisor : supervisoresEncontrados) {
-                    int index = supervisor.getArea_idarea();
-                    frmTrabajador.cb_Area.setSelectedIndex(index - 1);
-                    switch (supervisor.getNombre_turno()) {
-                        case "A":
-                            frmTrabajador.btn_A.setSelected(true);
-                            break;
-                        case "B":
-                            frmTrabajador.btn_B.setSelected(true);
-                            break;
-                        case "C":
-                            frmTrabajador.btn_C.setSelected(true);
-                            break;
-                        case "D":
-                            frmTrabajador.btn_D.setSelected(true);
-                            break;
-                        case "LV":
-                            frmTrabajador.btn_LV.setSelected(true);
-                            break;
-                        case "LS":
-                            frmTrabajador.btn_LS.setSelected(true);
-                            break;
-                    }
-                }
-            }
-            frmTrabajador.btn_guardar_sup.setText("Actualizar");
+            cargarSupervisorSeleccionado(true);
         }
 
         if (e.getSource() == frmTrabajador.btn_guardar_sup) {
@@ -1248,6 +1215,63 @@ public class CtrlTrabajador implements ActionListener, KeyListener, MouseListene
                     DesignTabla.designBrigadistasBrigada(frmTrabajador, Integer.parseInt(idBrigada));
                 }
             }
+        }
+        if (e.getSource() == frmTrabajador.jTable_Supervisores.getSelectionModel()) {
+            if (!e.getValueIsAdjusting()) {
+                cargarSupervisorSeleccionado(true);
+            }
+        }
+    }
+
+    /** Carga área, turnos y datos del supervisor seleccionado en el panel de edición. */
+    private void cargarSupervisorSeleccionado(boolean modoActualizar) {
+        int row = frmTrabajador.jTable_Supervisores.getSelectedRow();
+        if (row < 0 || row >= frmTrabajador.jTable_Supervisores.getRowCount()) {
+            return;
+        }
+        limpiarRBSupervisor();
+        Object nombreObj = frmTrabajador.jTable_Supervisores.getValueAt(row, 1);
+        if (nombreObj == null) {
+            return;
+        }
+        String nombreS = nombreObj.toString();
+        modSupervisor.setNombre_supervisor(nombreS);
+        List<Supervisor> supervisoresEncontrados = conSupervisor.buscarSupervisor(modSupervisor);
+        if (conSupervisor.buscar(modSupervisor)) {
+            frmTrabajador.txt_nomina_sup.setText(String.valueOf(modSupervisor.getId_supervisor()));
+            frmTrabajador.txt_NombreSupervisor.setText(modSupervisor.getNombre_supervisor());
+            frmTrabajador.txt_Propuesto.setText(String.valueOf(modSupervisor.getPropuesto_trabajadores()));
+            for (Supervisor supervisor : supervisoresEncontrados) {
+                int index = supervisor.getArea_idarea();
+                if (index > 0 && index <= frmTrabajador.cb_Area.getItemCount()) {
+                    frmTrabajador.cb_Area.setSelectedIndex(index - 1);
+                }
+                switch (supervisor.getNombre_turno()) {
+                    case "A":
+                        frmTrabajador.btn_A.setSelected(true);
+                        break;
+                    case "B":
+                        frmTrabajador.btn_B.setSelected(true);
+                        break;
+                    case "C":
+                        frmTrabajador.btn_C.setSelected(true);
+                        break;
+                    case "D":
+                        frmTrabajador.btn_D.setSelected(true);
+                        break;
+                    case "LV":
+                        frmTrabajador.btn_LV.setSelected(true);
+                        break;
+                    case "LS":
+                        frmTrabajador.btn_LS.setSelected(true);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        if (modoActualizar) {
+            frmTrabajador.btn_guardar_sup.setText("Actualizar");
         }
     }
 }

@@ -120,39 +120,49 @@ public class CargarTabla {
         return trabajador;
     }
 
+    private static final String SQL_LISTA_BAJAS =
+            "SELECT b.Folio_Trabajador, b.Nombre_Trabajador, b.Fecha_Baja, b.Comentario,\n"
+            + "       b.CURP_Trabajador AS Curp_Trabajador, b.RFC_Trabajador, b.Fecha_Antiguedad,\n"
+            + "       a.Nombre_Area, tn.Nombre_Turno, p.Nombre_Puesto,\n"
+            + "       COALESCE(b.supervisor, s.Nombre_Supervisor) AS Supervisor,\n"
+            + "       b.SalarioDiario_Trabajador\n"
+            + "FROM baja b\n"
+            + "LEFT JOIN area a ON b.puesto_area_idArea = a.idArea\n"
+            + "LEFT JOIN puesto p ON b.puesto_idPuesto = p.idPuesto AND b.puesto_area_idArea = p.area_idArea\n"
+            + "LEFT JOIN turno tn ON b.turno_idTurno = tn.idTurno\n"
+            + "LEFT JOIN supervisor_turno st ON st.turno_idTurno = b.turno_idTurno\n"
+            + "  AND st.supervisor_area_idArea = b.puesto_area_idArea\n"
+            + "LEFT JOIN supervisor s ON s.idSupervisor = st.supervisor_idSupervisor";
+
+    private static Bajas mapFilaBaja(ResultSet rs) throws SQLException {
+        Bajas tbr = new Bajas();
+        tbr.setFolio_Trabajador(rs.getString("Folio_Trabajador"));
+        tbr.setNombre_Trabajador(rs.getString("Nombre_Trabajador"));
+        tbr.setFecha_Baja(DateTools.MySQLtoString(rs.getDate("Fecha_Baja")));
+        tbr.setComentario(rs.getString("Comentario"));
+        tbr.setCURP_Trabajador(rs.getString("Curp_Trabajador"));
+        tbr.setRFC_Trabajador(rs.getString("RFC_Trabajador"));
+        tbr.setFecha_Antiguedad(DateTools.MySQLtoString(rs.getDate("Fecha_Antiguedad")));
+        tbr.setNombre_Area(rs.getString("Nombre_Area"));
+        tbr.setNombre_Turno(rs.getString("Nombre_Turno"));
+        tbr.setNombre_Puesto(rs.getString("Nombre_Puesto"));
+        tbr.setNombre_Supervisor(rs.getString("Supervisor"));
+        tbr.setSalarioDiario_Trabajador(
+                rs.getString("SalarioDiario_Trabajador") != null
+                ? Double.valueOf(rs.getString("SalarioDiario_Trabajador")) : 0.0);
+        return tbr;
+    }
+
     public static List<Bajas> cargarTablaBajas() {
         List<Bajas> bajas = new ArrayList<>();
         Connection con = conn.getConnection();
 
-        String sql = "Select * from view_bajas";
-        String mode = "SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));";
-
         try {
-            ps = con.prepareStatement(mode);
-            ps.executeUpdate();
-            ps.close();
-
-            ps = con.prepareStatement(sql);
+            ps = con.prepareStatement(SQL_LISTA_BAJAS + " ORDER BY b.Fecha_Baja DESC");
             rs = ps.executeQuery();
 
             while (rs.next()) {
-                Bajas tbr = new Bajas();
-                tbr.setFolio_Trabajador(rs.getString("Folio_Trabajador"));
-                tbr.setNombre_Trabajador(rs.getString("Nombre_Trabajador"));
-                tbr.setFecha_Baja(DateTools.MySQLtoString(rs.getDate("Fecha_Baja")));
-                tbr.setComentario(rs.getString("Comentario"));
-                tbr.setCURP_Trabajador(rs.getString("Curp_Trabajador"));
-                tbr.setRFC_Trabajador(rs.getString("RFC_Trabajador"));
-                tbr.setFecha_Antiguedad(DateTools.MySQLtoString(
-                        rs.getDate("Fecha_Antiguedad")));
-                tbr.setNombre_Area(rs.getString("Nombre_Area"));
-                tbr.setNombre_Turno(rs.getString("Nombre_Turno"));
-                tbr.setNombre_Puesto(rs.getString("Nombre_Puesto"));
-                tbr.setNombre_Supervisor(rs.getString("Supervisor"));
-                tbr.setSalarioDiario_Trabajador(
-                        rs.getString("SalarioDiario_Trabajador") != null
-                        ? Double.valueOf(rs.getString("SalarioDiario_Trabajador")) : 0.0);
-                bajas.add(tbr);
+                bajas.add(mapFilaBaja(rs));
             }
         } catch (SQLException ex) {
             Logger.getLogger(CargarTabla.class.getName()).log(Level.SEVERE, null, ex);
@@ -268,8 +278,9 @@ public class CargarTabla {
         List<LBU> lbu = new ArrayList<>();
         Connection con = conn.getConnection();
 
-        String sql1 = "SET @supervisor_id:=?";
-        String sql2 = "SET @supervisor_puesto:=?";
+        // Las funciones SUPERVISOR_ID() y SUPERVISOR_PUESTO() leen @p2 y @p3
+        String sql1 = "SET @p2:=?";
+        String sql2 = "SET @p3:=?";
         String sql = "SELECT * FROM view_lbu_trabajador";
 
         try {
@@ -288,7 +299,16 @@ public class CargarTabla {
                 tbr.setNombre_Turno(rs.getString("Turno"));
                 tbr.setFolio_Trabajador(rs.getString("Nómina"));
                 tbr.setNombre_Trabajador(rs.getString("Trabajador"));
-                tbr.setStatus_trabajador(rs.getString("Status_Trabajador"));
+                String status = "Activo";
+                try {
+                    status = rs.getString("Status_Trabajador");
+                } catch (SQLException ignored) {
+                    // vista legacy sin columna Status_Trabajador
+                }
+                if (status == null || status.trim().isEmpty()) {
+                    status = "Activo";
+                }
+                tbr.setStatus_trabajador(status);
                 lbu.add(tbr);
             }
         } catch (SQLException ex) {
@@ -395,6 +415,7 @@ public class CargarTabla {
         List<Puesto> lbu = new ArrayList<>();
         Connection con = conn.getConnection();
 
+        // view_lbu_area_supervisor usa SUPERVISOR_ID_AREA() → @supervisor_id_area
         String sql1 = "SET @supervisor_id_area:=?";
         String sql = "SELECT * FROM view_lbu_area_supervisor";
 
@@ -1376,36 +1397,20 @@ public class CargarTabla {
         List<Bajas> bajas = new ArrayList<>();
         Connection con = conn.getConnection();
 
-        String mode = "SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));";
-
-        String sql = "Select * from view_bajas "
-                + "WHERE Folio_Trabajador LIKE '%" + texto + "%'"
-                + "OR Nombre_Trabajador LIKE '%" + texto + "%'"
-                + "ORDER BY Folio_Trabajador ASC";
+        String sql = SQL_LISTA_BAJAS
+                + " WHERE CAST(b.Folio_Trabajador AS CHAR) LIKE ?"
+                + " OR b.Nombre_Trabajador LIKE ?"
+                + " ORDER BY b.Folio_Trabajador ASC";
 
         try {
-            ps = con.prepareStatement(mode);
-            ps.executeUpdate();
-
+            String like = "%" + texto + "%";
             ps = con.prepareStatement(sql);
+            ps.setString(1, like);
+            ps.setString(2, like);
             rs = ps.executeQuery();
 
             while (rs.next()) {
-                Bajas tbr = new Bajas();
-                tbr.setFolio_Trabajador(rs.getString("Folio_Trabajador"));
-                tbr.setNombre_Trabajador(rs.getString("Nombre_Trabajador"));
-                tbr.setFecha_Baja(DateTools.MySQLtoString(rs.getDate("Fecha_Baja")));
-                tbr.setComentario(rs.getString("Comentario"));
-                tbr.setCURP_Trabajador(rs.getString("Curp_Trabajador"));
-                tbr.setRFC_Trabajador(rs.getString("RFC_Trabajador"));
-                tbr.setFecha_Antiguedad(DateTools.MySQLtoString(
-                        rs.getDate("Fecha_Antiguedad")));
-                tbr.setNombre_Area(rs.getString("Nombre_Area"));
-                tbr.setNombre_Turno(rs.getString("Nombre_Turno"));
-                tbr.setNombre_Puesto(rs.getString("Nombre_Puesto"));
-                Double salario = rs.getString("SalarioDiario_Trabajador") != null ? Double.valueOf(rs.getString("SalarioDiario_Trabajador")) : 0.0;
-                tbr.setSalarioDiario_Trabajador(salario);
-                bajas.add(tbr);
+                bajas.add(mapFilaBaja(rs));
             }
         } catch (SQLException ex) {
             Logger.getLogger(CargarTabla.class.getName()).log(Level.SEVERE, null, ex);

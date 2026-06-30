@@ -105,6 +105,11 @@ public class QueryFunctions {
         ResultSet rs = null;
         Conexion conn = new Conexion();
         Connection con = conn.getConnection();
+        if (con == null) {
+            Logger.getLogger(QueryFunctions.class.getName()).log(Level.SEVERE,
+                    "CapturaCondicionalSimple: conexión nula ({0})", tabla);
+            return "0";
+        }
 
         try {
 
